@@ -3,7 +3,8 @@ import numpy as np
 from datetime import datetime, timedelta
 import logging
 import matplotlib.pyplot as plt
-from typing import Dict, Any
+from typing import Dict, Any, List
+import os
 
 from data.data_interface import MySQLDataSource
 from strategy.combined_strategy import CombinedStrategy
@@ -148,7 +149,7 @@ def run_backtest(data: pd.DataFrame, strategy: CombinedStrategy, initial_capital
         logger.error(f"回测过程中出错: {str(e)}")
         raise
 
-def plot_results(results: Dict[str, Any], save_path: str = None):
+def plot_results(results: Dict[str, Any], symbol: str, save_path: str = None):
     """
     绘制回测结果
     """
@@ -158,13 +159,13 @@ def plot_results(results: Dict[str, Any], save_path: str = None):
         
         # 绘制权益曲线
         results['equity_curve'].plot(ax=ax1)
-        ax1.set_title('权益曲线')
+        ax1.set_title(f'{symbol} 权益曲线')
         ax1.set_xlabel('日期')
         ax1.set_ylabel('权益')
         
         # 绘制回撤曲线
         results['drawdown'].plot(ax=ax2)
-        ax2.set_title('回撤曲线')
+        ax2.set_title(f'{symbol} 回撤曲线')
         ax2.set_xlabel('日期')
         ax2.set_ylabel('回撤')
         
@@ -181,6 +182,57 @@ def plot_results(results: Dict[str, Any], save_path: str = None):
         logger.error(f"绘制结果时出错: {str(e)}")
         raise
 
+def run_multi_stock_test(symbols: List[str], start_date: str, end_date: str, initial_capital: float = 100000.0) -> Dict[str, Dict[str, Any]]:
+    """
+    运行多股票回测
+    """
+    try:
+        results = {}
+        
+        for symbol in symbols:
+            logger.info(f"\n开始回测股票 {symbol}...")
+            
+            # 准备数据
+            data = prepare_data(start_date, end_date, symbol)
+            logger.info(f"数据准备完成，共 {len(data)} 条记录")
+            
+            # 创建策略实例
+            strategy = CombinedStrategy()
+            
+            # 优化参数
+            logger.info(f"开始优化 {symbol} 的参数...")
+            optimal_params = strategy.optimize_parameters(data, symbol)
+            logger.info(f"{symbol} 参数优化完成")
+            
+            # 运行回测
+            result = run_backtest(data, strategy, initial_capital)
+            results[symbol] = result
+            
+            # 输出回测结果
+            logger.info(f"\n=== {symbol} 回测结果 ===")
+            logger.info(f"初始资金: ${result['initial_capital']:,.2f}")
+            logger.info(f"最终资金: ${result['final_capital']:,.2f}")
+            logger.info(f"总收益率: {result['total_return']*100:.2f}%")
+            logger.info(f"夏普比率: {result['sharpe_ratio']:.2f}")
+            logger.info(f"最大回撤: {result['max_drawdown']*100:.2f}%")
+            logger.info(f"胜率: {result['win_rate']*100:.2f}%")
+            logger.info(f"平均交易收益: {result['avg_trade_return']*100:.2f}%")
+            logger.info(f"盈亏比: {result['profit_factor']:.2f}")
+            logger.info(f"平均交易持续时间: {result['avg_trade_duration']:.1f}天")
+            logger.info(f"总交易次数: {result['total_trades']}")
+            logger.info(f"最优参数: {optimal_params}")
+            
+            # 绘制结果
+            save_path = f'results/{symbol}_combined_strategy_results.png'
+            os.makedirs('results', exist_ok=True)
+            plot_results(result, symbol, save_path)
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"多股票回测过程中出错: {str(e)}")
+        raise
+
 def main():
     """
     主函数
@@ -189,36 +241,32 @@ def main():
         # 设置回测参数
         start_date = '2023-01-01'  # 使用最近的数据
         end_date = '2024-04-01'
-        symbol = 'AAPL'  # 使用苹果公司股票
         initial_capital = 100000.0
         
-        # 准备数据
-        logger.info("准备回测数据...")
-        data = prepare_data(start_date, end_date, symbol)
-        logger.info(f"数据准备完成，共 {len(data)} 条记录")
+        # 选择测试股票
+        symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
         
-        # 创建策略实例
-        strategy = CombinedStrategy()
+        # 运行多股票回测
+        results = run_multi_stock_test(symbols, start_date, end_date, initial_capital)
         
-        # 运行回测
-        logger.info("开始回测...")
-        results = run_backtest(data, strategy, initial_capital)
+        # 计算平均表现
+        avg_metrics = {
+            'total_return': np.mean([r['total_return'] for r in results.values()]),
+            'sharpe_ratio': np.mean([r['sharpe_ratio'] for r in results.values()]),
+            'max_drawdown': np.mean([r['max_drawdown'] for r in results.values()]),
+            'win_rate': np.mean([r['win_rate'] for r in results.values()]),
+            'profit_factor': np.mean([r['profit_factor'] for r in results.values()]),
+            'total_trades': np.mean([r['total_trades'] for r in results.values()])
+        }
         
-        # 输出回测结果
-        logger.info("\n=== 回测结果 ===")
-        logger.info(f"初始资金: ${results['initial_capital']:,.2f}")
-        logger.info(f"最终资金: ${results['final_capital']:,.2f}")
-        logger.info(f"总收益率: {results['total_return']*100:.2f}%")
-        logger.info(f"夏普比率: {results['sharpe_ratio']:.2f}")
-        logger.info(f"最大回撤: {results['max_drawdown']*100:.2f}%")
-        logger.info(f"胜率: {results['win_rate']*100:.2f}%")
-        logger.info(f"平均交易收益: {results['avg_trade_return']*100:.2f}%")
-        logger.info(f"盈亏比: {results['profit_factor']:.2f}")
-        logger.info(f"平均交易持续时间: {results['avg_trade_duration']:.1f}天")
-        logger.info(f"总交易次数: {results['total_trades']}")
-        
-        # 绘制结果
-        plot_results(results, 'combined_strategy_results.png')
+        # 输出平均表现
+        logger.info("\n=== 平均表现 ===")
+        logger.info(f"平均总收益率: {avg_metrics['total_return']*100:.2f}%")
+        logger.info(f"平均夏普比率: {avg_metrics['sharpe_ratio']:.2f}")
+        logger.info(f"平均最大回撤: {avg_metrics['max_drawdown']*100:.2f}%")
+        logger.info(f"平均胜率: {avg_metrics['win_rate']*100:.2f}%")
+        logger.info(f"平均盈亏比: {avg_metrics['profit_factor']:.2f}")
+        logger.info(f"平均交易次数: {avg_metrics['total_trades']:.1f}")
         
     except Exception as e:
         logger.error(f"主程序执行出错: {str(e)}")

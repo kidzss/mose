@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any, List
 import logging
-from datetime import datetime
-
+from sklearn.model_selection import train_test_split
 from .strategy_base import Strategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
 from .cpgw_strategy import CPGWStrategy
@@ -11,11 +10,29 @@ from .custom_cpgw_strategy import CustomCPGWStrategy
 
 logger = logging.getLogger(__name__)
 
+def calculate_sharpe_ratio(returns: pd.Series, risk_free_rate: float = 0.02) -> float:
+    """
+    计算夏普比率
+    """
+    if len(returns) < 2:
+        return 0.0
+    
+    # 计算年化收益率
+    annual_return = (1 + returns.mean()) ** 252 - 1
+    
+    # 计算年化波动率
+    annual_volatility = returns.std() * np.sqrt(252)
+    
+    # 计算夏普比率
+    if annual_volatility == 0:
+        return 0.0
+    
+    sharpe = (annual_return - risk_free_rate) / annual_volatility
+    return sharpe
+
 class CombinedStrategy(Strategy):
-    def __init__(self):
-        super().__init__(name="CombinedStrategy")
-        
-        # 初始化子策略
+    def __init__(self, name: str = "CombinedStrategy"):
+        super().__init__(name=name)
         self.niuniu = NiuniuStrategyV3()
         self.cpgw = CPGWStrategy()
         self.custom_cpgw = CustomCPGWStrategy()
@@ -27,123 +44,146 @@ class CombinedStrategy(Strategy):
             'custom_cpgw': 0.3
         }
         
-        # 设置最大回撤限制
-        self.max_drawdown_limit = -0.15
-        
-        # 设置每个策略的仓位限制
-        self.position_limits = {
-            'niuniu': 0.5,
-            'cpgw': 0.4,
-            'custom_cpgw': 0.4
+        # 参数优化范围
+        self.param_ranges = {
+            'niuniu_weight': (0.2, 0.6),
+            'cpgw_weight': (0.2, 0.6),
+            'custom_cpgw_weight': (0.2, 0.6),
+            'niuniu_rsi_period': (5, 30),
+            'niuniu_adx_period': (5, 30),
+            'cpgw_ema_period': (5, 30),
+            'custom_cpgw_ema_period': (5, 30)
         }
-    
+        
+        # 存储每个股票的最优参数
+        self.optimal_params = {}
+        
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         计算技术指标
         """
         try:
-            # 计算每个策略的指标
+            # 计算各个策略的指标
             data = self.niuniu.calculate_indicators(data)
             data = self.cpgw.calculate_indicators(data)
             data = self.custom_cpgw.calculate_indicators(data)
-            
             return data
-            
         except Exception as e:
             logger.error(f"计算指标时出错: {str(e)}")
             raise
-    
+
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         生成交易信号
         """
         try:
-            # 计算指标
-            data = self.calculate_indicators(data)
-            
-            # 获取每个策略的信号
+            # 获取各个策略的信号
             niuniu_signals = self.niuniu.generate_signals(data)
             cpgw_signals = self.cpgw.generate_signals(data)
             custom_cpgw_signals = self.custom_cpgw.generate_signals(data)
             
             # 组合信号
-            data['signal'] = (
+            combined_signals = (
                 niuniu_signals['signal'] * self.weights['niuniu'] +
                 cpgw_signals['signal'] * self.weights['cpgw'] +
                 custom_cpgw_signals['signal'] * self.weights['custom_cpgw']
             )
             
-            # 应用风险管理
-            data = self._apply_risk_management(data)
-            
+            data['signal'] = combined_signals
             return data
             
         except Exception as e:
             logger.error(f"生成信号时出错: {str(e)}")
             raise
-    
+
+    def optimize_parameters(self, data: pd.DataFrame, symbol: str) -> Dict[str, float]:
+        """
+        优化策略参数
+        """
+        try:
+            # 如果已经有该股票的最优参数，直接返回
+            if symbol in self.optimal_params:
+                return self.optimal_params[symbol]
+            
+            # 准备训练数据
+            train_data, test_data = train_test_split(data, test_size=0.2, shuffle=False)
+            
+            best_params = None
+            best_sharpe = float('-inf')
+            
+            # 网格搜索最优参数
+            for niuniu_weight in np.linspace(self.param_ranges['niuniu_weight'][0], 
+                                           self.param_ranges['niuniu_weight'][1], 5):
+                for cpgw_weight in np.linspace(self.param_ranges['cpgw_weight'][0], 
+                                             self.param_ranges['cpgw_weight'][1], 5):
+                    for custom_cpgw_weight in np.linspace(self.param_ranges['custom_cpgw_weight'][0], 
+                                                        self.param_ranges['custom_cpgw_weight'][1], 5):
+                        # 确保权重和为1
+                        if abs(niuniu_weight + cpgw_weight + custom_cpgw_weight - 1.0) > 0.01:
+                            continue
+                        
+                        # 更新权重
+                        self.weights = {
+                            'niuniu': niuniu_weight,
+                            'cpgw': cpgw_weight,
+                            'custom_cpgw': custom_cpgw_weight
+                        }
+                        
+                        # 在训练集上生成信号
+                        train_signals = self.generate_signals(train_data.copy())
+                        
+                        # 计算夏普比率
+                        returns = train_signals['signal'] * train_data['returns']
+                        sharpe = calculate_sharpe_ratio(returns)
+                        
+                        if sharpe > best_sharpe:
+                            best_sharpe = sharpe
+                            best_params = {
+                                'niuniu_weight': niuniu_weight,
+                                'cpgw_weight': cpgw_weight,
+                                'custom_cpgw_weight': custom_cpgw_weight
+                            }
+            
+            # 保存最优参数
+            self.optimal_params[symbol] = best_params
+            
+            # 使用最优参数更新权重
+            self.weights = {
+                'niuniu': best_params['niuniu_weight'],
+                'cpgw': best_params['cpgw_weight'],
+                'custom_cpgw': best_params['custom_cpgw_weight']
+            }
+            
+            logger.info(f"股票 {symbol} 的最优参数: {best_params}")
+            return best_params
+            
+        except Exception as e:
+            logger.error(f"优化参数时出错: {str(e)}")
+            raise
+
     def extract_signal_components(self, data: pd.DataFrame) -> Dict[str, pd.Series]:
         """
         提取信号组件
         """
         try:
-            components = {
-                'niuniu': self.niuniu.extract_signal_components(data),
-                'cpgw': self.cpgw.extract_signal_components(data),
-                'custom_cpgw': self.custom_cpgw.extract_signal_components(data)
+            return {
+                'niuniu_signal': self.niuniu.generate_signals(data)['signal'],
+                'cpgw_signal': self.cpgw.generate_signals(data)['signal'],
+                'custom_cpgw_signal': self.custom_cpgw.generate_signals(data)['signal']
             }
-            
-            return components
-            
         except Exception as e:
             logger.error(f"提取信号组件时出错: {str(e)}")
             raise
-    
+
     def get_signal_metadata(self) -> Dict[str, Any]:
         """
         获取信号元数据
         """
         try:
-            metadata = {
-                'strategy_name': 'CombinedStrategy',
-                'version': '1.0.0',
-                'description': '组合策略，整合了牛牛策略V3和CPGW策略',
-                'components': {
-                    'niuniu': self.niuniu.get_signal_metadata(),
-                    'cpgw': self.cpgw.get_signal_metadata(),
-                    'custom_cpgw': self.custom_cpgw.get_signal_metadata()
-                },
+            return {
                 'weights': self.weights,
-                'position_limits': self.position_limits,
-                'max_drawdown_limit': self.max_drawdown_limit
+                'optimal_params': self.optimal_params
             }
-            
-            return metadata
-            
         except Exception as e:
             logger.error(f"获取信号元数据时出错: {str(e)}")
-            raise
-    
-    def _apply_risk_management(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        应用风险管理规则
-        """
-        try:
-            # 计算当前回撤
-            data['equity'] = (1 + data['returns']).cumprod()
-            data['drawdown'] = (data['equity'] / data['equity'].cummax() - 1)
-            
-            # 如果回撤超过限制，清空仓位
-            data.loc[data['drawdown'] < self.max_drawdown_limit, 'signal'] = 0
-            
-            # 应用仓位限制
-            data['signal'] = data['signal'].clip(
-                lower=-max(self.position_limits.values()),
-                upper=max(self.position_limits.values())
-            )
-            
-            return data
-            
-        except Exception as e:
-            logger.error(f"应用风险管理时出错: {str(e)}")
             raise 
