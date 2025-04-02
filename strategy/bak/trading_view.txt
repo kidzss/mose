@@ -1,0 +1,162 @@
+# https://www.tradingview.com/script/4aCWjKe6-Market-Forecast-w-Signals-QuantVue/
+
+//@version=5
+indicator('Market Forecast w/ Signals [QuantVue]', shorttitle='Market Forecast', overlay=false, max_lines_count=500,
+          max_labels_count=500)
+
+// ---------settings - -------- //
+medLen = input.int(31, 'Intermediate Length', inline='0')
+medCol = input.color(color.green, '', inline='0')
+momLen = input.int(5, 'Momentum Length', inline='1')
+momCol = input.color(color.red, '', inline='1')
+nearLen = input.int(3, 'Near Length', inline='2')
+nearCol = input.color(color.blue, '', inline='2')
+showClusters = input.bool(true, 'Show Clusters')
+bearClustCol = input.color(color.new(color.red, 80), 'Bear Cluster', inline='3')
+bullClustCol = input.color(color.new(color.lime, 80), 'Bull Cluster', inline='3')
+showDiv = input.bool(true, 'Show Divergences', inline='4')
+onlyLast = input.string('Most Recent', ' ', ['Most Recent', 'All'], inline='4')
+bullDivCol = input.color(color.yellow, 'Bullish', inline='5')
+bearDivCol = input.color(color.fuchsia, 'Bearish', inline='5')
+showConfirms = input.bool(true, 'Show Trend Reversal Confirmations', inline='6')
+onlyLast2 = input.string('Most Recent', ' ', ['Most Recent', 'All'], inline='6')
+bullConCol = input.color(color.new(color.lime, 80), 'Bullish', inline='7')
+bearConCol = input.color(color.new(color.red, 80), 'Bearish', inline='7')
+
+// ---------variables - -------- //
+var phPrices = array.new < float > ()
+var phNear = array.new < float > ()
+var phIdx = array.new < int > ()
+var plPrices = array.new < float > ()
+var plNear = array.new < float > ()
+var plIdx = array.new < int > ()
+var prevNpl = 0.0
+var
+prevNph = 0.0
+var
+nplPrice = 0.0
+var
+nphPrice = 0.0
+
+var
+label
+bullConfirm = na
+var
+label
+bearConfirm = na
+var
+line
+divBull = na
+var
+line
+divBear = na
+
+// ---------calculations - -------- //
+c1I = close - ta.lowest(low, medLen)
+c2I = ta.highest(high, medLen) - ta.lowest(low, medLen)
+fastK_I = c1I / c2I * 100
+
+c1N = close - ta.lowest(low, nearLen)
+c2N = ta.highest(high, nearLen) - ta.lowest(low, nearLen)
+fastK_N = c1N / c2N * 100
+
+c1M = close - ta.lowest(low, momLen)
+c2M = ta.highest(high, momLen) - ta.lowest(low, momLen)
+fastK_M = c1M / c2M * 100
+
+min1 = math.min(low, low[1])
+min2 = math.min(min1, math.min(low[2], low[3]))
+max1 = math.max(high, math.max(high[1], math.max(high[2], high[3])))
+
+momentum = ((close - min1) / (max1 - min2)) * 100
+
+inter = ta.sma(fastK_I, 5)
+near = ta.sma(fastK_N, 2)
+
+bullCluster = momentum <= 20 and inter <= 20 and near <= 20
+bearCluster = momentum >= 80 and inter >= 80 and near >= 80
+
+// clusters
+var
+dir = 0
+dir := bearCluster ? -1: bullCluster ? 1: dir
+
+if bearCluster and not bearCluster[1]
+    for i = 0 to 10
+    if near[i] > near[i + 1] and near[i + 1] < near[i + 2]
+        prevNpl := near[i + 1]
+        nplPrice := low[i + 1]
+        break
+
+if bullCluster and not bullCluster[1]
+    for i = 0 to 10
+    if near[i] < near[i + 1] and near[i + 1] > near[i + 2]
+        prevNph := near[i + 1]
+        nphPrice := high[i + 1]
+        break
+
+if dir == -1 and close < nplPrice
+    if onlyLast2 == 'Most Recent'
+        (bearConfirm[1]).delete()
+    if showConfirms
+        bearConfirm := label.new(bar_index, near, style=label.style_circle, color=bearConCol, size=size.small)
+        alert('Bearish Trend Confirmed', alert.freq_once_per_bar_close)
+    dir := 0
+
+if dir == 1 and close > nphPrice
+    if onlyLast2 == 'Most Recent'
+        (bullConfirm[1]).delete()
+    if showConfirms
+        bullConfirm := label.new(bar_index, near, style=label.style_circle, color=bullConCol, size=size.small)
+        alert('Bullish Trend Confirmed', alert.freq_once_per_bar_close)
+    dir := 0
+
+// divergences
+ph = ta.pivothigh(near, 2, 2)
+pl = ta.pivotlow(near, 2, 2)
+
+if not na(ph)
+    phPrices.unshift(high[2])
+    phNear.unshift(near[2])
+    phIdx.unshift(bar_index[2])
+
+if not na(pl)
+    plPrices.unshift(low[2])
+    plNear.unshift(near[2])
+    plIdx.unshift(bar_index[2])
+
+if phPrices.size() > 1
+    if phPrices.get(0) > phPrices.get(1) and phNear.get(0) <= phNear.get(1) and showDiv
+        if onlyLast == 'Most Recent'
+            (divBear[1]).delete()
+        divBear := line.new(phIdx.get(1), phNear.get(1), phIdx.get(0), phNear.get(0), color=bearDivCol, width=3)
+        alert('Bearish Divergence', alert.freq_once_per_bar_close)
+if plPrices.size() > 1
+    if plPrices.get(0) < plPrices.get(1) and plNear.get(0) >= plNear.get(1) and showDiv
+        if onlyLast == 'Most Recent'
+            (divBull[1]).delete()
+        divBull := line.new(plIdx.get(1), plNear.get(1), plIdx.get(0), plNear.get(0), color=bullDivCol, width=3)
+        alert('Bullish Divergence', alert.freq_once_per_bar_close)
+
+// -----------plots - --------- //
+plot(inter, 'Intermediate', medCol, linewidth=2)
+plot(near, 'NearTerm', nearCol, linewidth=1)
+plot(momentum, 'Momentum', momCol, linewidth=1)
+
+// ----------lines and fills - --------- //
+bLine = hline(0, 'Bottom Line', color.gray)
+tLine = hline(100, 'Top Line', color.gray)
+urz = hline(80, 'Upper Reversal Zone', color.gray)
+lrz = hline(20, 'Lower Reversal Zone', color.gray)
+
+fill(bLine, lrz, color.new(color.green, 75))
+fill(tLine, urz, color.new(color.red, 75))
+
+bgcolor(bullCluster and showClusters ? bullClustCol: na)
+bgcolor(bearCluster and showClusters ? bearClustCol: na)
+
+// ----------alerts - --------- //
+if bullCluster
+    alert('Bullish Cluster', alert.freq_once_per_bar_close)
+if bearCluster
+    alert('Bearish Cluster', alert.freq_once_per_bar_close)

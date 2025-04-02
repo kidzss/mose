@@ -1,0 +1,83 @@
+{
+    "model_config": {
+        "learning_rate": 0.0005,
+        "batch_size": 32,
+        "epochs": 100,
+        "sequence_length": 30,
+        "n_heads": 8,
+        "n_layers": 6,
+        "d_model": 512,
+        "dropout": 0.2,
+        "weight_decay": 1e-05,
+        "early_stopping_patience": 10,
+        "validation_split": 0.2,
+        "test_split": 0.1
+    },
+    "data_config": {
+        "lookback_period": 504,
+        "prediction_period": 20,
+        "min_samples": 50,
+        "feature_groups": {
+            "trend": true,
+            "momentum": true,
+            "volatility": true,
+            "volume": true,
+            "advanced": true,
+            "custom": true
+        }
+    },
+    "strategy_config": {
+        "strategies": {
+            "GoldTriangleStrategy": {
+                "base_weight": 0.2,
+                "min_weight": 0.1,
+                "max_weight": 0.3
+            },
+            "MomentumStrategy": {
+                "base_weight": 0.2,
+                "min_weight": 0.1,
+                "max_weight": 0.3
+            },
+            "NiuniuStrategy": {
+                "base_weight": 0.15,
+                "min_weight": 0.05,
+                "max_weight": 0.25
+            },
+            "TDIStrategy": {
+                "base_weight": 0.15,
+                "min_weight": 0.05,
+                "max_weight": 0.25
+            },
+            "MarketForecastStrategy": {
+                "base_weight": 0.15,
+                "min_weight": 0.05,
+                "max_weight": 0.25
+            },
+            "CPGWStrategy": {
+                "base_weight": 0.15,
+                "min_weight": 0.05,
+                "max_weight": 0.25
+            }
+        },
+        "rebalance_frequency": "daily",
+        "total_weight": 1.0
+    },
+    "optimization_config": {
+        "objective": "sharpe_ratio",
+        "constraints": {
+            "max_drawdown": 0.15,
+            "min_return": 0.0,
+            "max_volatility": 0.25,
+            "min_trades": 20
+        },
+        "risk_free_rate": 0.03,
+        "transaction_cost": 0.001
+    },
+    "training_config": {
+        "gpu_id": 0,
+        "num_workers": 4,
+        "save_model": true,
+        "model_dir": "outputs",
+        "tensorboard_dir": "runs"
+    }
+}

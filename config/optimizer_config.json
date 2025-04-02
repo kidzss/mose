@@ -1,0 +1,67 @@
+{
+    "data_config": {
+        "lookback_period": 1825,
+        "min_samples": 300,
+        "validation_split": 0.15,
+        "test_split": 0.15,
+        "symbols": ["GOOG", "NVDA", "AMD", "TSLA", "AAPL", "ASML", "MSFT", "AMZN", "META", "GOOGL"],
+        "start_date": "2020-01-01",
+        "end_date": "2025-03-11",
+        "rolling_window": 60
+    },
+    "model_config": {
+        "sequence_length": 60,
+        "input_size": 205,
+        "hidden_size": 384,
+        "num_heads": 12,
+        "num_layers": 3,
+        "dropout": 0.35,
+        "output_size": 6,
+        "learning_rate": 2e-5,
+        "batch_size": 64,
+        "epochs": 200,
+        "early_stopping_patience": 15,
+        "early_stopping_min_delta": 3e-5,
+        "weight_decay": 1e-4,
+        "grad_clip": 1.0
+    },
+    "strategy_config": {
+        "strategies": {
+            "GoldTriangleStrategy": {
+                "weight": 1.2,
+                "risk_adjust": 0.8,
+                "params": {}
+            },
+            "MomentumStrategy": {
+                "weight": 0.9,
+                "smoothing": 5,
+                "params": {}
+            },
+            "NiuniuStrategy": {
+                "weight": 1.0,
+                "max_exposure": 0.3,
+                "params": {}
+            },
+            "TDIStrategy": {
+                "weight": 1.0,
+                "trend_window": 30,
+                "params": {}
+            },
+            "MarketForecastStrategy": {
+                "weight": 1.0,
+                "ensemble_size": 3,
+                "params": {}
+            },
+            "CPGWStrategy": {
+                "weight": 0.8,
+                "volatility_threshold": 0.4,
+                "params": {}
+            },
+            "VolumeStrategy": {
+                "weight": 0.8,
+                "volume_threshold": 1000000,
+                "params": {}
+            }
+        }
+    }
+} 

@@ -1,0 +1,11 @@
+{
+    "initial_capital": 100000.0,
+    "final_capital": NaN,
+    "total_return": NaN,
+    "sharpe_ratio": 0.0,
+    "max_drawdown": 0.0,
+    "win_rate": 0.35714285714285715,
+    "avg_profit": NaN,
+    "trades": [
+        {
+            "date": 

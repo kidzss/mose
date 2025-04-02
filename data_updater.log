@@ -1,0 +1,4 @@
+2025-03-26 13:06:10,978 - __main__ - INFO - 开始增量更新股票数据，截止日期：2025-03-26
+2025-03-26 13:06:10,978 - __main__ - ERROR - 运行过程中出错: [Errno 2] No such file or directory: 'stock_pool/sp500_stocks.csv'
+2025-04-01 16:07:58,909 - __main__ - INFO - 开始增量更新股票数据，截止日期：2025-04-01
+2025-04-01 16:07:58,910 - __main__ - ERROR - 运行过程中出错: [Errno 2] No such file or directory: 'stock_pool/sp500_stocks.csv'

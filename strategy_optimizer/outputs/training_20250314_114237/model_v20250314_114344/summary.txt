@@ -1,0 +1,6 @@
+Model Version: v20250314_114344
+Training Date: 2025-03-14 11:43:44
+Epochs Trained: 16
+Final Test MSE: 8877.505859375
+Final Test MAE: 38.21388626098633
+Best Validation Loss: 2499.720860072545

@@ -1,0 +1,2 @@
+Strategy,RMSE,MAE,Direction Accuracy,Sharpe Ratio,Max Drawdown,Total Return
+条件XGBoost模型,0.026693024376303283,0.02208295517314901,0.41414141414141414,0,0,0

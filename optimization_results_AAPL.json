@@ -1,0 +1,12 @@
+{
+    "best_parameters": {
+        "short_term_period": 11.0,
+        "macd_fast": 3.0,
+        "macd_slow": 19.0
+    },
+    "performance": {
+        "sharpe_ratio": 0.6543745003844058,
+        "sortino_ratio": 1.090748451968767,
+        "total_return": 0.1756514920790735
+    }
+}

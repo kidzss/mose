@@ -1,0 +1,1026 @@
+2025-03-24 22:36:34,618 - strategy_test - INFO - 开始测试自定义策略系统...
+2025-03-24 22:36:34,966 - strategy_test - INFO - 获取AAPL的历史数据...
+2025-03-24 22:36:34,978 - strategy_test - INFO - 获取到AAPL的历史数据: 249条记录
+2025-03-24 22:36:34,978 - strategy_test - INFO - 获取MSFT的历史数据...
+2025-03-24 22:36:35,004 - strategy_test - INFO - 获取到MSFT的历史数据: 250条记录
+2025-03-24 22:36:35,004 - strategy_test - INFO - 获取GOOGL的历史数据...
+2025-03-24 22:36:35,013 - strategy_test - INFO - 获取到GOOGL的历史数据: 249条记录
+2025-03-24 22:36:35,013 - strategy_test - INFO - 获取AMZN的历史数据...
+2025-03-24 22:36:35,022 - strategy_test - INFO - 获取到AMZN的历史数据: 249条记录
+2025-03-24 22:36:35,022 - strategy_test - INFO - 获取META的历史数据...
+2025-03-24 22:36:35,030 - strategy_test - INFO - 获取到META的历史数据: 250条记录
+2025-03-24 22:36:35,031 - strategy_test - INFO - 
+========== 测试 AAPL ==========
+2025-03-24 22:36:35,031 - strategy_test - INFO - 开始测试CustomCPGWStrategy策略: AAPL
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:35,040 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:35,040 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:35,043 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:35,043 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:35,045 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:35,045 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:35,055 - strategy_test - INFO - AAPL - CustomCPGWStrategy: 买入信号 5, 卖出信号 14
+2025-03-24 22:36:35,056 - strategy_test - INFO - 首个买入信号: 2024-06-05 00:00:00 价格: 195.214
+2025-03-24 22:36:35,056 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 168.912
+2025-03-24 22:36:35,551 - strategy_test - INFO - AAPL - 市场环境统计: {<MarketRegime.UNKNOWN: 'unknown'>: 49, <MarketRegime.BULLISH: 'bullish'>: 103, <MarketRegime.RANGING: 'ranging'>: 75, <MarketRegime.BEARISH: 'bearish'>: 22}
+2025-03-24 22:36:35,981 - strategy_test - INFO - 开始测试TDI策略: AAPL
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:35,994 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:35,994 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:35,996 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:35,996 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:35,999 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:35,999 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:36,010 - strategy_test - INFO - AAPL - TDI策略: 买入信号 11, 卖出信号 5
+2025-03-24 22:36:36,011 - strategy_test - INFO - 首个买入信号: 2024-05-17 00:00:00 价格: 189.234
+2025-03-24 22:36:36,011 - strategy_test - INFO - 首个卖出信号: 2024-04-30 00:00:00 价格: 169.529
+2025-03-24 22:36:36,279 - strategy_test - INFO - 开始测试金三角策略: AAPL
+2025-03-24 22:36:36,406 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:36,406 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:36,409 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:36,409 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:36,410 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:36,410 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:36,434 - strategy_test - INFO - AAPL - 金三角策略: 买入信号 35, 卖出信号 101
+2025-03-24 22:36:36,435 - strategy_test - INFO - 首个买入信号: 2024-08-20 00:00:00 价格: 226.013
+2025-03-24 22:36:36,435 - strategy_test - INFO - 首个卖出信号: 2024-04-10 00:00:00 价格: 166.991
+2025-03-24 22:36:36,699 - strategy_test - INFO - 开始测试市场预测策略: AAPL
+2025-03-24 22:36:36,715 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:36,717 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:36,718 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:36,736 - strategy_test - INFO - AAPL - 市场预测策略: 买入信号 3, 卖出信号 34
+2025-03-24 22:36:36,736 - strategy_test - INFO - 首个买入信号: 2024-09-18 00:00:00 价格: 220.205
+2025-03-24 22:36:36,736 - strategy_test - INFO - 首个卖出信号: 2024-05-06 00:00:00 价格: 180.856
+2025-03-24 22:36:36,973 - strategy_test - INFO - 开始测试复合策略: AAPL
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+2025-03-24 22:36:36,974 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:36,989 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:36,989 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:36,990 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:36,990 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:36,993 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:36,993 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,035 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,035 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,035 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,035 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,037 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,037 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:37,042 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,043 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,044 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,057 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,057 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,058 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,058 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,061 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,061 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,077 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,077 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,078 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,078 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,080 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,080 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,122 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,122 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,123 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,123 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,124 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,124 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:37,129 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,130 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,131 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,144 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,144 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,145 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,145 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,147 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,147 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,151 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.1803057476383662, 'GoldTriangleStrategy': 0.45908275708490154, 'MarketForecastStrategy': 0.1803057476383662, 'CustomCPGWStrategy': 0.1803057476383662}
+2025-03-24 22:36:37,151 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.1803057476383662, 'GoldTriangleStrategy': 0.45908275708490154, 'MarketForecastStrategy': 0.1803057476383662, 'CustomCPGWStrategy': 0.1803057476383662}
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,164 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,164 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,166 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,166 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,169 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,169 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,306 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,306 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,308 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,308 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,310 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,310 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,330 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,332 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,333 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,348 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,348 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,351 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,351 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,353 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,353 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,371 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,371 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,374 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,374 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,377 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,377 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:37,513 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,513 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,515 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,515 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,516 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,516 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:37,537 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,539 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,540 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,555 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,555 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,557 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,557 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,560 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,560 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,586 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,586 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,588 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,588 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,590 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:37,590 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:37,591 - strategy_test - INFO - AAPL - 复合策略: 买入信号 3, 卖出信号 11
+2025-03-24 22:36:37,592 - strategy_test - INFO - 首个买入信号: 2024-10-18 00:00:00 价格: 234.484
+2025-03-24 22:36:37,592 - strategy_test - INFO - 首个卖出信号: 2024-04-30 00:00:00 价格: 169.529
+2025-03-24 22:36:37,592 - strategy_test - INFO - 当前策略权重: {'TDIStrategy': 0.21569366424554984, 'GoldTriangleStrategy': 0.381378587962416, 'MarketForecastStrategy': 0.25314048095484676, 'CustomCPGWStrategy': 0.1497872668371874}
+2025-03-24 22:36:37,822 - strategy_test - INFO - 
+========== 测试 MSFT ==========
+2025-03-24 22:36:37,823 - strategy_test - INFO - 开始测试CustomCPGWStrategy策略: MSFT
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:37,831 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,831 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:37,834 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,834 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:37,837 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,837 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:37,848 - strategy_test - INFO - MSFT - CustomCPGWStrategy: 买入信号 3, 卖出信号 16
+2025-03-24 22:36:37,848 - strategy_test - INFO - 首个买入信号: 2024-06-10 00:00:00 价格: 425.394
+2025-03-24 22:36:37,848 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 418.455
+2025-03-24 22:36:38,374 - strategy_test - INFO - MSFT - 市场环境统计: {<MarketRegime.UNKNOWN: 'unknown'>: 49, <MarketRegime.BULLISH: 'bullish'>: 74, <MarketRegime.RANGING: 'ranging'>: 59, <MarketRegime.BEARISH: 'bearish'>: 54, <MarketRegime.VOLATILE: 'volatile'>: 14}
+2025-03-24 22:36:38,606 - strategy_test - INFO - 开始测试TDI策略: MSFT
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:38,619 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:38,619 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:38,621 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:38,621 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:38,624 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:38,624 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:38,635 - strategy_test - INFO - MSFT - TDI策略: 买入信号 5, 卖出信号 12
+2025-03-24 22:36:38,635 - strategy_test - INFO - 首个买入信号: 2024-05-24 00:00:00 价格: 427.671
+2025-03-24 22:36:38,636 - strategy_test - INFO - 首个卖出信号: 2024-04-24 00:00:00 价格: 405.961
+2025-03-24 22:36:38,864 - strategy_test - INFO - 开始测试金三角策略: MSFT
+2025-03-24 22:36:38,991 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:38,991 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:38,998 - strategy_test - INFO - MSFT - 金三角策略: 买入信号 46, 卖出信号 146
+2025-03-24 22:36:38,998 - strategy_test - INFO - 首个买入信号: 2024-06-13 00:00:00 价格: 439.025
+2025-03-24 22:36:38,999 - strategy_test - INFO - 首个卖出信号: 2024-04-19 00:00:00 价格: 396.096
+2025-03-24 22:36:39,234 - strategy_test - INFO - 开始测试市场预测策略: MSFT
+2025-03-24 22:36:39,249 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,251 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,252 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:39,276 - strategy_test - INFO - MSFT - 市场预测策略: 买入信号 4, 卖出信号 31
+2025-03-24 22:36:39,277 - strategy_test - INFO - 首个买入信号: 2024-09-10 00:00:00 价格: 412.545
+2025-03-24 22:36:39,277 - strategy_test - INFO - 首个卖出信号: 2024-05-16 00:00:00 价格: 418.554
+2025-03-24 22:36:39,512 - strategy_test - INFO - 开始测试复合策略: MSFT
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+2025-03-24 22:36:39,512 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,529 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,529 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,529 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,529 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,532 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,532 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,575 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:39,575 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:39,580 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,581 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,582 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,597 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,597 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,597 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,597 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,600 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:39,600 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,616 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,616 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,617 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,617 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,619 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,619 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,657 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:39,657 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:39,663 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,663 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,664 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,679 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,679 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,680 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,680 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,682 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:39,682 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:39,686 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.1711153129589623, 'GoldTriangleStrategy': 0.48665406112311327, 'MarketForecastStrategy': 0.1711153129589623, 'CustomCPGWStrategy': 0.1711153129589623}
+2025-03-24 22:36:39,686 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.1711153129589623, 'GoldTriangleStrategy': 0.48665406112311327, 'MarketForecastStrategy': 0.1711153129589623, 'CustomCPGWStrategy': 0.1711153129589623}
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,698 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,698 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,701 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,701 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,703 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,703 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,842 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:39,842 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:39,846 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,848 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,849 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,873 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,873 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,875 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,875 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,878 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:39,878 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:39,900 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,900 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:39,902 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,902 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:39,905 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:39,905 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:40,050 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:40,050 - strategy.GoldTriangleStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:40,054 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,057 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,058 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:40,080 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,080 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,082 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,082 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,085 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:40,085 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:40,117 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,117 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,119 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,119 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,123 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:40,123 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:40,124 - strategy_test - INFO - MSFT - 复合策略: 买入信号 4, 卖出信号 19
+2025-03-24 22:36:40,124 - strategy_test - INFO - 首个买入信号: 2024-07-02 00:00:00 价格: 456.622
+2025-03-24 22:36:40,124 - strategy_test - INFO - 首个卖出信号: 2024-04-24 00:00:00 价格: 405.961
+2025-03-24 22:36:40,124 - strategy_test - INFO - 当前策略权重: {'TDIStrategy': 0.20648085067734062, 'GoldTriangleStrategy': 0.4078014490990163, 'MarketForecastStrategy': 0.24232822058660117, 'CustomCPGWStrategy': 0.1433894796370421}
+2025-03-24 22:36:40,364 - strategy_test - INFO - 
+========== 测试 GOOGL ==========
+2025-03-24 22:36:40,364 - strategy_test - INFO - 开始测试CustomCPGWStrategy策略: GOOGL
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:40,371 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,371 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:40,374 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,374 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:40,376 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:40,376 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:40,384 - strategy_test - INFO - GOOGL - CustomCPGWStrategy: 买入信号 9, 卖出信号 16
+2025-03-24 22:36:40,384 - strategy_test - INFO - 首个买入信号: 2024-04-23 00:00:00 价格: 157.507
+2025-03-24 22:36:40,385 - strategy_test - INFO - 首个卖出信号: 2024-04-16 00:00:00 价格: 153.665
+2025-03-24 22:36:40,887 - strategy_test - INFO - GOOGL - 市场环境统计: {<MarketRegime.UNKNOWN: 'unknown'>: 49, <MarketRegime.BULLISH: 'bullish'>: 124, <MarketRegime.RANGING: 'ranging'>: 11, <MarketRegime.BEARISH: 'bearish'>: 63, <MarketRegime.VOLATILE: 'volatile'>: 2}
+2025-03-24 22:36:41,132 - strategy_test - INFO - 开始测试TDI策略: GOOGL
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:41,145 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:41,145 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:41,147 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:41,147 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:41,150 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:41,150 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:41,160 - strategy_test - INFO - GOOGL - TDI策略: 买入信号 9, 卖出信号 8
+2025-03-24 22:36:41,160 - strategy_test - INFO - 首个买入信号: 2024-04-23 00:00:00 价格: 157.507
+2025-03-24 22:36:41,161 - strategy_test - INFO - 首个卖出信号: 2024-08-05 00:00:00 价格: 158.674
+2025-03-24 22:36:41,394 - strategy_test - INFO - 开始测试金三角策略: GOOGL
+2025-03-24 22:36:41,503 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:41,503 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:41,506 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:41,506 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:41,507 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:41,507 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:41,528 - strategy_test - INFO - GOOGL - 金三角策略: 买入信号 35, 卖出信号 120
+2025-03-24 22:36:41,528 - strategy_test - INFO - 首个买入信号: 2024-06-25 00:00:00 价格: 183.365
+2025-03-24 22:36:41,528 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 149.953
+2025-03-24 22:36:41,767 - strategy_test - INFO - 开始测试市场预测策略: GOOGL
+2025-03-24 22:36:41,781 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:41,783 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:41,785 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:41,807 - strategy_test - INFO - GOOGL - 市场预测策略: 买入信号 3, 卖出信号 26
+2025-03-24 22:36:41,807 - strategy_test - INFO - 首个买入信号: 2025-01-15 00:00:00 价格: 195.325
+2025-03-24 22:36:41,807 - strategy_test - INFO - 首个卖出信号: 2024-04-25 00:00:00 价格: 155.258
+2025-03-24 22:36:42,053 - strategy_test - INFO - 开始测试复合策略: GOOGL
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+2025-03-24 22:36:42,053 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,068 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,068 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,069 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,069 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,071 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,071 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,112 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,112 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,113 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,113 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,114 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,114 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:42,119 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,120 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,121 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,135 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,135 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,136 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,136 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,138 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,138 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,155 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,155 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,156 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,156 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,159 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,159 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,198 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,198 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,199 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,199 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,200 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,200 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:42,205 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,206 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,207 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,221 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,221 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,222 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,222 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,225 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,225 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,229 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.15585643810284763, 'GoldTriangleStrategy': 0.5324306856914571, 'MarketForecastStrategy': 0.15585643810284763, 'CustomCPGWStrategy': 0.15585643810284763}
+2025-03-24 22:36:42,229 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.15585643810284763, 'GoldTriangleStrategy': 0.5324306856914571, 'MarketForecastStrategy': 0.15585643810284763, 'CustomCPGWStrategy': 0.15585643810284763}
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,241 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,241 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,243 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,243 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,246 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,246 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,383 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,383 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,386 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,386 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,387 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,387 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,404 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,406 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,407 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,426 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,426 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,428 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,428 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,431 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,431 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,449 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,449 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,451 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,451 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,454 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,454 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:42,593 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,593 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,596 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,596 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,597 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,597 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:42,615 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,617 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,619 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,638 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,638 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,640 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,640 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,643 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,643 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,671 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,671 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,674 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,674 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,676 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:42,676 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:42,677 - strategy_test - INFO - GOOGL - 复合策略: 买入信号 2, 卖出信号 13
+2025-03-24 22:36:42,678 - strategy_test - INFO - 首个买入信号: 2024-07-03 00:00:00 价格: 185.148
+2025-03-24 22:36:42,678 - strategy_test - INFO - 首个卖出信号: 2024-06-13 00:00:00 价格: 174.527
+2025-03-24 22:36:42,678 - strategy_test - INFO - 当前策略权重: {'TDIStrategy': 0.19082550712863158, 'GoldTriangleStrategy': 0.452701844138022, 'MarketForecastStrategy': 0.22395493544957457, 'CustomCPGWStrategy': 0.13251771328377193}
+2025-03-24 22:36:42,921 - strategy_test - INFO - 
+========== 测试 AMZN ==========
+2025-03-24 22:36:42,921 - strategy_test - INFO - 开始测试CustomCPGWStrategy策略: AMZN
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:42,929 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,929 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:42,932 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,932 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:42,934 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,934 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:42,945 - strategy_test - INFO - AMZN - CustomCPGWStrategy: 买入信号 3, 卖出信号 15
+2025-03-24 22:36:42,945 - strategy_test - INFO - 首个买入信号: 2024-10-29 00:00:00 价格: 190.83
+2025-03-24 22:36:42,945 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 178.3
+2025-03-24 22:36:43,452 - strategy_test - INFO - AMZN - 市场环境统计: {<MarketRegime.UNKNOWN: 'unknown'>: 49, <MarketRegime.RANGING: 'ranging'>: 27, <MarketRegime.BULLISH: 'bullish'>: 129, <MarketRegime.VOLATILE: 'volatile'>: 20, <MarketRegime.BEARISH: 'bearish'>: 24}
+2025-03-24 22:36:43,756 - strategy_test - INFO - 开始测试TDI策略: AMZN
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:43,769 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:43,769 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:43,771 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:43,771 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:43,774 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:43,774 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:43,784 - strategy_test - INFO - AMZN - TDI策略: 买入信号 6, 卖出信号 6
+2025-03-24 22:36:43,785 - strategy_test - INFO - 首个买入信号: 2024-05-17 00:00:00 价格: 184.7
+2025-03-24 22:36:43,785 - strategy_test - INFO - 首个卖出信号: 2024-04-30 00:00:00 价格: 175.0
+2025-03-24 22:36:44,034 - strategy_test - INFO - 开始测试金三角策略: AMZN
+2025-03-24 22:36:44,161 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,161 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,164 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,164 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,166 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:44,166 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:44,201 - strategy_test - INFO - AMZN - 金三角策略: 买入信号 58, 卖出信号 115
+2025-03-24 22:36:44,201 - strategy_test - INFO - 首个买入信号: 2024-04-11 00:00:00 价格: 189.05
+2025-03-24 22:36:44,201 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 178.3
+2025-03-24 22:36:44,462 - strategy_test - INFO - 开始测试市场预测策略: AMZN
+2025-03-24 22:36:44,477 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,479 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,481 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:44,501 - strategy_test - INFO - AMZN - 市场预测策略: 买入信号 2, 卖出信号 39
+2025-03-24 22:36:44,501 - strategy_test - INFO - 首个买入信号: 2025-01-03 00:00:00 价格: 224.19
+2025-03-24 22:36:44,501 - strategy_test - INFO - 首个卖出信号: 2024-05-07 00:00:00 价格: 188.76
+2025-03-24 22:36:44,759 - strategy_test - INFO - 开始测试复合策略: AMZN
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+2025-03-24 22:36:44,759 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:44,774 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,774 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,775 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,775 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,778 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:44,778 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:44,817 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,817 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,817 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,817 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,819 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:44,819 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:44,823 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,824 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,825 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:44,838 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,838 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,838 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,838 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,841 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:44,841 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:44,856 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,856 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,857 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,857 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,860 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:44,860 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:44,899 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,899 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,899 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,899 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,901 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:44,901 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:44,906 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,907 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,908 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:44,922 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,922 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,922 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,922 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,925 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:44,925 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:44,929 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.16100656137826683, 'GoldTriangleStrategy': 0.5169803158651997, 'MarketForecastStrategy': 0.16100656137826683, 'CustomCPGWStrategy': 0.16100656137826683}
+2025-03-24 22:36:44,929 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.16100656137826683, 'GoldTriangleStrategy': 0.5169803158651997, 'MarketForecastStrategy': 0.16100656137826683, 'CustomCPGWStrategy': 0.16100656137826683}
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:44,942 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,942 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:44,944 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,944 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:44,947 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:44,947 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:45,093 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,093 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,096 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,096 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,097 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:45,097 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:45,131 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,133 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,134 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:45,152 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,152 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,155 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,155 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,157 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:45,157 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:45,178 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,178 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,180 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,180 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,183 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:45,183 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:45,329 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,329 - strategy.GoldTriangleStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,332 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,332 - strategy.GoldTriangleStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,334 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:45,334 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 熊市环境，仅保留强势买入信号
+2025-03-24 22:36:45,366 - strategy.uss_market_forecast_strategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,369 - strategy.uss_market_forecast_strategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,370 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:45,388 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,388 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,390 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,390 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,393 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:45,393 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:45,420 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,420 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,422 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,422 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,425 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:45,425 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:45,426 - strategy_test - INFO - AMZN - 复合策略: 买入信号 3, 卖出信号 7
+2025-03-24 22:36:45,426 - strategy_test - INFO - 首个买入信号: 2024-06-26 00:00:00 价格: 193.61
+2025-03-24 22:36:45,426 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 178.3
+2025-03-24 22:36:45,426 - strategy_test - INFO - 当前策略权重: {'TDIStrategy': 0.19616051202740614, 'GoldTriangleStrategy': 0.4374007536991755, 'MarketForecastStrategy': 0.23021615647660865, 'CustomCPGWStrategy': 0.13622257779680982}
+2025-03-24 22:36:45,682 - strategy_test - INFO - 
+========== 测试 META ==========
+2025-03-24 22:36:45,682 - strategy_test - INFO - 开始测试CustomCPGWStrategy策略: META
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:45,691 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,691 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:45,693 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,693 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:45,696 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:45,696 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:45,705 - strategy_test - INFO - META - CustomCPGWStrategy: 买入信号 5, 卖出信号 13
+2025-03-24 22:36:45,705 - strategy_test - INFO - 首个买入信号: 2024-06-26 00:00:00 价格: 511.762
+2025-03-24 22:36:45,706 - strategy_test - INFO - 首个卖出信号: 2024-03-26 00:00:00 价格: 494.088
+2025-03-24 22:36:46,216 - strategy_test - INFO - META - 市场环境统计: {<MarketRegime.UNKNOWN: 'unknown'>: 49, <MarketRegime.BEARISH: 'bearish'>: 21, <MarketRegime.RANGING: 'ranging'>: 34, <MarketRegime.BULLISH: 'bullish'>: 146}
+2025-03-24 22:36:46,455 - strategy_test - INFO - 开始测试TDI策略: META
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:46,467 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:46,467 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:46,469 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:46,469 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:46,472 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:46,472 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:46,482 - strategy_test - INFO - META - TDI策略: 买入信号 6, 卖出信号 8
+2025-03-24 22:36:46,483 - strategy_test - INFO - 首个买入信号: 2024-05-14 00:00:00 价格: 470.135
+2025-03-24 22:36:46,483 - strategy_test - INFO - 首个卖出信号: 2024-05-13 00:00:00 价格: 466.309
+2025-03-24 22:36:46,723 - strategy_test - INFO - 开始测试金三角策略: META
+2025-03-24 22:36:46,840 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:46,840 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:46,850 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:46,850 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:46,852 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:46,852 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:46,857 - strategy_test - INFO - META - 金三角策略: 买入信号 122, 卖出信号 97
+2025-03-24 22:36:46,858 - strategy_test - INFO - 首个买入信号: 2024-06-05 00:00:00 价格: 493.26
+2025-03-24 22:36:46,858 - strategy_test - INFO - 首个卖出信号: 2024-04-22 00:00:00 价格: 479.979
+2025-03-24 22:36:47,085 - strategy_test - INFO - 开始测试市场预测策略: META
+2025-03-24 22:36:47,098 - strategy.uss_market_forecast_strategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,149 - strategy.uss_market_forecast_strategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,150 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 高波动环境，减少信号频率
+2025-03-24 22:36:47,167 - strategy_test - INFO - META - 市场预测策略: 买入信号 22, 卖出信号 33
+2025-03-24 22:36:47,168 - strategy_test - INFO - 首个买入信号: 2024-04-23 00:00:00 价格: 494.297
+2025-03-24 22:36:47,168 - strategy_test - INFO - 首个卖出信号: 2024-05-29 00:00:00 价格: 472.636
+2025-03-24 22:36:47,382 - strategy_test - INFO - 开始测试复合策略: META
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 TDIStrategy，权重: 0.5714
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 GoldTriangleStrategy，权重: 0.5385
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 MarketForecastStrategy，权重: 0.5200
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+2025-03-24 22:36:47,383 - strategy.CompositeStrategy - INFO - 添加策略 CustomCPGWStrategy，权重: 0.5102
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,398 - strategy.TDIStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,398 - strategy.TDIStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,415 - strategy.TDIStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,415 - strategy.TDIStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,418 - strategy.TDIStrategy - INFO - TDI策略: 高波动环境，调整为波动带突破策略
+2025-03-24 22:36:47,418 - strategy.TDIStrategy - INFO - TDI策略: 高波动环境，调整为波动带突破策略
+2025-03-24 22:36:47,456 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,456 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,457 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,457 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,458 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,458 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:47,462 - strategy.uss_market_forecast_strategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,473 - strategy.uss_market_forecast_strategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,474 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 高波动环境，减少信号频率
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,486 - strategy.CustomCPGWStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,486 - strategy.CustomCPGWStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,503 - strategy.CustomCPGWStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,503 - strategy.CustomCPGWStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,505 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 高波动环境，减少信号频率
+2025-03-24 22:36:47,505 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 高波动环境，减少信号频率
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,533 - strategy.TDIStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,533 - strategy.TDIStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,550 - strategy.TDIStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,550 - strategy.TDIStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,552 - strategy.TDIStrategy - INFO - TDI策略: 高波动环境，调整为波动带突破策略
+2025-03-24 22:36:47,552 - strategy.TDIStrategy - INFO - TDI策略: 高波动环境，调整为波动带突破策略
+2025-03-24 22:36:47,587 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,587 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,588 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,588 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,589 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,589 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+/Users/gangtao.zhou/py_project/qute/mose/strategy/uss_market_forecast_strategy.py:161: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  data['signal'] = 0
+2025-03-24 22:36:47,593 - strategy.uss_market_forecast_strategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,603 - strategy.uss_market_forecast_strategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,604 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 高波动环境，减少信号频率
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,613 - strategy.CustomCPGWStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,613 - strategy.CustomCPGWStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,625 - strategy.CustomCPGWStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,625 - strategy.CustomCPGWStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,628 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 高波动环境，减少信号频率
+2025-03-24 22:36:47,628 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 高波动环境，减少信号频率
+2025-03-24 22:36:47,638 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.19841980722440186, 'GoldTriangleStrategy': 0.40474057832679455, 'MarketForecastStrategy': 0.19841980722440186, 'CustomCPGWStrategy': 0.19841980722440186}
+2025-03-24 22:36:47,638 - strategy.CompositeStrategy - INFO - 更新策略权重: {'TDIStrategy': 0.19841980722440186, 'GoldTriangleStrategy': 0.40474057832679455, 'MarketForecastStrategy': 0.19841980722440186, 'CustomCPGWStrategy': 0.19841980722440186}
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,646 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,646 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,648 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,648 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,650 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:47,650 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:47,748 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,748 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,756 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,756 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,757 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,757 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,759 - strategy.uss_market_forecast_strategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,798 - strategy.uss_market_forecast_strategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,799 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 高波动环境，减少信号频率
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,811 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,811 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,813 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,813 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,814 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:47,814 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+/Users/gangtao.zhou/py_project/qute/mose/strategy/tdi_strategy.py:167: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,826 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,826 - strategy.TDIStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,827 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,827 - strategy.TDIStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,829 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:47,829 - strategy.TDIStrategy - INFO - TDI策略: 熊市环境，增强RSI过滤条件
+2025-03-24 22:36:47,929 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,929 - strategy.GoldTriangleStrategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,937 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,937 - strategy.GoldTriangleStrategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,938 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,938 - strategy.GoldTriangleStrategy - INFO - 黄金三角策略: 高波动环境，增加止损宽度
+2025-03-24 22:36:47,940 - strategy.uss_market_forecast_strategy - INFO - 高波动环境，减少信号频率
+2025-03-24 22:36:47,981 - strategy.uss_market_forecast_strategy - INFO - 市场环境: volatile，信号调整完成
+2025-03-24 22:36:47,982 - strategy.uss_market_forecast_strategy - INFO - Market Forecast策略: 高波动环境，减少信号频率
+/Users/gangtao.zhou/py_project/qute/mose/strategy/custom_cpgw_strategy.py:151: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df = df.fillna(0)
+2025-03-24 22:36:47,993 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,993 - strategy.CustomCPGWStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:47,995 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,995 - strategy.CustomCPGWStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:47,997 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:47,997 - strategy.CustomCPGWStrategy - INFO - CPGW策略: 熊市环境，增强卖出信号权重
+2025-03-24 22:36:48,016 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:48,016 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:48,018 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:48,018 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:48,020 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:48,020 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:48,021 - strategy_test - INFO - META - 复合策略: 买入信号 10, 卖出信号 10
+2025-03-24 22:36:48,021 - strategy_test - INFO - 首个买入信号: 2024-06-05 00:00:00 价格: 493.26
+2025-03-24 22:36:48,021 - strategy_test - INFO - 首个卖出信号: 2024-05-13 00:00:00 价格: 466.309
+2025-03-24 22:36:48,021 - strategy_test - INFO - 当前策略权重: {'TDIStrategy': 0.23339418860459146, 'GoldTriangleStrategy': 0.33061250073822024, 'MarketForecastStrategy': 0.27391401301511087, 'CustomCPGWStrategy': 0.16207929764207743}
+2025-03-24 22:36:48,215 - strategy_test - INFO - 开始测试策略管理器...
+2025-03-24 22:36:48,215 - strategy_manager - INFO - 开始发现策略类...
+2025-03-24 22:36:48,215 - strategy_manager - INFO - 开始发现策略类...
+2025-03-24 22:36:49,283 - strategy_manager - INFO - 发现 19 个策略类
+2025-03-24 22:36:49,283 - strategy_manager - INFO - 发现 19 个策略类
+2025-03-24 22:36:49,283 - strategy_test - INFO - 已注册策略类: 19
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - BollingerBandsStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - BreakoutStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - CompositeStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - CPGWStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - CustomCPGWStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - CustomStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - EnhancedMomentumStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - GoldenCrossStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - MACDStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - MarketForecastStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - MeanReversionStrategy
+2025-03-24 22:36:49,283 - strategy_test - INFO -   - MomentumStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - NiuNiuStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - RSIStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - GoldTriangleStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - NiuniuStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - TDIStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - VolumeStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - HouWangStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO - 可创建的策略: 19
+2025-03-24 22:36:49,284 - strategy.BollingerBandsStrategy - INFO - 初始化布林带策略，参数: {'bb_length': 20, 'bb_std': 2.0, 'rsi_length': 14, 'rsi_overbought': 70, 'rsi_oversold': 30, 'price_pct_trigger': 0.01}
+2025-03-24 22:36:49,284 - strategy.BollingerBandsStrategy - INFO - 初始化布林带策略，参数: {'bb_length': 20, 'bb_std': 2.0, 'rsi_length': 14, 'rsi_overbought': 70, 'rsi_oversold': 30, 'price_pct_trigger': 0.01}
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: BollingerBandsStrategy
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: BollingerBandsStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - 创建策略: BollingerBandsStrategy 成功
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: BreakoutStrategy
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: BreakoutStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - 创建策略: BreakoutStrategy 成功
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: CompositeStrategy
+2025-03-24 22:36:49,284 - strategy_manager - INFO - 创建策略实例: CompositeStrategy
+2025-03-24 22:36:49,284 - strategy_test - INFO -   - 创建策略: CompositeStrategy 成功
+2025-03-24 22:36:49,284 - strategy_test - INFO - 活跃策略实例: 3
+2025-03-24 22:36:49,284 - strategy_test - INFO - 使用策略管理器为AAPL生成信号...
+2025-03-24 22:36:49,302 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,302 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,303 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,303 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,337 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,337 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,338 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,338 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,346 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,346 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,348 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,348 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,358 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,358 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,360 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,360 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,361 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,361 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,361 - strategy_test - INFO - AAPL - 没有生成有效信号
+2025-03-24 22:36:49,361 - strategy_test - INFO - 使用策略管理器为MSFT生成信号...
+2025-03-24 22:36:49,377 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,377 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,379 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,379 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,411 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,411 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,412 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,412 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,420 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,420 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,421 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,421 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,432 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,432 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,434 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,434 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,435 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,435 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,435 - strategy_test - INFO - MSFT - 没有生成有效信号
+2025-03-24 22:36:49,435 - strategy_test - INFO - 使用策略管理器为GOOGL生成信号...
+2025-03-24 22:36:49,452 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,452 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,453 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,453 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,485 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,485 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,486 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,486 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,495 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,495 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,496 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,496 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,506 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,506 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,508 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,508 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,510 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,510 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,510 - strategy_test - INFO - GOOGL - 没有生成有效信号
+2025-03-24 22:36:49,510 - strategy_test - INFO - 使用策略管理器为AMZN生成信号...
+2025-03-24 22:36:49,526 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,526 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,528 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,528 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,558 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,558 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,558 - strategy.BreakoutStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:49,558 - strategy.BreakoutStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:49,561 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,561 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,561 - strategy.BreakoutStrategy - INFO - 盘整市场环境，增强突破信号
+2025-03-24 22:36:49,561 - strategy.BreakoutStrategy - INFO - 盘整市场环境，增强突破信号
+2025-03-24 22:36:49,563 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,563 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,565 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,565 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,565 - strategy.BreakoutStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:49,565 - strategy.BreakoutStrategy - INFO - 市场环境: ranging，信号调整完成
+2025-03-24 22:36:49,567 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,567 - strategy.BreakoutStrategy - INFO - 检测到盘整市场，有潜在突破机会
+2025-03-24 22:36:49,567 - strategy.BreakoutStrategy - INFO - 盘整市场环境，增强突破信号
+2025-03-24 22:36:49,567 - strategy.BreakoutStrategy - INFO - 盘整市场环境，增强突破信号
+2025-03-24 22:36:49,575 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,575 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,576 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,576 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,578 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,578 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,578 - strategy_test - INFO - AMZN - 没有生成有效信号
+2025-03-24 22:36:49,578 - strategy_test - INFO - 使用策略管理器为META生成信号...
+2025-03-24 22:36:49,594 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,594 - strategy.BollingerBandsStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,596 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,596 - strategy.BollingerBandsStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,628 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,628 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,629 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,629 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,637 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,637 - strategy.BreakoutStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,638 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,638 - strategy.BreakoutStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,649 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,649 - strategy.CompositeStrategy - INFO - 熊市环境，减少多头信号
+2025-03-24 22:36:49,650 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,650 - strategy.CompositeStrategy - INFO - 市场环境: bearish，信号调整完成
+2025-03-24 22:36:49,652 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,652 - strategy.CompositeStrategy - INFO - 熊市环境，调整策略权重
+2025-03-24 22:36:49,652 - strategy_test - INFO - META - 没有生成有效信号
+2025-03-24 22:36:49,652 - strategy_test - INFO - 自定义策略系统测试完成
+富途数据源初始化失败: 缺少futu依赖，请先安装: pip install futu-api

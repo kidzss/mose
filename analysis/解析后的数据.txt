@@ -1,0 +1,48 @@
+Top Stocks by Total Return:
+     Stock Code         Strategy  Total Return(%)  Gain/loss ratio  Batting Avg
+213       NVDA    Gold Triangle       348.417482         4.035504     0.473684
+261       SMCI    Gold Triangle       214.649495         4.105689     0.409091
+215       NVDA         Momentum       206.595428         1.116019     0.622807
+36         ARM    Gold Triangle       193.781626         9.070977     0.444444
+263       SMCI         Momentum       188.758996         1.024414     0.617647
+184        MDB  Market Forecast       151.964361         5.178909     0.800000
+66         CEG    Gold Triangle       133.608492         3.734263     0.409091
+38         ARM         Momentum       133.502517         1.573606     0.617647
+26         AMD         Momentum       118.127040         1.005510     0.617978
+25         AMD  Market Forecast        89.690254              NaN     1.000000
+257       ROST         Momentum        84.865229         1.503506     0.593023
+75        COST    Gold Triangle        80.820242         3.607186     0.555556
+192       META    Gold Triangle        79.157328         3.214975     0.421053
+255       ROST    Gold Triangle        71.242755         3.038683     0.500000
+130        GFS  Market Forecast        70.094185         4.038555     0.900000
+54         BKR    Gold Triangle        69.152727         3.618041     0.421053
+51        BKNG    Gold Triangle        67.493576         2.682620     0.473684
+44        AVGO         Momentum        67.281044         1.760801     0.470588
+273       TSLA    Gold Triangle        64.408285         3.710447     0.333333
+194       META         Momentum        63.756788         1.074280     0.584158
+
+Top Stocks by Gain/Loss Ratio:
+     Stock Code         Strategy  Total Return(%)  Gain/loss ratio  Batting Avg
+298        XEL  Market Forecast        16.003661        58.886511     0.666667
+292        WBD  Market Forecast        10.091909        15.704235     0.857143
+4         ABNB  Market Forecast        31.683371        12.327506     0.833333
+58        CCEP  Market Forecast         4.197776        12.182787     0.250000
+133       GILD  Market Forecast        19.946828        12.099208     0.666667
+31        AMZN  Market Forecast        12.776375        11.911576     0.400000
+76        COST  Market Forecast         3.817035         9.511543     0.500000
+286       VRSK  Market Forecast         8.853923         9.425885     0.500000
+36         ARM    Gold Triangle       193.781626         9.070977     0.444444
+52        BKNG  Market Forecast        15.722796         7.961602     0.666667
+
+Top Stocks by Batting Avg:
+     Stock Code         Strategy  Total Return(%)  Gain/loss ratio  Batting Avg
+37         ARM  Market Forecast        17.987196              NaN          1.0
+61        CDNS  Market Forecast        20.544524              NaN          1.0
+280       TTWO  Market Forecast         5.900057              NaN          1.0
+73       CMCSA  Market Forecast         3.039357              NaN          1.0
+67         CEG  Market Forecast         3.555831              NaN          1.0
+211       NFLX  Market Forecast        32.433397              NaN          1.0
+79        CPRT  Market Forecast        30.867451              NaN          1.0
+175       LULU  Market Forecast         5.274935              NaN          1.0
+220       ODFL  Market Forecast        28.100956              NaN          1.0
+274       TSLA  Market Forecast        28.752622              NaN          1.0
