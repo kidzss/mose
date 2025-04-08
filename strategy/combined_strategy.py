@@ -6,8 +6,6 @@ from datetime import datetime
 
 from .strategy_base import Strategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
-from .cpgw_strategy import CPGWStrategy
-from .custom_cpgw_strategy import CustomCPGWStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +15,10 @@ class CombinedStrategy(Strategy):
         
         # 初始化子策略
         self.niuniu = NiuniuStrategyV3()
-        self.cpgw = CPGWStrategy()
-        self.custom_cpgw = CustomCPGWStrategy()
         
         # 初始化权重
         self.weights = {
-            'niuniu': 0.4,
-            'cpgw': 0.3,
-            'custom_cpgw': 0.3
+            'niuniu': 1.0
         }
         
         # 设置最大回撤限制
@@ -32,9 +26,7 @@ class CombinedStrategy(Strategy):
         
         # 设置每个策略的仓位限制
         self.position_limits = {
-            'niuniu': 0.5,
-            'cpgw': 0.4,
-            'custom_cpgw': 0.4
+            'niuniu': 1.0
         }
     
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -44,8 +36,6 @@ class CombinedStrategy(Strategy):
         try:
             # 计算每个策略的指标
             data = self.niuniu.calculate_indicators(data)
-            data = self.cpgw.calculate_indicators(data)
-            data = self.custom_cpgw.calculate_indicators(data)
             
             return data
             
@@ -63,15 +53,9 @@ class CombinedStrategy(Strategy):
             
             # 获取每个策略的信号
             niuniu_signals = self.niuniu.generate_signals(data)
-            cpgw_signals = self.cpgw.generate_signals(data)
-            custom_cpgw_signals = self.custom_cpgw.generate_signals(data)
             
             # 组合信号
-            data['signal'] = (
-                niuniu_signals['signal'] * self.weights['niuniu'] +
-                cpgw_signals['signal'] * self.weights['cpgw'] +
-                custom_cpgw_signals['signal'] * self.weights['custom_cpgw']
-            )
+            data['signal'] = niuniu_signals['signal'] * self.weights['niuniu']
             
             # 应用风险管理
             data = self._apply_risk_management(data)
@@ -88,9 +72,7 @@ class CombinedStrategy(Strategy):
         """
         try:
             components = {
-                'niuniu': self.niuniu.extract_signal_components(data),
-                'cpgw': self.cpgw.extract_signal_components(data),
-                'custom_cpgw': self.custom_cpgw.extract_signal_components(data)
+                'niuniu': self.niuniu.extract_signal_components(data)
             }
             
             return components
@@ -107,11 +89,9 @@ class CombinedStrategy(Strategy):
             metadata = {
                 'strategy_name': 'CombinedStrategy',
                 'version': '1.0.0',
-                'description': '组合策略，整合了牛牛策略V3和CPGW策略',
+                'description': '组合策略，整合了牛牛策略V3',
                 'components': {
-                    'niuniu': self.niuniu.get_signal_metadata(),
-                    'cpgw': self.cpgw.get_signal_metadata(),
-                    'custom_cpgw': self.custom_cpgw.get_signal_metadata()
+                    'niuniu': self.niuniu.get_signal_metadata()
                 },
                 'weights': self.weights,
                 'position_limits': self.position_limits,

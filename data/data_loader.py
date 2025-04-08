@@ -2,6 +2,7 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime
 import logging
+from typing import Dict
 
 class DataLoader:
     """数据加载器"""
@@ -46,3 +47,36 @@ class DataLoader:
         except Exception as e:
             self.logger.error(f"加载数据时出错: {str(e)}")
             raise 
+
+    def load_positions(self) -> Dict[str, Dict]:
+        """
+        加载持仓数据
+        
+        返回:
+            字典，key为股票代码，value为包含size和avg_price的字典
+        """
+        try:
+            # 从配置文件加载持仓数据
+            import json
+            import os
+            
+            # 获取文件路径
+            file_path = os.path.join(os.path.dirname(__file__), '..', 'monitor', 'configs', 'portfolio_config.json')
+            
+            # 读取持仓数据
+            with open(file_path, 'r') as f:
+                config = json.load(f)
+            
+            # 转换格式
+            positions = {}
+            for symbol, data in config['positions'].items():
+                positions[symbol] = {
+                    'size': data['shares'],
+                    'avg_price': data['cost_basis']
+                }
+            
+            return positions
+            
+        except Exception as e:
+            self.logger.error(f"加载持仓数据失败: {e}")
+            return {} 

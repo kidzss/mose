@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from data.data_interface import DataInterface
+from data.data_validator import DataValidator
 from config.data_config import DataConfig, MySQLConfig, FutuConfig
 
 
@@ -31,102 +32,121 @@ def basic_usage_example():
     print(f"获取AAPL从{start_date}到{end_date}的数据...")
     
     try:
+        # 第一次调用会从数据源获取数据
+        print("第一次调用get_historical_data...")
         aapl_data = data_interface.get_historical_data('AAPL', start_date, end_date)
         
-        # 打印数据基本信息
-        print(f"数据时间范围: {aapl_data.index[0]} 到 {aapl_data.index[-1]}")
-        print(f"数据点数量: {len(aapl_data)}")
-        print(f"数据列: {aapl_data.columns.tolist()}")
-        print("\n前5行数据:")
-        print(aapl_data.head())
+        # 第二次调用会使用缓存
+        print("第二次调用get_historical_data（使用缓存）...")
+        aapl_data_cached = data_interface.get_historical_data('AAPL', start_date, end_date)
         
-        # 绘制收盘价走势图
-        plt.figure(figsize=(12, 6))
-        plt.plot(aapl_data.index, aapl_data['close'])
-        plt.title('AAPL股价走势')
-        plt.xlabel('日期')
-        plt.ylabel('价格 ($)')
+        # 验证数据质量
+        print("\n验证数据质量...")
+        validated_data, report = DataValidator.validate_data(aapl_data)
+        
+        print("\n数据验证报告:")
+        print(f"- 原始数据行数: {report['original_rows']}")
+        print(f"- 处理后行数: {report['processed_rows']}")
+        
+        if report['missing_values']:
+            print(f"- 缺失值: {report['missing_values']}")
+        
+        if report['outliers']:
+            print(f"- 异常值: {report['outliers']}")
+            
+        if report['invalid_prices']:
+            print(f"- 不合理价格: {report['invalid_prices']}")
+            
+        if report['gaps']:
+            print(f"- 数据缺失区间: {report['gaps']}")
+        
+        # 打印数据基本信息
+        print("\n数据基本信息:")
+        print(f"数据时间范围: {validated_data.index[0]} 到 {validated_data.index[-1]}")
+        print(f"数据点数量: {len(validated_data)}")
+        print(f"数据列: {validated_data.columns.tolist()}")
+        print("\n前5行数据:")
+        print(validated_data.head())
+        
+        # 绘制收盘价和技术指标
+        plt.figure(figsize=(15, 10))
+        
+        # 绘制主图
+        plt.subplot(2, 1, 1)
+        plt.plot(validated_data.index, validated_data['close'], label='收盘价')
+        plt.plot(validated_data.index, validated_data['ma20'], label='20日均线')
+        plt.plot(validated_data.index, validated_data['upper_band'], '--', label='上轨')
+        plt.plot(validated_data.index, validated_data['lower_band'], '--', label='下轨')
+        plt.title('AAPL股价走势与技术指标')
+        plt.legend()
         plt.grid(True)
-        plt.savefig('aapl_price.png')
-        print("已保存价格走势图到 aapl_price.png")
+        
+        # 绘制副图（成交量）
+        plt.subplot(2, 1, 2)
+        plt.bar(validated_data.index, validated_data['volume'], label='成交量')
+        plt.plot(validated_data.index, validated_data['volume_ma'], 'r', label='成交量MA20')
+        plt.legend()
+        plt.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig('aapl_analysis.png')
+        print("已保存分析图表到 aapl_analysis.png")
         
     except Exception as e:
         print(f"获取数据失败: {e}")
 
 
 def strategy_data_example():
-    """获取策略数据示例"""
+    """策略数据使用示例"""
     data_interface = DataInterface()
     
-    # 获取策略所需的AAPL数据（包含技术指标）
     try:
-        aapl_strategy_data = data_interface.get_data_for_strategy('AAPL')
+        # 获取策略所需数据
+        print("\n获取策略数据...")
+        strategy_data = data_interface.get_data_for_strategy('AAPL', lookback_days=120)
         
-        # 打印策略数据基本信息
-        print("\n策略数据信息:")
-        print(f"数据时间范围: {aapl_strategy_data.index[0]} 到 {aapl_strategy_data.index[-1]}")
-        print(f"数据点数量: {len(aapl_strategy_data)}")
-        print(f"数据列: {aapl_strategy_data.columns.tolist()}")
+        print(f"\n策略数据包含以下指标:")
+        print(f"技术指标: {[col for col in strategy_data.columns if col not in ['open', 'high', 'low', 'close', 'volume']]}")
         
-        # 绘制价格和移动平均线
-        plt.figure(figsize=(12, 6))
-        plt.plot(aapl_strategy_data.index, aapl_strategy_data['close'], label='收盘价')
-        plt.plot(aapl_strategy_data.index, aapl_strategy_data['ma20'], label='20日均线', linewidth=1.5)
-        plt.plot(aapl_strategy_data.index, aapl_strategy_data['ma60'], label='60日均线', linewidth=1.5)
-        plt.fill_between(aapl_strategy_data.index, 
-                        aapl_strategy_data['upper_band'],
-                        aapl_strategy_data['lower_band'], 
-                        alpha=0.2, color='gray', label='布林带')
-        plt.title('AAPL股价和技术指标')
-        plt.xlabel('日期')
-        plt.ylabel('价格 ($)')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig('aapl_indicators.png')
-        print("已保存技术指标图到 aapl_indicators.png")
+        # 计算一些基本的统计信息
+        print("\n基本统计信息:")
+        print(f"平均日收益率: {strategy_data['returns'].mean():.4%}")
+        print(f"收益率标准差: {strategy_data['returns'].std():.4%}")
+        print(f"最大日收益率: {strategy_data['returns'].max():.4%}")
+        print(f"最小日收益率: {strategy_data['returns'].min():.4%}")
         
     except Exception as e:
         print(f"获取策略数据失败: {e}")
 
 
 def multiple_symbols_example():
-    """获取多个股票数据示例"""
+    """多股票数据示例"""
     data_interface = DataInterface()
     
-    # 股票列表
     symbols = ['AAPL', 'MSFT', 'GOOGL']
+    start_date = '2023-01-01'
+    end_date = dt.datetime.now().strftime('%Y-%m-%d')
     
-    # 获取多个股票的数据
     try:
-        # 获取近90天数据
-        end_date = dt.datetime.now()
-        start_date = end_date - dt.timedelta(days=90)
+        print(f"\n获取多个股票的数据: {symbols}")
+        data_dict = data_interface.get_multiple_symbols_data(symbols, start_date, end_date)
         
-        print(f"\n获取多个股票数据: {', '.join(symbols)}")
-        data_dict = data_interface.get_multiple_symbols_data(
-            symbols, start_date, end_date
-        )
-        
-        # 打印每个股票的数据信息
-        for symbol, df in data_dict.items():
-            print(f"{symbol} 数据点数量: {len(df)}")
-        
-        # 归一化价格并绘制比较图
-        plt.figure(figsize=(12, 6))
-        
-        for symbol, df in data_dict.items():
-            if not df.empty:
-                # 归一化价格（第一天=100）
-                normalized = df['close'] / df['close'].iloc[0] * 100
-                plt.plot(df.index, normalized, label=symbol)
-        
-        plt.title('股票价格比较 (基准化)')
-        plt.xlabel('日期')
-        plt.ylabel('价格 (归一化)')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig('stocks_comparison.png')
-        print("已保存股票比较图到 stocks_comparison.png")
+        # 计算每个股票的基本统计信息
+        for symbol, data in data_dict.items():
+            # 验证数据
+            validated_data, report = DataValidator.validate_data(data)
+            
+            print(f"\n{symbol} 统计信息:")
+            print(f"数据点数量: {len(validated_data)}")
+            print(f"平均收盘价: ${validated_data['close'].mean():.2f}")
+            print(f"平均日成交量: {validated_data['volume'].mean():.0f}")
+            
+            if not report['validation_passed']:
+                print(f"警告: 数据验证未通过")
+                if report['invalid_prices']:
+                    print(f"发现不合理价格: {report['invalid_prices']}")
+                if report['gaps']:
+                    print(f"发现数据缺失: {report['gaps']}")
         
     except Exception as e:
         print(f"获取多股票数据失败: {e}")

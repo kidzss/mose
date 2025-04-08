@@ -1,13 +1,18 @@
 """
-Monitor module for real-time market data monitoring
+投资组合监控模块
 """
 
-from .real_time_monitor import RealTimeMonitor
-from .data_fetcher import DataFetcher
-from .stock_monitor_manager import StockMonitorManager
+from .portfolio_monitor import PortfolioMonitor
+from .report_generator import ReportGenerator
+from .notification_manager import NotificationManager
 from .market_monitor import MarketMonitor
 
-__all__ = ['RealTimeMonitor', 'DataFetcher', 'StockMonitorManager', 'MarketMonitor']
+__all__ = [
+    'PortfolioMonitor',
+    'ReportGenerator',
+    'NotificationManager',
+    'MarketMonitor'
+]
 
 __version__ = '0.1.0'
 

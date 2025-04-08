@@ -4,6 +4,7 @@ import logging
 import time
 import smtplib
 import pandas as pd
+import numpy as np
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -16,7 +17,86 @@ from backtest.risk_manager import RiskManager
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.trading_config import TradingConfig, default_config
-from strategy.uss_cpgw import calculate_indicators, check_last_day_signal
+
+def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate technical indicators for trading signals"""
+    if df is None or df.empty:
+        return None
+        
+    try:
+        # Calculate moving averages
+        df['MA5'] = df['Close'].rolling(window=5).mean()
+        df['MA10'] = df['Close'].rolling(window=10).mean()
+        df['MA20'] = df['Close'].rolling(window=20).mean()
+        
+        # Calculate volume indicators
+        df['Volume_MA5'] = df['Volume'].rolling(window=5).mean()
+        df['Volume_MA10'] = df['Volume'].rolling(window=10).mean()
+        
+        # Calculate momentum indicators
+        df['RSI'] = calculate_rsi(df['Close'], period=14)
+        df['MACD'], df['Signal'], df['Hist'] = calculate_macd(df['Close'])
+        
+        # Calculate custom indicators
+        df['Long Line'] = (df['MA20'] + df['MA10']) / 2
+        df['Hot Money Line'] = df['MA5']
+        df['Main Force Line'] = df['MA10']
+        
+        return df
+    except Exception as e:
+        logging.error(f"Error calculating indicators: {str(e)}")
+        return None
+
+def calculate_rsi(prices: pd.Series, period: int = 14) -> pd.Series:
+    """Calculate Relative Strength Index"""
+    delta = prices.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+
+def calculate_macd(prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> tuple:
+    """Calculate MACD, Signal line, and Histogram"""
+    exp1 = prices.ewm(span=fast, adjust=False).mean()
+    exp2 = prices.ewm(span=slow, adjust=False).mean()
+    macd = exp1 - exp2
+    signal_line = macd.ewm(span=signal, adjust=False).mean()
+    hist = macd - signal_line
+    return macd, signal_line, hist
+
+def check_last_day_signal(df: pd.DataFrame) -> str:
+    """Check for trading signals based on the latest data"""
+    if df is None or len(df) < 20:
+        return "Insufficient data"
+        
+    try:
+        last_row = df.iloc[-1]
+        prev_row = df.iloc[-2]
+        
+        # Check for buy signals
+        buy_signal = (
+            last_row['Hot Money Line'] > last_row['Main Force Line'] and
+            last_row['Main Force Line'] > last_row['Long Line'] and
+            last_row['Volume'] > last_row['Volume_MA5'] * 1.5
+        )
+        
+        # Check for sell signals
+        sell_signal = (
+            last_row['Hot Money Line'] < last_row['Main Force Line'] and
+            last_row['Main Force Line'] < last_row['Long Line'] and
+            last_row['Volume'] > last_row['Volume_MA5']
+        )
+        
+        if buy_signal:
+            return "Buy signal detected"
+        elif sell_signal:
+            return "Sell signal detected"
+        else:
+            return "No clear signal"
+            
+    except Exception as e:
+        logging.error(f"Error checking signals: {str(e)}")
+        return "Error in signal detection"
 
 class DataFetcher:
     def __init__(self, config: TradingConfig):

@@ -1,16 +1,30 @@
 # data/data_interface.py
 import pandas as pd
 from abc import ABC, abstractmethod
-from typing import List, Dict, Optional, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple, Any, Callable
 import datetime as dt
 import pymysql
 from pymysql.cursors import DictCursor
 import os
 import sys
+from functools import lru_cache
+import hashlib
+import json
+import random
+import asyncio
 
 # 添加项目根目录到sys.path以便导入config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config.data_config import default_data_config
+from .data_validator import DataValidator
+
+def cache_key(*args, **kwargs):
+    """生成缓存键"""
+    # 将参数转换为字符串
+    key_parts = [str(arg) for arg in args]
+    key_parts.extend(f"{k}={v}" for k, v in sorted(kwargs.items()))
+    # 使用MD5生成唯一键
+    return hashlib.md5(json.dumps(key_parts).encode()).hexdigest()
 
 class DataSource(ABC):
     """数据源抽象基类"""
@@ -36,6 +50,46 @@ class DataSource(ABC):
     @abstractmethod
     def search_symbols(self, query: str) -> List[Dict]:
         """搜索股票代码"""
+        pass
+
+
+class RealTimeDataSource(DataSource):
+    """实时数据源基类"""
+    
+    @abstractmethod
+    async def get_realtime_data(self, symbols: List[str], 
+                              timeframe: str = '1m') -> Dict[str, pd.DataFrame]:
+        """获取实时数据
+        
+        参数:
+            symbols: 股票代码列表
+            timeframe: 时间周期，如'1m', '5m', '15m'等
+            
+        返回:
+            字典，key为股票代码，value为DataFrame
+        """
+        pass
+    
+    @abstractmethod
+    async def subscribe_updates(self, symbols: List[str], 
+                              callback: Callable[[str, pd.DataFrame], None],
+                              timeframe: str = '1m') -> None:
+        """订阅数据更新
+        
+        参数:
+            symbols: 股票代码列表
+            callback: 回调函数，接收股票代码和DataFrame
+            timeframe: 时间周期
+        """
+        pass
+    
+    @abstractmethod
+    async def unsubscribe_updates(self, symbols: List[str]) -> None:
+        """取消订阅数据更新
+        
+        参数:
+            symbols: 股票代码列表
+        """
         pass
 
 
@@ -393,19 +447,145 @@ class MySQLDataSource(DataSource):
 #         return df
 
 
-class YahooFinanceDataSource(DataSource):
-    """Yahoo Finance API数据源实现"""
+class YahooFinanceDataSource(RealTimeDataSource):
+    """Yahoo Finance数据源实现"""
+    
+    def __init__(self):
+        import yfinance as yf
+        self.yf = yf
+        
+    def get_historical_data(self, symbol: str, start_date: dt.datetime, 
+                           end_date: dt.datetime, timeframe: str = 'daily') -> pd.DataFrame:
+        """获取历史数据"""
+        try:
+            # 获取股票数据
+            stock = self.yf.Ticker(symbol)
+            # 获取历史数据
+            df = stock.history(
+                start=start_date.strftime('%Y-%m-%d'),
+                end=end_date.strftime('%Y-%m-%d'),
+                interval=timeframe
+            )
+            if not df.empty:
+                # 标准化列名
+                df = self._standardize_dataframe(df)
+            return df
+        except Exception as e:
+            print(f"获取{symbol}历史数据失败: {e}")
+            return pd.DataFrame()
+            
+    def get_multiple_symbols(self, symbols: List[str], start_date: dt.datetime,
+                            end_date: dt.datetime, timeframe: str = 'daily') -> Dict[str, pd.DataFrame]:
+        """获取多个股票的历史数据"""
+        result = {}
+        for symbol in symbols:
+            result[symbol] = self.get_historical_data(symbol, start_date, end_date, timeframe)
+        return result
+        
+    def get_latest_data(self, symbol: str, n_bars: int = 1, 
+                       timeframe: str = 'daily') -> pd.DataFrame:
+        """获取最新的n条数据"""
+        end_date = dt.datetime.now()
+        start_date = end_date - dt.timedelta(days=n_bars * 2)  # 多取一些数据确保足够
+        df = self.get_historical_data(symbol, start_date, end_date, timeframe)
+        if not df.empty and len(df) > n_bars:
+            return df.iloc[-n_bars:]
+        return df
+        
+    def search_symbols(self, query: str) -> List[Dict]:
+        """搜索股票代码"""
+        try:
+            # 使用yfinance的搜索功能
+            from yfinance.utils import get_market_symbols
+            # 获取所有股票列表然后过滤
+            all_symbols = get_market_symbols()
+            
+            # 过滤包含查询字符串的股票
+            results = []
+            for symbol in all_symbols:
+                if query.lower() in symbol.lower():
+                    results.append({
+                        'symbol': symbol,
+                        'name': '', # yfinance API不直接提供名称信息
+                        'exchange': '' # yfinance API不直接提供交易所信息
+                    })
+                    if len(results) >= 20:
+                        break
+                        
+            return results
+            
+        except Exception as e:
+            print(f"搜索股票出错: {e}")
+            return []
+            
+    async def get_realtime_data(self, symbols: List[str], 
+                              timeframe: str = '1m') -> Dict[str, pd.DataFrame]:
+        """获取实时数据"""
+        result = {}
+        for symbol in symbols:
+            try:
+                # 获取股票数据
+                stock = self.yf.Ticker(symbol)
+                # 获取实时数据
+                df = stock.history(period='1d', interval='1m')
+                if not df.empty:
+                    # 标准化列名
+                    df = self._standardize_dataframe(df)
+                    result[symbol] = df
+            except Exception as e:
+                print(f"获取{symbol}实时数据失败: {e}")
+        return result
+        
+    async def subscribe_updates(self, symbols: List[str], 
+                              callback: Callable[[str, pd.DataFrame], None],
+                              timeframe: str = '1m') -> None:
+        """订阅数据更新"""
+        # Yahoo Finance不支持实时订阅，这里使用轮询方式
+        while True:
+            data = await self.get_realtime_data(symbols, timeframe)
+            for symbol, df in data.items():
+                if not df.empty:
+                    callback(symbol, df)
+            await asyncio.sleep(60)  # 每分钟更新一次
+            
+    async def unsubscribe_updates(self, symbols: List[str]) -> None:
+        """取消订阅数据更新"""
+        # Yahoo Finance不支持取消订阅，这里只是占位
+        pass
+        
+    def _standardize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """标准化DataFrame格式"""
+        # 重命名列
+        df = df.rename(columns={
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume',
+            'Adj Close': 'adj_close'
+        })
+        # 确保所有必需的列都存在
+        required_columns = ['open', 'high', 'low', 'close', 'volume', 'adj_close']
+        for col in required_columns:
+            if col not in df.columns:
+                df[col] = None
+        return df
+
+
+class YahooFinanceRealTimeSource(RealTimeDataSource):
+    """基于YahooFinance的实时数据源实现"""
     
     def __init__(self, config: Dict = None):
-        """
-        初始化Yahoo Finance数据源
+        """初始化Yahoo Finance实时数据源
         
         Args:
             config: 配置参数
                 - proxy: 代理服务器地址
                 - timeout: 请求超时时间(秒)
                 - max_retries: 最大重试次数
+                - update_interval: 更新间隔(秒)
         """
+        super().__init__()
         try:
             import yfinance as yf
             self.yf = yf
@@ -420,106 +600,48 @@ class YahooFinanceDataSource(DataSource):
         self.proxy = config.get('proxy')
         self.timeout = config.get('timeout', 30)
         self.max_retries = config.get('max_retries', 3)
+        self.update_interval = config.get('update_interval', 60)  # 默认60秒更新一次
+        
+        # 用于存储订阅信息
+        self.subscriptions = {}
+        self.running = False
+        self.update_task = None
+        
+    async def get_historical_data(self, symbol: str, start_date: dt.datetime, 
+                                end_date: dt.datetime, timeframe: str = 'daily') -> pd.DataFrame:
+        """获取历史OHLCV数据"""
+        try:
+            ticker = self.yf.Ticker(symbol)
+            df = ticker.history(
+                start=start_date.strftime('%Y-%m-%d'),
+                end=end_date.strftime('%Y-%m-%d'),
+                interval=timeframe
+            )
+            return self._standardize_dataframe(df)
+        except Exception as e:
+            print(f"获取历史数据失败 ({symbol}): {e}")
+            return pd.DataFrame()
     
-    def get_historical_data(self, symbol: str, start_date: dt.datetime, 
-                           end_date: dt.datetime, timeframe: str = 'daily') -> pd.DataFrame:
-        """从Yahoo Finance获取历史OHLCV数据"""
-        
-        # 映射时间周期格式
-        interval_map = {
-            'daily': '1d',
-            'weekly': '1wk',
-            'monthly': '1mo'
-        }
-        interval = interval_map.get(timeframe.lower(), '1d')
-        
-        # 尝试获取数据，支持重试
-        for attempt in range(self.max_retries):
-            try:
-                # 使用yfinance获取数据
-                ticker = self.yf.Ticker(symbol)
-                df = ticker.history(
-                    start=start_date.strftime('%Y-%m-%d'),
-                    end=end_date.strftime('%Y-%m-%d'),
-                    interval=interval,
-                    proxy=self.proxy,
-                    timeout=self.timeout
-                )
-                
-                # 如果成功获取数据，退出重试循环
-                if not df.empty:
-                    break
-                    
-            except Exception as e:
-                # 最后一次尝试仍然失败，则抛出异常
-                if attempt == self.max_retries - 1:
-                    print(f"获取Yahoo数据失败 ({symbol}): {e}")
-                    return pd.DataFrame(columns=['Open', 'High', 'Low', 'Close', 'Volume'])
-                # 否则等待一段时间后重试
-                else:
-                    import time
-                    time.sleep(1)  # 等待1秒后重试
-        
-        # 标准化Yahoo Finance数据格式
-        if not df.empty:
-            # 重命名列
-            df = df.rename(columns={
-                'Open': 'open',
-                'High': 'high',
-                'Low': 'low',
-                'Close': 'close',
-                'Volume': 'volume',
-                'Adj Close': 'adj_close'
-            })
-            
-            # 删除不需要的列
-            for col in df.columns:
-                if col not in ['open', 'high', 'low', 'close', 'volume', 'adj_close']:
-                    df = df.drop(col, axis=1)
-            
-            # 确保所有必要的列存在
-            for col in ['open', 'high', 'low', 'close', 'volume', 'adj_close']:
-                if col not in df.columns:
-                    df[col] = 0.0
-        
-        return df
-    
-    def get_multiple_symbols(self, symbols: List[str], start_date: dt.datetime,
-                            end_date: dt.datetime, timeframe: str = 'daily') -> Dict[str, pd.DataFrame]:
+    async def get_multiple_symbols(self, symbols: List[str], start_date: dt.datetime,
+                                 end_date: dt.datetime, timeframe: str = 'daily') -> Dict[str, pd.DataFrame]:
         """获取多个股票的历史数据"""
         result = {}
         for symbol in symbols:
-            result[symbol] = self.get_historical_data(symbol, start_date, end_date, timeframe)
+            result[symbol] = await self.get_historical_data(symbol, start_date, end_date, timeframe)
         return result
     
-    def get_latest_data(self, symbol: str, n_bars: int = 1, 
-                       timeframe: str = 'daily') -> pd.DataFrame:
+    async def get_latest_data(self, symbol: str, n_bars: int = 1, 
+                            timeframe: str = 'daily') -> pd.DataFrame:
         """获取最新的n条数据"""
-        # 计算开始日期，保守估计 (因为可能有非交易日)
-        end_date = dt.datetime.now()
-        
-        # 根据时间周期和所需条数计算所需天数
-        days_map = {
-            'daily': 1.5,   # 每条数据约1.5天 (考虑周末和假日)
-            'weekly': 7,     # 每条数据7天
-            'monthly': 31    # 每条数据31天
-        }
-        
-        # 计算需要获取的日期范围，多获取一些以确保足够
-        days_factor = days_map.get(timeframe.lower(), 1.5)
-        days_needed = int(n_bars * days_factor * 2)  # 多取2倍时间以确保数据足够
-        
-        start_date = end_date - dt.timedelta(days=days_needed)
-        
-        # 获取历史数据
-        df = self.get_historical_data(symbol, start_date, end_date, timeframe)
-        
-        # 截取所需的最新n条数据
-        if len(df) > n_bars:
-            return df.iloc[-n_bars:]
-        return df
+        try:
+            ticker = self.yf.Ticker(symbol)
+            df = ticker.history(period=f"{n_bars}d", interval=timeframe)
+            return self._standardize_dataframe(df)
+        except Exception as e:
+            print(f"获取最新数据失败 ({symbol}): {e}")
+            return pd.DataFrame()
     
-    def search_symbols(self, query: str) -> List[Dict]:
+    async def search_symbols(self, query: str) -> List[Dict]:
         """搜索股票代码"""
         try:
             # 使用yfinance的搜索功能
@@ -544,9 +666,136 @@ class YahooFinanceDataSource(DataSource):
             
         except Exception as e:
             print(f"搜索股票出错: {e}")
-            
-            # 返回空列表
             return []
+        
+    async def get_realtime_data(self, symbols: List[str], 
+                              timeframe: str = '1m') -> Dict[str, pd.DataFrame]:
+        """获取实时数据
+        
+        Args:
+            symbols: 股票代码列表
+            timeframe: 时间周期，如'1m', '5m', '15m'等
+            
+        Returns:
+            字典，key为股票代码，value为DataFrame
+        """
+        result = {}
+        for symbol in symbols:
+            try:
+                # 使用yfinance获取最新数据
+                ticker = self.yf.Ticker(symbol)
+                # 获取最近的分钟数据
+                df = ticker.history(period='1d', interval=timeframe)
+                
+                if not df.empty:
+                    # 标准化数据格式
+                    df = self._standardize_dataframe(df)
+                    result[symbol] = df
+                else:
+                    result[symbol] = pd.DataFrame()
+                    
+            except Exception as e:
+                print(f"获取{symbol}实时数据失败: {e}")
+                result[symbol] = pd.DataFrame()
+                
+        return result
+        
+    async def subscribe_updates(self, symbols: List[str], 
+                              callback: Callable[[str, pd.DataFrame], None],
+                              timeframe: str = '1m') -> None:
+        """订阅数据更新
+        
+        Args:
+            symbols: 股票代码列表
+            callback: 回调函数，接收股票代码和DataFrame
+            timeframe: 时间周期
+        """
+        import asyncio
+        
+        # 存储订阅信息
+        for symbol in symbols:
+            if symbol not in self.subscriptions:
+                self.subscriptions[symbol] = set()
+            self.subscriptions[symbol].add(callback)
+        
+        # 如果更新任务未运行，启动它
+        if not self.running:
+            self.running = True
+            self.update_task = asyncio.create_task(self._update_loop(timeframe))
+            
+    async def unsubscribe_updates(self, symbols: List[str]) -> None:
+        """取消订阅数据更新
+        
+        Args:
+            symbols: 股票代码列表
+        """
+        # 移除订阅
+        for symbol in symbols:
+            if symbol in self.subscriptions:
+                del self.subscriptions[symbol]
+                
+        # 如果没有任何订阅，停止更新任务
+        if not self.subscriptions and self.update_task:
+            self.running = False
+            self.update_task.cancel()
+            self.update_task = None
+            
+    async def _update_loop(self, timeframe: str) -> None:
+        """更新循环"""
+        import asyncio
+        
+        while self.running:
+            try:
+                # 获取所有订阅的股票的最新数据
+                symbols = list(self.subscriptions.keys())
+                data = await self.get_realtime_data(symbols, timeframe)
+                
+                # 调用回调函数
+                for symbol, df in data.items():
+                    if symbol in self.subscriptions and not df.empty:
+                        for callback in self.subscriptions[symbol]:
+                            try:
+                                callback(symbol, df)
+                            except Exception as e:
+                                print(f"调用回调函数失败 ({symbol}): {e}")
+                                
+            except Exception as e:
+                print(f"更新循环出错: {e}")
+                
+            # 等待下一次更新
+            await asyncio.sleep(self.update_interval)
+            
+    def _standardize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """标准化DataFrame格式"""
+        if df.empty:
+            return df
+            
+        # 重命名列
+        renaming = {
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume',
+            'Adj Close': 'adj_close'
+        }
+        df = df.rename(columns={k: v for k, v in renaming.items() if k in df.columns})
+        
+        # 确保所有必要的列存在
+        for col in ['open', 'high', 'low', 'close', 'volume']:
+            if col not in df.columns:
+                df[col] = 0.0
+                
+        if 'adj_close' not in df.columns:
+            df['adj_close'] = df['close']
+            
+        return df
+            
+    def __del__(self):
+        """清理资源"""
+        if self.update_task:
+            self.running = False
+            self.update_task.cancel()
 
 
 class DataInterface:
@@ -571,9 +820,13 @@ class DataInterface:
         self.config = config
         self.default_source = default_source
         self.data_sources = {}
+        self._cache = {}
         
         # 初始化所有配置的数据源
         self._init_data_sources()
+        
+        # 初始化数据更新器
+        self._init_data_updater()
     
     def _init_data_sources(self):
         """初始化所有配置的数据源"""
@@ -591,7 +844,7 @@ class DataInterface:
         # Yahoo Finance数据源
         if 'yahoo' in self.config:
             try:
-                self.data_sources['yahoo'] = YahooFinanceDataSource(self.config['yahoo'])
+                self.data_sources['yahoo'] = YahooFinanceDataSource()
             except (ImportError, ConnectionError) as e:
                 print(f"Yahoo Finance数据源初始化失败: {e}")
     
@@ -606,10 +859,11 @@ class DataInterface:
             raise ValueError(f"数据源 '{source_name}' 不存在")
         return self.data_sources[source_name]
     
+    @lru_cache(maxsize=100)
     def get_historical_data(self, symbol: str, start_date: Union[str, dt.datetime], 
                           end_date: Union[str, dt.datetime], timeframe: str = 'daily',
                           source: str = None) -> pd.DataFrame:
-        """获取历史数据"""
+        """获取历史数据（带缓存）"""
         # 处理日期格式
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
@@ -618,11 +872,14 @@ class DataInterface:
         data_source = self.get_data_source(source)
         
         # 获取数据
-        return data_source.get_historical_data(symbol, start_date, end_date, timeframe)
+        df = data_source.get_historical_data(symbol, start_date, end_date, timeframe)
+        
+        return df
     
+    @lru_cache(maxsize=50)
     def get_data_for_strategy(self, symbol: str, lookback_days: int = None, 
                             timeframe: str = 'daily', source: str = None) -> pd.DataFrame:
-        """获取适合策略使用的数据"""
+        """获取适合策略使用的数据（带缓存）"""
         # 使用配置文件中的默认回溯天数
         if lookback_days is None:
             lookback_days = default_data_config.default_lookback_days
@@ -635,31 +892,35 @@ class DataInterface:
         df = self.get_historical_data(symbol, start_date, end_date, timeframe, source)
         
         # 进行必要的预处理
+        df = self._preprocess_strategy_data(df)
+        
+        return df
+    
+    def _preprocess_strategy_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        """预处理策略数据"""
+        if df.empty:
+            return df
+            
         # 1. 确保没有缺失值
-        df = df.ffill()  # 使用前向填充替代method='ffill'
+        df = df.ffill()
         
-        # 2. 计算一些基本的衍生变量
-        if not df.empty:
-            # 计算收益率
-            df['returns'] = df['close'].pct_change()
-            
-            # 计算波动率
-            df['volatility'] = df['returns'].rolling(window=20).std()
-            
-            # 计算移动平均线
-            df['ma5'] = df['close'].rolling(window=5).mean()
-            df['ma10'] = df['close'].rolling(window=10).mean()
-            df['ma20'] = df['close'].rolling(window=20).mean()
-            df['ma60'] = df['close'].rolling(window=60).mean()
-            
-            # 计算布林带
-            df['upper_band'] = df['ma20'] + (df['close'].rolling(window=20).std() * 2)
-            df['lower_band'] = df['ma20'] - (df['close'].rolling(window=20).std() * 2)
+        # 2. 计算基本的衍生变量
+        # 计算收益率
+        df['returns'] = df['close'].pct_change()
         
-        # 3. 截取所需的最近数据
-        if len(df) > lookback_days:
-            df = df.iloc[-lookback_days:]
-            
+        # 计算波动率
+        df['volatility'] = df['returns'].rolling(window=20).std()
+        
+        # 计算移动平均线
+        df['ma5'] = df['close'].rolling(window=5).mean()
+        df['ma10'] = df['close'].rolling(window=10).mean()
+        df['ma20'] = df['close'].rolling(window=20).mean()
+        df['ma60'] = df['close'].rolling(window=60).mean()
+        
+        # 计算布林带
+        df['upper_band'] = df['ma20'] + (df['close'].rolling(window=20).std() * 2)
+        df['lower_band'] = df['ma20'] - (df['close'].rolling(window=20).std() * 2)
+        
         return df
     
     def get_multiple_symbols_data(self, symbols: List[str], start_date: Union[str, dt.datetime], 
@@ -680,3 +941,185 @@ class DataInterface:
         """搜索股票代码"""
         data_source = self.get_data_source(source)
         return data_source.search_symbols(query)
+    
+    def _init_data_updater(self):
+        """初始化数据更新器"""
+        from .data_updater import MarketDataUpdater
+        self.updater = MarketDataUpdater(self.config.get('mysql', {}))
+    
+    def update_market_data(self, symbols: List[str] = None, force_update: bool = False) -> Dict[str, Any]:
+        """
+        更新市场数据
+        
+        Args:
+            symbols: 要更新的股票列表，如果为None则使用默认列表
+            force_update: 是否强制更新（忽略最后更新时间）
+            
+        Returns:
+            更新报告，包含更新状态和统计信息
+        """
+        return self.updater.update_stock_data(symbols, force_update=force_update)
+    
+    def get_last_update_time(self, symbol: str = None) -> Union[dt.datetime, Dict[str, dt.datetime]]:
+        """
+        获取数据最后更新时间
+        
+        Args:
+            symbol: 股票代码，如果为None则返回所有股票的最后更新时间
+            
+        Returns:
+            最后更新时间或更新时间字典
+        """
+        if symbol is None:
+            # 获取所有股票的最后更新时间
+            return self.updater.get_last_update_times()
+        return self.updater.get_last_update_time(symbol)
+    
+    def check_data_status(self, symbol: str = None) -> Dict[str, Any]:
+        """
+        检查数据状态
+        
+        Args:
+            symbol: 股票代码，如果为None则检查所有股票
+            
+        Returns:
+            数据状态报告，包含：
+            - 最后更新时间
+            - 数据完整性
+            - 缺失区间
+            - 异常值统计
+        """
+        if symbol is None:
+            symbols = self.get_available_symbols()
+        else:
+            symbols = [symbol]
+            
+        report = {}
+        for sym in symbols:
+            # 获取最新数据
+            data = self.get_historical_data(sym, 
+                                         start_date=dt.datetime.now() - dt.timedelta(days=30),
+                                         end_date=dt.datetime.now())
+            
+            # 验证数据
+            _, validation_report = DataValidator.validate_data(data)
+            
+            # 获取最后更新时间
+            last_update = self.get_last_update_time(sym)
+            
+            report[sym] = {
+                'last_update': last_update,
+                'validation': validation_report,
+                'data_points': len(data) if not data.empty else 0,
+                'status': 'ok' if validation_report['validation_passed'] else 'warning'
+            }
+            
+        return report
+    
+    def get_available_symbols(self) -> List[str]:
+        """获取可用的股票代码列表"""
+        return self.updater.db_manager.get_existing_stocks()
+    
+    def get_symbol_info(self, symbol: str) -> Dict[str, Any]:
+        """
+        获取股票详细信息
+        
+        Args:
+            symbol: 股票代码
+            
+        Returns:
+            股票信息字典，包含：
+            - 基本信息（代码、名称等）
+            - 数据统计（数据点数量、时间范围等）
+            - 最后更新时间
+            - 数据质量报告
+        """
+        # 获取基本数据
+        data = self.get_historical_data(symbol,
+                                     start_date=dt.datetime.now() - dt.timedelta(days=365),
+                                     end_date=dt.datetime.now())
+        
+        # 获取数据验证报告
+        _, validation_report = DataValidator.validate_data(data)
+        
+        # 获取最后更新时间
+        last_update = self.get_last_update_time(symbol)
+        
+        # 计算基本统计信息
+        if not data.empty:
+            stats = {
+                'data_points': len(data),
+                'date_range': {
+                    'start': data.index[0].strftime('%Y-%m-%d'),
+                    'end': data.index[-1].strftime('%Y-%m-%d')
+                },
+                'price_range': {
+                    'min': data['low'].min(),
+                    'max': data['high'].max(),
+                    'current': data['close'].iloc[-1]
+                },
+                'volume_stats': {
+                    'avg': data['volume'].mean(),
+                    'max': data['volume'].max()
+                }
+            }
+        else:
+            stats = {
+                'data_points': 0,
+                'date_range': None,
+                'price_range': None,
+                'volume_stats': None
+            }
+            
+        return {
+            'symbol': symbol,
+            'last_update': last_update,
+            'validation': validation_report,
+            'statistics': stats
+        }
+    
+    @lru_cache(maxsize=100)
+    def get_market_status(self) -> Dict[str, Any]:
+        """
+        获取市场整体状态
+        
+        Returns:
+            市场状态报告，包含：
+            - 可用股票数量
+            - 数据更新统计
+            - 数据质量统计
+            - 系统状态
+        """
+        symbols = self.get_available_symbols()
+        
+        status = {
+            'total_symbols': len(symbols),
+            'last_update': dt.datetime.now(),
+            'data_quality': {
+                'valid': 0,
+                'warning': 0,
+                'error': 0
+            },
+            'system_status': 'operational'
+        }
+        
+        # 检查随机样本
+        sample_size = min(10, len(symbols))
+        sample_symbols = random.sample(symbols, sample_size)
+        
+        for symbol in sample_symbols:
+            symbol_status = self.check_data_status(symbol)
+            if symbol_status[symbol]['status'] == 'ok':
+                status['data_quality']['valid'] += 1
+            elif symbol_status[symbol]['status'] == 'warning':
+                status['data_quality']['warning'] += 1
+            else:
+                status['data_quality']['error'] += 1
+        
+        # 扩展到总体
+        factor = len(symbols) / sample_size
+        status['data_quality'] = {
+            k: int(v * factor) for k, v in status['data_quality'].items()
+        }
+        
+        return status

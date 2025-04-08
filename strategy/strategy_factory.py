@@ -7,13 +7,12 @@ import sys
 from pathlib import Path
 
 from .strategy_base import Strategy
-from .uss_gold_triangle_strategy import GoldTriangleStrategy
-from .uss_momentum_strategy import MomentumStrategy
-from .uss_tdi_strategy import TDIStrategy
-from .uss_market_forecast_strategy import MarketForecastStrategy
-from .uss_cpgw_strategy import CPGWStrategy
-from .uss_volume_strategy import VolumeStrategy
 from .uss_niuniu_strategy import NiuniuStrategy
+from .tdi_strategy import TDIStrategy
+from .bollinger_bands_strategy import BollingerBandsStrategy
+from .custom_strategy import CustomStrategy
+from .niuniu_strategy_v3 import NiuniuStrategyV3
+from .combined_strategy import CombinedStrategy
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
@@ -39,6 +38,10 @@ class StrategyFactory:
         self.register_strategy("CPGW", CPGWStrategy)
         self.register_strategy("Volume", VolumeStrategy)
         self.register_strategy("Niuniu", NiuniuStrategy)
+        self.register_strategy("BollingerBands", BollingerBandsStrategy)
+        self.register_strategy("Custom", CustomStrategy)
+        self.register_strategy("NiuniuV3", NiuniuStrategyV3)
+        self.register_strategy("Combined", CombinedStrategy)
         logger.info(f"注册了 {len(self.strategies)} 个内置策略")
 
     def register_strategy(self, name: str, strategy_class: Type[Strategy]) -> None:
@@ -56,29 +59,27 @@ class StrategyFactory:
         self.strategies[name] = strategy_class
         logger.info(f"成功注册策略: {name}")
 
-    def create_strategy(self, name: str, parameters: Optional[Dict[str, Any]] = None) -> Optional[Strategy]:
+    @staticmethod
+    def create_strategy(strategy_name: str, **kwargs) -> Strategy:
         """
         创建策略实例
-        
-        参数:
-            name: 策略名称
-            parameters: 策略参数
-            
-        返回:
-            策略实例，如果策略不存在则返回None
+        :param strategy_name: 策略名称
+        :param kwargs: 策略参数
+        :return: 策略实例
         """
-        strategy_class = self.strategies.get(name)
-        if strategy_class is None:
-            logger.warning(f"策略 {name} 不存在")
-            return None
-
-        try:
-            strategy = strategy_class(parameters)
-            logger.info(f"成功创建策略 {name} 实例")
-            return strategy
-        except Exception as e:
-            logger.error(f"创建策略 {name} 实例时出错: {e}")
-            return None
+        strategy_map = {
+            'niuniu': NiuniuStrategy,
+            'tdi': TDIStrategy,
+            'bollinger_bands': BollingerBandsStrategy,
+            'custom': CustomStrategy,
+            'niuniu_v3': NiuniuStrategyV3,
+            'combined': CombinedStrategy
+        }
+        
+        if strategy_name not in strategy_map:
+            raise ValueError(f"Unknown strategy: {strategy_name}")
+            
+        return strategy_map[strategy_name](**kwargs)
 
     def create_all_strategies(self, parameters: Optional[Dict[str, Dict[str, Any]]] = None) -> Dict[str, Strategy]:
         """

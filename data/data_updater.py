@@ -12,6 +12,7 @@ from tqdm import tqdm
 import sys
 from config.trading_config import default_config
 import pymysql
+from typing import List, Dict, Any
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -257,6 +258,100 @@ class DatabaseManager:
             logger.error(f"同步表之间差异时出错: {str(e)}")
             raise
 
+    def save_stock_data(self, symbol: str, df: pd.DataFrame) -> bool:
+        """
+        保存股票数据到数据库
+        
+        Args:
+            symbol: 股票代码
+            df: 包含股票数据的DataFrame
+            
+        Returns:
+            bool: 是否成功保存
+        """
+        try:
+            if df.empty:
+                logger.warning(f"股票 {symbol} 没有数据需要保存")
+                return False
+                
+            # 确保日期格式正确
+            df['Date'] = pd.to_datetime(df['Date']).dt.strftime('%Y-%m-%d')
+            
+            # 添加股票代码列
+            df['Code'] = symbol
+            
+            # 移除Amount列（如果存在）
+            if 'Amount' in df.columns:
+                df = df.drop('Amount', axis=1)
+            
+            # 分别保存到两个表
+            try:
+                # 获取连接
+                conn = pymysql.connect(
+                    host=self.config['host'],
+                    port=self.config['port'],
+                    user=self.config['user'],
+                    password=self.config['password'],
+                    database=self.config['database']
+                )
+                
+                try:
+                    with conn.cursor() as cursor:
+                        # 临时关闭严格模式
+                        cursor.execute("SET SESSION sql_mode=''")
+                        
+                        # 获取列名
+                        columns = df.columns.tolist()
+                        column_names = ', '.join(['`' + col + '`' for col in columns])
+                        
+                        # 构建占位符
+                        placeholders = ', '.join(['%s'] * len(columns))
+                        
+                        # 构建SQL - 使用REPLACE INTO
+                        sql = f"""
+                        REPLACE INTO stock_time_code ({column_names})
+                        VALUES ({placeholders})
+                        """
+                        
+                        # 逐行插入
+                        for _, row in df.iterrows():
+                            values = [row[col] for col in columns]
+                            cursor.execute(sql, values)
+                            
+                        # 提交事务
+                        conn.commit()
+                        
+                        # 对stock_code_time表执行相同的操作
+                        sql = f"""
+                        REPLACE INTO stock_code_time ({column_names})
+                        VALUES ({placeholders})
+                        """
+                        
+                        for _, row in df.iterrows():
+                            values = [row[col] for col in columns]
+                            cursor.execute(sql, values)
+                            
+                        # 提交事务
+                        conn.commit()
+                        
+                    logger.info(f"成功保存股票 {symbol} 的数据，总计 {len(df)} 条记录")
+                    return True
+                    
+                except Exception as e:
+                    conn.rollback()
+                    logger.error(f"保存股票 {symbol} 数据时出错: {str(e)}")
+                    return False
+                finally:
+                    conn.close()
+                    
+            except Exception as e:
+                logger.error(f"保存股票 {symbol} 数据时出错: {str(e)}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"保存股票 {symbol} 数据初始化阶段出错: {str(e)}")
+            return False
+
 
 class StockDataFetcher:
     """负责从API获取股票数据的类"""
@@ -403,6 +498,34 @@ class MarketDataUpdater:
         """
         self.db_manager = DatabaseManager(db_config)
         self.data_fetcher = StockDataFetcher(proxies)
+        self._last_update_times = {}
+    
+    def get_last_update_time(self, symbol: str) -> datetime:
+        """
+        获取股票最后更新时间
+        
+        Args:
+            symbol: 股票代码
+            
+        Returns:
+            最后更新时间
+        """
+        if symbol in self._last_update_times:
+            return self._last_update_times[symbol]
+            
+        last_update = self.db_manager.get_last_update_date(symbol)
+        self._last_update_times[symbol] = last_update
+        return last_update
+        
+    def get_last_update_times(self) -> Dict[str, datetime]:
+        """
+        获取所有股票的最后更新时间
+        
+        Returns:
+            股票代码到更新时间的映射字典
+        """
+        symbols = self.db_manager.get_existing_stocks()
+        return {symbol: self.get_last_update_time(symbol) for symbol in symbols}
     
     def load_stock_lists(self):
         """加载SP500和Nasdaq100的股票列表"""
@@ -485,6 +608,38 @@ class MarketDataUpdater:
             # 3. 确保Code列为字符串
             df['Code'] = df['Code'].astype(str)
             
+            # 4. 验证价格数据的合理性
+            # 检查最高价是否低于最低价
+            invalid_hl = df[df['High'] < df['Low']]
+            if not invalid_hl.empty:
+                logger.warning(f"股票 {symbol} 存在最高价低于最低价的情况，日期: {invalid_hl['Date'].tolist()}")
+                # 修正数据：将最高价和最低价交换
+                df.loc[invalid_hl.index, ['High', 'Low']] = df.loc[invalid_hl.index, ['Low', 'High']].values
+            
+            # 检查最高价是否低于开盘价或收盘价
+            invalid_ho = df[df['High'] < df['Open']]
+            invalid_hc = df[df['High'] < df['Close']]
+            if not invalid_ho.empty:
+                logger.warning(f"股票 {symbol} 存在最高价低于开盘价的情况，日期: {invalid_ho['Date'].tolist()}")
+                # 修正数据：将最高价设置为开盘价和收盘价中的较大值
+                df.loc[invalid_ho.index, 'High'] = df.loc[invalid_ho.index, ['Open', 'Close']].max(axis=1)
+            if not invalid_hc.empty:
+                logger.warning(f"股票 {symbol} 存在最高价低于收盘价的情况，日期: {invalid_hc['Date'].tolist()}")
+                # 修正数据：将最高价设置为开盘价和收盘价中的较大值
+                df.loc[invalid_hc.index, 'High'] = df.loc[invalid_hc.index, ['Open', 'Close']].max(axis=1)
+            
+            # 检查最低价是否高于开盘价或收盘价
+            invalid_lo = df[df['Low'] > df['Open']]
+            invalid_lc = df[df['Low'] > df['Close']]
+            if not invalid_lo.empty:
+                logger.warning(f"股票 {symbol} 存在最低价高于开盘价的情况，日期: {invalid_lo['Date'].tolist()}")
+                # 修正数据：将最低价设置为开盘价和收盘价中的较小值
+                df.loc[invalid_lo.index, 'Low'] = df.loc[invalid_lo.index, ['Open', 'Close']].min(axis=1)
+            if not invalid_lc.empty:
+                logger.warning(f"股票 {symbol} 存在最低价高于收盘价的情况，日期: {invalid_lc['Date'].tolist()}")
+                # 修正数据：将最低价设置为开盘价和收盘价中的较小值
+                df.loc[invalid_lc.index, 'Low'] = df.loc[invalid_lc.index, ['Open', 'Close']].min(axis=1)
+            
             # 记录处理后的数据类型，便于调试
             logger.info(f"股票 {symbol} 处理后数据类型: {df.dtypes.to_dict()}")
             
@@ -516,123 +671,50 @@ class MarketDataUpdater:
                             columns = df_time_code.columns.tolist()
                             column_names = ', '.join(['`' + col + '`' for col in columns])
                             
-                            # 构建ON DUPLICATE KEY UPDATE部分
-                            update_clause = ', '.join([f"`{col}` = VALUES(`{col}`)" for col in columns if col not in ['Date', 'Code']])
-                            
                             # 构建占位符
                             placeholders = ', '.join(['%s'] * len(columns))
                             
-                            # 构建SQL
+                            # 构建SQL - 使用REPLACE INTO
                             sql = f"""
-                            INSERT INTO stock_time_code ({column_names})
+                            REPLACE INTO stock_time_code ({column_names})
                             VALUES ({placeholders})
-                            ON DUPLICATE KEY UPDATE {update_clause}
-                            """
-                            
-                            # 逐行插入 - 完全避免类型比较问题
-                            for _, row in df_time_code.iterrows():
-                                values = []
-                                for col in columns:
-                                    value = row[col]
-                                    # 确保正确的数据类型
-                                    if pd.isna(value):
-                                        if col in numeric_columns:
-                                            values.append(0.0)
-                                        else:
-                                            values.append("")
-                                    else:
-                                        values.append(value)
-                                
-                                # 执行SQL
-                                cursor.execute(sql, values)
-                            
-                            # 提交事务
-                            conn.commit()
-                            
-                        logger.info(f"股票 {symbol}: 插入/更新 {total_rows} 条记录到stock_time_code表")
-                    except Exception as batch_error:
-                        conn.rollback()
-                        logger.error(f"插入 {symbol} 数据到stock_time_code表时出错: {str(batch_error)}")
-                        raise
-                    finally:
-                        conn.close()
-                    
-                    # 2. 准备并更新stock_code_time表
-                    df_code_time = df.copy()
-                    valid_code_time_columns = [col for col in df_code_time.columns if col in code_time_columns]
-                    
-                    if not valid_code_time_columns:
-                        logger.error(f"股票 {symbol} 的数据与stock_code_time表结构不兼容，无法插入")
-                        return False
-                    
-                    df_code_time = df_code_time[valid_code_time_columns]
-                    total_rows = len(df_code_time)
-                    
-                    # 使用相同的方法处理stock_code_time表
-                    conn = pymysql.connect(
-                        host=self.db_manager.config['host'],
-                        port=self.db_manager.config['port'],
-                        user=self.db_manager.config['user'],
-                        password=self.db_manager.config['password'],
-                        database=self.db_manager.config['database']
-                    )
-                    
-                    try:
-                        with conn.cursor() as cursor:
-                            # 临时关闭严格模式
-                            cursor.execute("SET SESSION sql_mode=''")
-                            
-                            # 获取列名
-                            columns = df_code_time.columns.tolist()
-                            column_names = ', '.join(['`' + col + '`' for col in columns])
-                            
-                            # 构建ON DUPLICATE KEY UPDATE部分
-                            update_clause = ', '.join([f"`{col}` = VALUES(`{col}`)" for col in columns if col not in ['Date', 'Code']])
-                            
-                            # 构建占位符
-                            placeholders = ', '.join(['%s'] * len(columns))
-                            
-                            # 构建SQL
-                            sql = f"""
-                            INSERT INTO stock_code_time ({column_names})
-                            VALUES ({placeholders})
-                            ON DUPLICATE KEY UPDATE {update_clause}
                             """
                             
                             # 逐行插入
-                            for _, row in df_code_time.iterrows():
-                                values = []
-                                for col in columns:
-                                    value = row[col]
-                                    # 确保正确的数据类型
-                                    if pd.isna(value):
-                                        if col in numeric_columns:
-                                            values.append(0.0)
-                                        else:
-                                            values.append("")
-                                    else:
-                                        values.append(value)
-                                
-                                # 执行SQL
+                            for _, row in df_time_code.iterrows():
+                                values = [row[col] for col in columns]
                                 cursor.execute(sql, values)
-                            
+                                
                             # 提交事务
                             conn.commit()
                             
-                        logger.info(f"股票 {symbol}: 插入/更新 {total_rows} 条记录到stock_code_time表")
-                    except Exception as batch_error:
+                            # 对stock_code_time表执行相同的操作
+                            sql = f"""
+                            REPLACE INTO stock_code_time ({column_names})
+                            VALUES ({placeholders})
+                            """
+                            
+                            for _, row in df_time_code.iterrows():
+                                values = [row[col] for col in columns]
+                                cursor.execute(sql, values)
+                                
+                            # 提交事务
+                            conn.commit()
+                            
+                        logger.info(f"成功保存股票 {symbol} 的数据，总计 {total_rows} 条记录")
+                        return True
+                        
+                    except Exception as e:
                         conn.rollback()
-                        logger.error(f"插入 {symbol} 数据到stock_code_time表时出错: {str(batch_error)}")
-                        raise
+                        logger.error(f"保存股票 {symbol} 数据时出错: {str(e)}")
+                        return False
                     finally:
                         conn.close()
                     
-                    logger.info(f"成功更新股票 {symbol} 的数据，总计 {total_rows} 条记录")
-                    return True
                 else:
                     logger.error(f"股票 {symbol} 的数据与stock_time_code表结构不兼容，无法插入")
                     return False
-                
+                    
             except Exception as e:
                 logger.error(f"处理股票 {symbol} 数据时出错: {str(e)}")
                 return False
@@ -641,117 +723,163 @@ class MarketDataUpdater:
             logger.error(f"处理股票 {symbol} 数据初始化阶段出错: {str(e)}")
             return False
     
-    def update_stock_data(self, symbols=None):
-        """更新股票数据 - 增量更新两张表
+    def is_market_closed(self):
+        """检查当前是否为收盘后时间"""
+        now = datetime.now()
+        market_close_time = datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        return now > market_close_time
+
+    def is_data_complete(self, symbol, date_str):
+        """检查指定日期的数据是否完整"""
+        try:
+            query = text("""
+                SELECT Volume, Close 
+                FROM stock_time_code 
+                WHERE Code = :symbol 
+                AND Date = :date
+            """)
+            with self.db_manager.engine.connect() as conn:
+                result = conn.execute(query, {"symbol": symbol, "date": date_str}).fetchone()
+                
+                if result is None:
+                    return False
+                    
+                volume, close = result
+                # 如果成交量为0或收盘价为None，认为数据不完整
+                return volume > 0 and close is not None
+        except Exception as e:
+            logger.error(f"检查数据完整性时出错: {str(e)}")
+            return False
+
+    def update_stock_data(self, symbols: List[str] = None, force_update: bool = False) -> Dict[str, Any]:
+        """
+        更新股票数据
         
         Args:
             symbols: 要更新的股票列表，如果为None则使用默认列表
+            force_update: 是否强制更新（忽略最后更新时间）
+            
+        Returns:
+            更新报告，包含更新状态和统计信息
         """
-        end_date = datetime.now()
-        default_start_date = datetime(2015, 1, 1)  # 默认从2015年开始
-
-        logger.info(f"开始增量更新股票数据，截止日期：{end_date.date()}")
-        
-        # 加载股票列表
         if symbols is None:
-            symbols = self.load_stock_lists()
+            symbols = self.db_manager.get_existing_stocks()
+            
+        report = {
+            'total': len(symbols),
+            'updated': 0,
+            'skipped': 0,
+            'failed': 0,
+            'details': {}
+        }
         
-        # 获取已存在的股票列表
-        existing_stocks = self.db_manager.get_existing_stocks()
-        logger.info(f"数据库中已有 {len(existing_stocks)} 只股票的数据")
-        
-        # 获取表列名
-        time_code_columns = self.db_manager.get_table_columns('stock_time_code')
-        code_time_columns = self.db_manager.get_table_columns('stock_code_time')
-        
-        # 获取市场开放的交易日，避免更新非交易日数据
-        trading_days = get_trading_days(end_date)
-
-        # 记录更新的股票
-        updated_symbols = []
-        skipped_symbols = []
-        
-        # 为每只股票确定开始日期
-        start_dates = {}
-        max_batch_size = 20  # 每批处理的股票数
-        
-        # 1. 确定每只股票的开始日期
         for symbol in symbols:
-            last_update_date = None
-            if symbol in existing_stocks:
-                last_update_date = self.db_manager.get_last_update_date(symbol)
-                if last_update_date:
-                    # 将日期向后推一天，避免重复数据
-                    start_date = last_update_date + timedelta(days=1)
+            try:
+                # 检查是否需要更新
+                last_update = self.get_last_update_time(symbol)
+                if not force_update and last_update and (datetime.now() - last_update).days < 1:
+                    report['skipped'] += 1
+                    report['details'][symbol] = 'skipped (up to date)'
+                    continue
                     
-                    # 确保start_date是datetime对象
-                    if not isinstance(start_date, datetime):
-                        if isinstance(start_date, date):
-                            start_date = datetime.combine(start_date, datetime.min.time())
-                        else:
-                            try:
-                                start_date = datetime.strptime(str(start_date), '%Y-%m-%d')
-                            except ValueError:
-                                logger.error(f"无法解析日期: {start_date}，使用默认开始日期")
-                                start_date = default_start_date
-                    
-                    # 检查是否为交易日
-                    start_date_str = start_date.strftime('%Y-%m-%d')
-                    current_date_str = end_date.strftime('%Y-%m-%d')
-                    
-                    if start_date_str not in trading_days and start_date_str < current_date_str:
-                        # 如果开始日期不是交易日，找到下一个交易日
-                        next_trading_day = self.get_next_trading_day(start_date, trading_days)
-                        if next_trading_day:
-                            start_date = datetime.combine(next_trading_day, datetime.min.time())
-                    
-                    # 如果最后更新日期是今天或未来，跳过这只股票
-                    if start_date.strftime('%Y-%m-%d') >= end_date.strftime('%Y-%m-%d'):
-                        logger.info(f"股票 {symbol} 已是最新数据，跳过更新")
-                        skipped_symbols.append(symbol)
-                        continue
-                        
-                    logger.info(f"股票 {symbol} 最后更新日期: {last_update_date.date() if hasattr(last_update_date, 'date') else last_update_date}, 将获取从 {start_date.date() if hasattr(start_date, 'date') else start_date} 到 {end_date.date()} 的数据")
-                    start_dates[symbol] = start_date
+                # 更新数据
+                success = self._update_single_stock(symbol)
+                if success:
+                    report['updated'] += 1
+                    report['details'][symbol] = 'updated'
+                    self._last_update_times[symbol] = datetime.now()
                 else:
-                    logger.info(f"股票 {symbol} 在数据库中存在但无法确定最后更新日期，将获取从 {default_start_date.date()} 的完整历史数据")
-                    start_dates[symbol] = default_start_date
-            else:
-                logger.info(f"股票 {symbol} 在数据库中不存在，将获取从 {default_start_date.date()} 的完整历史数据")
-                start_dates[symbol] = default_start_date
+                    report['failed'] += 1
+                    report['details'][symbol] = 'failed'
+                    
+            except Exception as e:
+                logger.error(f"更新股票 {symbol} 数据时出错: {str(e)}")
+                report['failed'] += 1
+                report['details'][symbol] = f'error: {str(e)}'
+                
+        return report
         
-        # 2. 按批次处理股票
-        symbols_to_process = [s for s in symbols if s not in skipped_symbols]
-        for i in range(0, len(symbols_to_process), max_batch_size):
-            batch_symbols = symbols_to_process[i:i+max_batch_size]
-            batch_start_dates = {symbol: start_dates.get(symbol, default_start_date) for symbol in batch_symbols}
-            
-            logger.info(f"处理第 {i//max_batch_size + 1} 批股票，共 {len(batch_symbols)} 只")
-            
-            # 获取数据
-            batch_data = self.data_fetcher.get_stock_data_batch(batch_symbols, batch_start_dates, end_date)
-            
-            # 处理数据
-            for symbol, df in batch_data.items():
-                if df is not None and not df.empty:
-                    success = self.process_stock_data(symbol, df, time_code_columns, code_time_columns)
-                    if success:
-                        updated_symbols.append(symbol)
-                    else:
-                        skipped_symbols.append(symbol)
-                else:
-                    logger.warning(f"股票 {symbol} 没有获取到数据")
-                    skipped_symbols.append(symbol)
-        
-        logger.info(f"股票数据增量更新完成，共更新了 {len(updated_symbols)} 只股票，跳过了 {len(skipped_symbols)} 只股票")
-        
-        # 检查并同步两个表之间的差异
+    def _update_single_stock(self, symbol: str) -> bool:
+        """更新单个股票的数据"""
         try:
-            logger.info("开始检查并同步两表之间的差异")
-            self.db_manager.sync_tables_differences()
-            logger.info("表同步完成")
+            # 获取最新数据
+            end_date = datetime.now()
+            # 增加获取数据的时间范围，确保有足够的数据
+            start_date = self.get_last_update_time(symbol) or (end_date - timedelta(days=60))
+            
+            # 从Yahoo Finance获取数据
+            ticker = yf.Ticker(symbol)
+            df = ticker.history(
+                start=start_date,
+                end=end_date,
+                interval="1d",
+                prepost=False,  # 不包括盘前盘后数据
+                actions=True  # 包括分红和拆分信息
+            )
+            
+            if df.empty:
+                logger.warning(f"未获取到股票 {symbol} 的新数据")
+                return False
+                
+            # 处理数据
+            df = self._process_data(df, symbol)
+            
+            # 验证数据
+            if len(df) < 20:  # 如果数据点不足20个
+                logger.warning(f"股票 {symbol} 数据点不足: {len(df)} < 20")
+                # 尝试获取更多历史数据
+                extended_start_date = end_date - timedelta(days=120)  # 扩展到120天
+                extended_df = ticker.history(
+                    start=extended_start_date,
+                    end=end_date,
+                    interval="1d",
+                    prepost=False,
+                    actions=True
+                )
+                if not extended_df.empty:
+                    extended_df = self._process_data(extended_df, symbol)
+                    if len(extended_df) > len(df):
+                        df = extended_df
+                        logger.info(f"成功获取更多历史数据，现在有 {len(df)} 个数据点")
+            
+            # 保存到数据库
+            self.db_manager.save_stock_data(symbol, df)
+            
+            return True
+            
         except Exception as e:
-            logger.error(f"同步表之间差异时出错: {str(e)}")
+            logger.error(f"更新股票 {symbol} 数据时出错: {str(e)}")
+            return False
+            
+    def _process_data(self, df: pd.DataFrame, symbol: str) -> pd.DataFrame:
+        """处理股票数据"""
+        try:
+            # 重置索引，将日期变为列
+            df = df.reset_index()
+            
+            # 重命名列
+            df = df.rename(columns={
+                'Stock Splits': 'StockSplits',
+                'Capital Gains': 'Capital_Gains'
+            })
+            
+            # 添加股票代码列
+            df['Code'] = symbol
+            
+            # 添加Amount列（计算为价格乘以成交量）
+            df['Amount'] = df['Close'] * df['Volume']
+            
+            # 确保日期格式正确
+            df['Date'] = pd.to_datetime(df['Date']).dt.strftime('%Y-%m-%d')
+            
+            # 按日期排序
+            df = df.sort_values('Date')
+            
+            return df
+            
+        except Exception as e:
+            logger.error(f"处理股票 {symbol} 数据时出错: {str(e)}")
+            return pd.DataFrame()
 
 
 def main():

@@ -10,11 +10,11 @@ import json
 import os
 from sqlalchemy import create_engine
 import mysql.connector
+import yfinance as yf
 
-from .data_fetcher import DataFetcher
-from .stock_monitor_manager import StockMonitorManager
-from .market_monitor import MarketMonitor
-from backtest.strategy_backtest import MonitorStrategy, VolatilityBreakoutStrategy, PriceBreakoutStrategy
+from data.data_interface import YahooFinanceRealTimeSource
+from monitor.market_monitor import MarketMonitor
+from monitor.notification_manager import NotificationManager
 
 # 配置日志
 logging.basicConfig(
@@ -29,31 +29,43 @@ logger = logging.getLogger("RealTimeMonitor")
 
 class RealTimeMonitor:
     """实时监控类"""
-    def __init__(
-        self,
-        data_fetcher: DataFetcher,
-        stock_manager: StockMonitorManager,
-        market_monitor: MarketMonitor,
-        check_interval: int = 60,  # 检查间隔（秒）
-        strategies: List[MonitorStrategy] = None,
-        alert_thresholds: Dict = None
-    ):
-        self.data_fetcher = data_fetcher
-        self.stock_manager = stock_manager
-        self.market_monitor = market_monitor
-        self.check_interval = check_interval
-        self.strategies = strategies or [
-            VolatilityBreakoutStrategy(),
-            PriceBreakoutStrategy()
-        ]
+    def __init__(self, symbols: List[str], config: Dict = None):
+        """
+        初始化实时监控器
+        
+        Args:
+            symbols: 要监控的股票代码列表
+            config: 监控配置
+        """
+        self.symbols = symbols
+        self.config = config or {}
+        
+        # 初始化组件
+        self.data_source = YahooFinanceRealTimeSource()
+        self.market_monitor = MarketMonitor()
+        self.notification_manager = NotificationManager()
+        
+        # 初始化数据存储
+        self.current_data = {}
+        self.historical_data = {}
+        self.signals = {}
+        self.last_update = None
         
         # 设置默认阈值
-        self.alert_thresholds = alert_thresholds or {
-            "price_change": 0.02,      # 价格变动阈值
-            "volume_ratio": 2.0,       # 成交量比率阈值
-            "volatility_ratio": 1.5,   # 波动率比率阈值
-            "signal_confirm": 2        # 信号确认数量
+        self.alert_thresholds = {
+            'price_change': 0.02,      # 价格变动阈值
+            'volume_ratio': 2.0,       # 成交量比率阈值
+            'volatility_ratio': 1.5,   # 波动率比率阈值
+            'rsi_overbought': 70,      # RSI超买阈值
+            'rsi_oversold': 30,        # RSI超卖阈值
+            'signal_threshold': 0.7     # 信号强度阈值
         }
+        
+        if config and 'alert_thresholds' in config:
+            self.alert_thresholds.update(config['alert_thresholds'])
+            
+        # 初始化数据
+        self._initialize_data()
         
         # 监控状态
         self.is_running = False
@@ -94,10 +106,10 @@ class RealTimeMonitor:
         while self.is_running:
             try:
                 # 获取监控的股票列表
-                stocks = self.stock_manager.get_monitored_stocks()
-                if stocks.empty:
+                stocks = self.symbols
+                if not stocks:
                     logger.warning("没有需要监控的股票")
-                    time.sleep(self.check_interval)
+                    time.sleep(60)  # 出错后等待一分钟再重试
                     continue
                     
                 logger.info(f"检查 {len(stocks)} 只股票的实时数据")
@@ -106,20 +118,17 @@ class RealTimeMonitor:
                 self._analyze_real_time_data(stocks)
                 
                 # 等待下一次检查
-                time.sleep(self.check_interval)
+                time.sleep(60)  # 出错后等待一分钟再重试
                 
             except Exception as e:
                 logger.error(f"监控循环中出错: {e}")
                 time.sleep(60)  # 出错后等待一分钟再重试
                 
-    def _analyze_real_time_data(self, stocks: pd.DataFrame) -> None:
+    def _analyze_real_time_data(self, stocks: List[str]) -> None:
         """分析实时数据"""
         try:
-            symbols = stocks['symbol'].tolist()
-            latest_data = self.data_fetcher.get_latest_data(symbols)
-            
-            for symbol in symbols:
-                data = latest_data.get(symbol)
+            for symbol in stocks:
+                data = self.current_data.get(symbol)
                 if data is None or data.empty:
                     continue
                     
@@ -195,7 +204,7 @@ class RealTimeMonitor:
                               if abs(result.get("signal", 0)) > 0)
             
             # 检查是否达到信号确认阈值
-            if valid_signals >= self.alert_thresholds["signal_confirm"]:
+            if valid_signals >= self.alert_thresholds["signal_threshold"]:
                 # 检查是否与缓存中的信号不同
                 if symbol not in self._signal_cache:
                     self._signal_cache[symbol] = signals
@@ -385,7 +394,7 @@ class RealTimeMonitor:
         try:
             return {
                 "is_running": self.is_running,
-                "monitored_stocks": len(self.stock_manager.get_monitored_stocks()),
+                "monitored_stocks": len(self.symbols),
                 "active_strategies": [s.name for s in self.strategies],
                 "alert_thresholds": self.alert_thresholds,
                 "last_check_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -686,3 +695,16 @@ class RealTimeMonitor:
         except Exception as e:
             logger.error(f"计算技术指标时出错: {e}")
             return {"trend": "unknown", "support_resistance": {}, "volatility": None}
+
+    def _initialize_data(self):
+        """初始化数据"""
+        try:
+            # 获取最新数据
+            self.current_data = self.get_latest_data(self.symbols)
+            self.historical_data = {symbol: self.get_historical_data(symbol, '2020-01-01', '2023-04-30') for symbol in self.symbols}
+            self.signals = {symbol: self._run_strategies(data, symbol) for symbol, data in self.current_data.items()}
+            self.last_update = dt.datetime.now()
+            
+            logger.info("数据初始化完成")
+        except Exception as e:
+            logger.error(f"初始化数据时出错: {e}")

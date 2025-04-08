@@ -1,54 +1,26 @@
 {
     "monitored_symbols": [
-        "GOOG", "NVDA", "AMD", "TSLA", "AAPL",
-        "ASML", "MSFT", "AMZN", "META", "GOOGL"
+        "SPY",
+        "QQQ",
+        "AAPL",
+        "MSFT",
+        "GOOGL"
     ],
-    "check_interval": 30,
-    "risk_thresholds": {
-        "max_drawdown": 0.05,
-        "volatility": 0.12,
-        "sharpe_ratio": 1.2
-    },
-    "strategy_weights": {
-        "GoldTriangleStrategy": 0.15,
-        "MomentumStrategy": 0.20,
-        "TDIStrategy": 0.20,
-        "MarketForecastStrategy": 0.25,
-        "VolumeStrategy": 0.20
-    },
-    "signal_thresholds": {
-        "strong": 0.5,
-        "moderate": 0.2
-    },
-    "market_state": {
-        "trend_period": 8,
-        "volatility_period": 5,
-        "risk_period": 13
-    },
     "price_alerts": {
         "enabled": true,
-        "threshold_percent": 1.2
+        "threshold_percent": 2.0
     },
     "volatility_alerts": {
         "enabled": true,
-        "threshold_ratio": 1.3
+        "threshold_ratio": 1.5
     },
     "volume_alerts": {
         "enabled": true,
-        "threshold_ratio": 1.8
+        "threshold_ratio": 2.0
     },
     "risk_alerts": {
         "enabled": true,
-        "max_drawdown": 0.05,
-        "var_threshold": 0.015
-    },
-    "sector_correlation": {
-        "enabled": true,
-        "threshold": 0.7
-    },
-    "logging": {
-        "level": "INFO",
-        "file": "realtime_monitor.log",
-        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        "max_drawdown": 0.1,
+        "var_threshold": 0.03
     }
 }

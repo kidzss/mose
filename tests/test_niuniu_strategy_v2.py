@@ -121,10 +121,27 @@ class TestNiuniuStrategyV2(unittest.TestCase):
         cls.analyzer = MarketStateAnalyzer()
         
         # 分析市场状态
-        cls.market_states = cls.analyzer.analyze(cls.market_data)
+        market_states = cls.analyzer.analyze(cls.market_data)
+        
+        # 将市场状态列表转换为DataFrame
+        states_data = []
+        for state in market_states:
+            data = {
+                'timestamp': state.timestamp,
+                'state_type': state.state_type.value,
+                'confidence': state.confidence,
+                **state.features
+            }
+            states_data.append(data)
+        
+        cls.market_states = pd.DataFrame(states_data)
+        cls.market_states.set_index('timestamp', inplace=True)
+        
+        # 添加收益率
+        cls.market_states['returns'] = cls.market_data['Close'].pct_change()
         
         # 准备特征和标签
-        cls.features = cls.market_states.drop(['returns', 'market_state'], axis=1)
+        cls.features = cls.market_states.drop(['returns', 'state_type'], axis=1)
         cls.labels = cls.market_states['returns']
         
         # 分离数值型和分类型特征

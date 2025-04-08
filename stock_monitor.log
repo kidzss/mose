@@ -1,0 +1,32 @@
+2025-04-08 16:23:43,270 - monitor.stock_monitor - INFO - 已加载持仓股票: {'MSFT', 'AMD', 'TSLA', 'TMDX', 'GOOG', 'NVDA', 'PFE'}
+2025-04-08 16:23:43,270 - monitor.stock_monitor - INFO - 已加载观察列表: {'PDD', 'AVGO', 'IWM', 'SOFI', 'SPY', 'QCOM', 'CRM', 'NFLX', 'ADBE', 'INTC', 'PYPL', 'BABA', 'GLD', 'ETH', 'BTC', 'META', 'AMZN', 'QQQ', 'AAPL', 'SLV'}
+2025-04-08 16:23:43,313 - monitor.stock_monitor - INFO - 市场已收盘，生成每日总结报告...
+2025-04-08 16:23:43,960 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,066 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,169 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,331 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 371}
+2025-04-08 16:23:44,464 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,557 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,654 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,758 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:44,987 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,085 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,184 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,280 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,372 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,511 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,614 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,706 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:45,800 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,034 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,127 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,217 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,367 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 385}
+2025-04-08 16:23:46,559 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 385}
+2025-04-08 16:23:46,677 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,777 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:46,955 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:47,144 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:47,401 - data.data_validator - WARNING - 发现缺失值: {'adj_close': 389}
+2025-04-08 16:23:49,452 - monitor.trading_monitor - INFO - 成功发送邮件: 批量提醒 - daily_summary (1条)
+2025-04-08 16:23:49,452 - monitor.stock_monitor - INFO - 市场已收盘，等待 15.10 小时后重新开始监控...
