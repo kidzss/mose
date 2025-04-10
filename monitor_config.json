@@ -8,19 +8,19 @@
     ],
     "price_alerts": {
         "enabled": true,
-        "threshold_percent": 2.0
+        "threshold_percent": 0.5
     },
     "volatility_alerts": {
         "enabled": true,
-        "threshold_ratio": 1.5
+        "threshold_ratio": 1.2
     },
     "volume_alerts": {
         "enabled": true,
-        "threshold_ratio": 2.0
+        "threshold_ratio": 1.5
     },
     "risk_alerts": {
         "enabled": true,
-        "max_drawdown": 0.1,
-        "var_threshold": 0.03
+        "max_drawdown": 0.05,
+        "var_threshold": 0.02
     }
 }

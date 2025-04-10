@@ -8,6 +8,9 @@ from .market_monitor import MarketMonitor, Alert
 from .notification_manager import NotificationManager
 from data.data_interface import YahooFinanceRealTimeSource
 import yfinance as yf
+import schedule
+import time
+import asyncio
 
 @dataclass
 class Position:
@@ -19,6 +22,8 @@ class Position:
     current_value: float = 0.0
     unrealized_pnl: float = 0.0
     unrealized_pnl_pct: float = 0.0
+    avg_price: float = 0.0
+    shares: float = 0.0
 
 class PortfolioMonitor:
     """投资组合监控类"""
@@ -42,6 +47,9 @@ class PortfolioMonitor:
         # 初始化通知管理器
         self.notification_manager = NotificationManager()
         
+        # 初始化实时数据源
+        self.realtime_data_source = YahooFinanceRealTimeSource()
+        
         # 设置默认配置
         self.config = {
             "price_alert_threshold": 0.02,    # 价格变动提醒阈值
@@ -60,6 +68,7 @@ class PortfolioMonitor:
         self.historical_data = {}
         self.alerts = []
         self.last_update = None
+        self.total_value = 0.0  # 添加总市值属性
         
         # 监控状态
         self.is_running = False
@@ -68,31 +77,37 @@ class PortfolioMonitor:
         # 初始化数据
         self.update_positions()
         
-    def update_positions(self) -> None:
+    async def update_positions(self) -> None:
         """更新所有持仓的当前价格和历史数据"""
         try:
-            for symbol in self.positions.keys():
-                ticker = yf.Ticker(symbol)
-                
-                # 获取当前价格
-                current_price = ticker.history(period='1d')['Close'].iloc[-1]
-                self.current_prices[symbol] = current_price
-                
-                # 获取历史数据用于分析
-                hist_data = ticker.history(period='1y')
-                self.historical_data[symbol] = hist_data
-                
+            # 获取实时数据
+            symbols = list(self.positions.keys())
+            data = await self.realtime_data_source.get_realtime_data(symbols, timeframe='1m')
+            
+            total_value = 0.0
+            for symbol, df in data.items():
+                if not df.empty:
+                    # 获取最新价格
+                    current_price = df['close'].iloc[-1]
+                    self.current_prices[symbol] = current_price
+                    # 获取历史数据用于分析
+                    self.historical_data[symbol] = df
+                    # 计算持仓市值
+                    shares = self.positions[symbol]['shares']
+                    total_value += current_price * shares
+                    
+            self.total_value = total_value  # 更新总市值
             self.last_update = dt.datetime.now()
-            self.logger.info("Successfully updated portfolio positions")
+            self.logger.info("Successfully updated portfolio positions with real-time data")
         except Exception as e:
-            self.logger.error(f"Error updating positions: {str(e)}")
+            self.logger.error(f"Error updating positions with real-time data: {str(e)}")
             
     def calculate_portfolio_value(self) -> float:
         """计算当前投资组合总价值"""
         total_value = 0
         for symbol, position in self.positions.items():
             if symbol in self.current_prices:
-                shares = position['weight'] * 100  # 假设总投资为100单位
+                shares = position['shares']
                 value = shares * self.current_prices[symbol]
                 total_value += value
         return total_value
@@ -102,35 +117,73 @@ class PortfolioMonitor:
         returns = {}
         for symbol, position in self.positions.items():
             if symbol in self.current_prices:
-                cost_basis = position['cost_basis']
+                avg_price = position['avg_price']
                 current_price = self.current_prices[symbol]
-                returns[symbol] = (current_price - cost_basis) / cost_basis
+                returns[symbol] = (current_price - avg_price) / avg_price
         return returns
         
+    def set_monitoring_parameters(self, config: Dict) -> None:
+        """
+        设置监控参数
+        
+        Args:
+            config: 包含监控参数的字典
+        """
+        if config:
+            self.config.update(config)
+            self.logger.info("Updated monitoring parameters")
+
     def check_alerts(self) -> List[str]:
-        """检查是否需要触发任何警报"""
-        new_alerts = []
+        """检查是否需要发出警报"""
+        alerts = []
         returns = self.calculate_returns()
         
+        # 定义行业分类
+        sectors = {
+            'AMD': 'semiconductor',
+            'NVDA': 'semiconductor',
+            'GOOG': 'tech',
+            'MSFT': 'tech',
+            'TSLA': 'automotive',
+            'PFE': 'healthcare',
+            'TMDX': 'healthcare'
+        }
+        
         for symbol, ret in returns.items():
-            # 止损警报
-            if ret <= -self.config['stop_loss']:
-                alert = f"Stop Loss Alert: {symbol} has lost {ret*100:.2f}% of its value"
-                new_alerts.append(alert)
+            position = self.positions[symbol]
+            current_price = self.current_prices[symbol]
+            avg_price = position['avg_price']
+            shares = position['shares']
+            
+            # 获取行业特定设置
+            sector = sectors.get(symbol)
+            stop_loss = self.config.get('sector_specific_settings', {}).get(sector, {}).get('stop_loss', self.config['stop_loss'])
+            price_alert_threshold = self.config.get('sector_specific_settings', {}).get(sector, {}).get('price_alert_threshold', self.config['price_alert_threshold'])
+            
+            # 计算持仓市值
+            position_value = current_price * shares
+            
+            # 检查止损
+            if ret < -stop_loss:
+                alerts.append(f"Stop Loss Alert: {symbol} has dropped {ret*100:.2f}% below entry price")
                 
-            # 获利目标警报
-            elif ret >= self.config['profit_target']:
-                alert = f"Profit Target Alert: {symbol} has gained {ret*100:.2f}% in value"
-                new_alerts.append(alert)
+            # 检查止盈
+            if ret > self.config['profit_target']:
+                alerts.append(f"Profit Target Alert: {symbol} has gained {ret*100:.2f}% above entry price")
                 
-            # 价格变动警报
-            if symbol in self.historical_data:
-                daily_return = self.historical_data[symbol]['Close'].pct_change().iloc[-1]
-                if abs(daily_return) >= self.config['price_alert_threshold']:
-                    alert = f"Price Movement Alert: {symbol} moved {daily_return*100:.2f}% today"
-                    new_alerts.append(alert)
-                    
-        return new_alerts
+            # 检查价格变动
+            if abs(ret) > price_alert_threshold:
+                alerts.append(f"Price Movement Alert: {symbol} has moved {ret*100:.2f}% from entry price")
+                
+            # 检查亏损
+            if ret < -self.config['loss_alert_threshold']:
+                alerts.append(f"Loss Alert: {symbol} is down {ret*100:.2f}%, consider cutting losses")
+                
+            # 特别关注半导体行业的关税相关新闻
+            if sector == 'semiconductor':
+                alerts.append(f"Semiconductor Alert: {symbol} may be affected by trade policy changes")
+                
+        return alerts
         
     def calculate_var(self, confidence_level: float = 0.95) -> float:
         """计算投资组合的在险价值(VaR)"""
@@ -181,7 +234,7 @@ class PortfolioMonitor:
         
     def generate_portfolio_report(self) -> str:
         """生成投资组合报告"""
-        total_value = self.calculate_portfolio_value()
+        total_value = self.total_value
         returns = self.calculate_returns()
         
         report = f"Portfolio Report (as of {self.last_update})\n"
@@ -191,12 +244,12 @@ class PortfolioMonitor:
         for symbol, position in self.positions.items():
             if symbol in self.current_prices:
                 current_price = self.current_prices[symbol]
-                shares = position['weight'] * 100
+                shares = position['shares']
                 value = shares * current_price
                 ret = returns[symbol]
                 
                 report += f"{symbol}:\n"
-                report += f"  Shares: {shares:.2f}\n"
+                report += f"  Shares: {shares}\n"
                 report += f"  Current Price: ${current_price:.2f}\n"
                 report += f"  Position Value: ${value:.2f}\n"
                 report += f"  Return: {ret*100:.2f}%\n"
@@ -230,4 +283,59 @@ class PortfolioMonitor:
                     f"Review position in {symbol} due to poor performance ({ret*100:.2f}%)"
                 )
                 
-        return recommendations 
+        return recommendations
+
+    def send_notifications(self, alerts: List[str]) -> None:
+        """发送通知"""
+        if not alerts:
+            return
+            
+        if self.config['email_notifications']:
+            try:
+                message = "\n".join(alerts)
+                self.notification_manager.send_email(
+                    subject="Portfolio Alerts",
+                    body=message
+                )
+                self.logger.info("Successfully sent email notifications")
+            except Exception as e:
+                self.logger.error(f"Failed to send email notifications: {str(e)}")
+
+    async def monitor_stocks(self) -> None:
+        """监控股票"""
+        try:
+            # 更新持仓数据
+            await self.update_positions()
+            
+            # 检查警报
+            alerts = self.check_alerts()
+            
+            # 发送通知
+            self.send_notifications(alerts)
+            
+            # 生成报告
+            report = self.generate_portfolio_report()
+            self.logger.info(report)
+            
+        except Exception as e:
+            self.logger.error(f"监控过程中发生错误: {str(e)}")
+            raise
+
+    def start_monitoring(self, interval_minutes: int = 5):
+        """开始监控
+        
+        Args:
+            interval_minutes: 检查间隔（分钟）
+        """
+        try:
+            # 使用 schedule 库设置定时任务
+            schedule.every(interval_minutes).minutes.do(lambda: asyncio.run(self.monitor_stocks()))
+            
+            # 运行调度器
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
+                
+        except Exception as e:
+            logger.error(f"启动监控时发生错误: {str(e)}")
+            raise 

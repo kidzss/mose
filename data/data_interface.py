@@ -251,29 +251,22 @@ class MySQLDataSource(DataSource):
     
     def _standardize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """标准化DataFrame格式"""
+        if df.empty:
+            return df
+            
+        # 重命名列为大写
+        df.columns = [col.upper() for col in df.columns]
+        
         # 重命名列
-        renaming = {
-            'Date': 'date',
-            'Code': 'symbol',
-            'Open': 'open',
-            'High': 'high',
-            'Low': 'low',
-            'Close': 'close',
-            'Volume': 'volume',
-            'AdjClose': 'adj_close'
-        }
-        df = df.rename(columns={k: v for k, v in renaming.items() if k in df.columns})
-        
-        # 确保date是datetime类型
-        df['date'] = pd.to_datetime(df['date'])
-        
-        # 设置date为索引
-        df.set_index('date', inplace=True)
-        
-        # 确保所有必要的列存在
-        for col in ['open', 'high', 'low', 'close', 'volume', 'adj_close']:
-            if col not in df.columns:
-                df[col] = 0.0
+        df.rename(columns={
+            'DATE': 'date',
+            'OPEN': 'open',
+            'HIGH': 'high',
+            'LOW': 'low',
+            'CLOSE': 'close',
+            'VOLUME': 'volume',
+            'ADJCLOSE': 'adj_close'
+        }, inplace=True)
         
         return df
 
@@ -555,20 +548,23 @@ class YahooFinanceDataSource(RealTimeDataSource):
         
     def _standardize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """标准化DataFrame格式"""
+        if df.empty:
+            return df
+            
+        # 重命名列为大写
+        df.columns = [col.upper() for col in df.columns]
+        
         # 重命名列
-        df = df.rename(columns={
-            'Open': 'open',
-            'High': 'high',
-            'Low': 'low',
-            'Close': 'close',
-            'Volume': 'volume',
-            'Adj Close': 'adj_close'
-        })
-        # 确保所有必需的列都存在
-        required_columns = ['open', 'high', 'low', 'close', 'volume', 'adj_close']
-        for col in required_columns:
-            if col not in df.columns:
-                df[col] = None
+        df.rename(columns={
+            'DATE': 'date',
+            'OPEN': 'open',
+            'HIGH': 'high',
+            'LOW': 'low',
+            'CLOSE': 'close',
+            'VOLUME': 'volume',
+            'ADJCLOSE': 'adj_close'
+        }, inplace=True)
+        
         return df
 
 
@@ -770,25 +766,20 @@ class YahooFinanceRealTimeSource(RealTimeDataSource):
         if df.empty:
             return df
             
-        # 重命名列
-        renaming = {
-            'Open': 'open',
-            'High': 'high',
-            'Low': 'low',
-            'Close': 'close',
-            'Volume': 'volume',
-            'Adj Close': 'adj_close'
-        }
-        df = df.rename(columns={k: v for k, v in renaming.items() if k in df.columns})
+        # 重命名列为大写
+        df.columns = [col.upper() for col in df.columns]
         
-        # 确保所有必要的列存在
-        for col in ['open', 'high', 'low', 'close', 'volume']:
-            if col not in df.columns:
-                df[col] = 0.0
-                
-        if 'adj_close' not in df.columns:
-            df['adj_close'] = df['close']
-            
+        # 重命名列
+        df.rename(columns={
+            'DATE': 'date',
+            'OPEN': 'open',
+            'HIGH': 'high',
+            'LOW': 'low',
+            'CLOSE': 'close',
+            'VOLUME': 'volume',
+            'ADJCLOSE': 'adj_close'
+        }, inplace=True)
+        
         return df
             
     def __del__(self):

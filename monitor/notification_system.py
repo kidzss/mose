@@ -5,12 +5,15 @@ from datetime import datetime
 from typing import List, Dict
 import json
 import os
+import logging
+from email.utils import formataddr
 
 class NotificationSystem:
     """邮件通知系统"""
     
-    def __init__(self, config_path: str = None):
-        self.email_config = self._load_config(config_path)
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.config = self._load_config()
         self.alert_levels = {
             'danger': '🔴',
             'warning': '🟡',
@@ -18,18 +21,15 @@ class NotificationSystem:
             'opportunity': '🟢'
         }
     
-    def _load_config(self, config_path: str = None) -> Dict:
+    def _load_config(self):
         """加载邮件配置"""
-        if config_path and os.path.exists(config_path):
+        try:
+            config_path = os.path.join(os.path.dirname(__file__), 'configs', 'email_config.json')
             with open(config_path, 'r') as f:
                 return json.load(f)
-        return {
-            'smtp_server': 'smtp.gmail.com',
-            'smtp_port': 587,
-            'sender_email': '',  # 需要配置
-            'sender_password': '',  # 需要配置
-            'recipient_email': ''  # 需要配置
-        }
+        except Exception as e:
+            self.logger.error(f"加载邮件配置失败: {e}")
+            return None
     
     def _format_alert_message(self, alerts: List[Dict], market_state: Dict) -> str:
         """格式化预警消息"""
@@ -79,39 +79,41 @@ class NotificationSystem:
         """
         return message
     
-    def send_notification(self, alerts: List[Dict], market_state: Dict) -> bool:
-        """发送预警通知"""
+    async def send_email(self, subject, body, is_html=False):
+        """发送邮件通知"""
+        if not self.config:
+            self.logger.error("邮件配置未加载，无法发送邮件")
+            return
+            
         try:
-            if not alerts:
-                return True
-                
+            # 创建邮件对象
             msg = MIMEMultipart('alternative')
-            msg['Subject'] = f"投资组合预警通知 - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-            msg['From'] = self.email_config['sender_email']
-            msg['To'] = self.email_config['recipient_email']
+            msg['From'] = formataddr(("Stock Monitor", self.config['sender_email']))
+            msg['To'] = self.config['recipient_email']
+            msg['Subject'] = subject
             
-            html_content = self._format_alert_message(alerts, market_state)
-            msg.attach(MIMEText(html_content, 'html'))
+            # 添加邮件内容
+            content_type = 'html' if is_html else 'plain'
+            msg.attach(MIMEText(body, content_type, 'utf-8'))
             
-            with smtplib.SMTP(self.email_config['smtp_server'], self.email_config['smtp_port']) as server:
+            # 连接SMTP服务器并发送邮件
+            with smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port']) as server:
                 server.starttls()
-                server.login(
-                    self.email_config['sender_email'],
-                    self.email_config['sender_password']
-                )
+                server.login(self.config['sender_email'], self.config['sender_password'])
                 server.send_message(msg)
+                
+            self.logger.info(f"邮件发送成功: {subject}")
             
-            return True
         except Exception as e:
-            print(f"发送通知时出错: {e}")
-            return False
+            self.logger.error(f"发送邮件失败: {e}")
+            raise
     
     def save_config(self, config: Dict, config_path: str) -> bool:
         """保存邮件配置"""
         try:
             with open(config_path, 'w') as f:
                 json.dump(config, f, indent=4)
-            self.email_config = config
+            self.config = config
             return True
         except Exception as e:
             print(f"保存配置时出错: {e}")

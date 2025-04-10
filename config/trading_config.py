@@ -48,9 +48,9 @@ class MonitoringConfig:
 
 @dataclass
 class NotificationThreshold:
-    price_change: float = 0.05  # 价格变动阈值（5%）
-    volume_change: float = 2.0  # 成交量变动阈值（200%）
-    market_volatility: float = 0.03  # 市场波动阈值（3%）
+    price_change: float = 0.01  # 价格变动阈值（1%）
+    volume_change: float = 1.2  # 成交量变动阈值（120%）
+    market_volatility: float = 0.01  # 市场波动阈值（1%）
 
 @dataclass
 class TradingConfig:

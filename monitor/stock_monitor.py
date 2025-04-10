@@ -10,6 +10,7 @@ from monitor.notification_manager import NotificationManager
 import json
 import pytz
 import time as time_module
+from data.data_loader import DataLoader
 
 class StockMonitor:
     def __init__(self, refresh_interval: int = 60):
@@ -46,14 +47,15 @@ class StockMonitor:
         
         self.load_watchlist()
         
+        self.data_loader = DataLoader()
+        self._load_config()
+        
     def _load_positions(self) -> Dict[str, Dict]:
         """加载持仓数据"""
         try:
             # 从data模块获取持仓数据
-            from data.data_loader import DataLoader
-            data_loader = DataLoader()
-            positions = data_loader.load_positions()
-            return positions
+            self.positions = self.data_loader.load_positions()
+            return self.positions
         except Exception as e:
             self.logger.error(f"加载持仓数据失败: {e}")
             return {}
@@ -162,7 +164,12 @@ class StockMonitor:
             
             # 计算各种指标
             price_change = (latest_data['close'] - prev_data['close']) / prev_data['close']
-            volume_change = (latest_data['volume'] - prev_data['volume']) / prev_data['volume']
+            
+            # 计算成交量变化
+            if prev_data['volume'] > 0:
+                volume_change = (latest_data['volume'] - prev_data['volume']) / prev_data['volume']
+            else:
+                volume_change = 0  # 如果前一天的成交量为0，则变化率为0
             
             # 计算技术指标
             rsi = latest_data.get('RSI', None)
@@ -277,7 +284,13 @@ class StockMonitor:
         """监控所有股票"""
         while True:
             try:
-                if not self.is_market_open():
+                # 获取当前时间（卡尔加里时区）
+                mt_tz = pytz.timezone('America/Edmonton')  # 使用埃德蒙顿时区（与卡尔加里相同）
+                now = datetime.now(mt_tz)
+                
+                # 检查是否在交易时间内
+                if not await self.is_market_open(now):
+                    # 市场已收盘，生成每日总结报告
                     self.logger.info("市场已收盘，生成每日总结报告...")
                     analysis_results = []
                     
@@ -307,30 +320,31 @@ class StockMonitor:
                         "message": html_report
                     }])
                     
-                    # 计算到明天开盘的等待时间
-                    now = datetime.now(pytz.timezone('America/New_York'))
-                    tomorrow = now.date() + timedelta(days=1)
-                    next_open = datetime.combine(tomorrow, time(9, 30))
-                    next_open = pytz.timezone('America/New_York').localize(next_open)
+                    # 计算到下一个交易日的等待时间（使用卡尔加里时间）
+                    next_open = await self.get_next_market_open(now)
                     sleep_time = (next_open - now).total_seconds()
                     
+                    # 确保等待时间合理（不超过18小时）
+                    if sleep_time <= 0 or sleep_time > 18 * 3600:
+                        self.logger.warning(f"等待时间 {sleep_time/3600:.2f} 小时超出合理范围，将调整为12小时")
+                        sleep_time = 12 * 3600
+                        
                     self.logger.info(f"市场已收盘，等待 {sleep_time/3600:.2f} 小时后重新开始监控...")
-                    time_module.sleep(sleep_time)
+                    await asyncio.sleep(sleep_time)
                     continue
                     
-                analysis_results = []
+                # 市场开盘时的操作
+                # 更新持仓数据
+                await self.update_positions()
                 
-                # 分析持仓股票
+                # 检查警报
+                alerts = await self.check_alerts()
+                if alerts:
+                    self.notification_manager.send_batch_alerts(alerts)
+                
+                # 生成报告
+                analysis_results = []
                 for symbol in self.monitored_stocks:
-                    try:
-                        result = await self.get_stock_analysis(symbol)
-                        if result:
-                            analysis_results.append(result)
-                    except Exception as e:
-                        self.logger.error(f"分析股票 {symbol} 失败: {str(e)}")
-                        
-                # 分析观察列表股票
-                for symbol in self.watchlist_stocks:
                     try:
                         result = await self.get_stock_analysis(symbol)
                         if result:
@@ -340,30 +354,44 @@ class StockMonitor:
                         
                 if analysis_results:
                     html_report = self._generate_html_report(analysis_results)
-                    self.notification_manager.send_batch_alerts([{
-                        "type": "comprehensive_report",
-                        "message": html_report
-                    }])
-                    
-                time_module.sleep(self.refresh_interval)
+                    self.logger.info(f"当前持仓总价值: ${sum(r.get('current_price', 0) * r.get('position_size', 0) for r in analysis_results):.2f}")
+                
+                # 等待下一次更新
+                await asyncio.sleep(self.refresh_interval)
                 
             except Exception as e:
-                self.logger.error(f"监控过程出错: {str(e)}")
-                time_module.sleep(self.refresh_interval)
+                self.logger.error(f"监控过程中发生错误: {str(e)}")
+                await asyncio.sleep(60)  # 发生错误时等待1分钟后重试
                 
-    def is_market_open(self):
-        """检查市场是否开盘"""
-        now = datetime.now(pytz.timezone('America/New_York'))
-        market_open = time(9, 30)  # 9:30 AM ET
-        market_close = time(16, 0)  # 4:00 PM ET
-        
-        # 检查是否是工作日
+    async def is_market_open(self, now):
+        """检查市场是否开盘（使用卡尔加里时间）"""
+        # 检查是否是工作日（周一至周五）
         if now.weekday() >= 5:  # 5是周六，6是周日
             return False
             
-        # 检查是否在交易时间内
+        # 检查是否在交易时间内（7:30 AM - 2:00 PM MT）
+        market_open = time(7, 30)  # 卡尔加里时间 7:30 AM
+        market_close = time(14, 0)  # 卡尔加里时间 2:00 PM
+        
         current_time = now.time()
         return market_open <= current_time <= market_close
+        
+    async def get_next_market_open(self, now):
+        """获取下一个市场开盘时间（使用卡尔加里时间）"""
+        # 计算到下一个交易日的天数
+        days_to_add = 1
+        if now.weekday() == 4:  # 周五
+            days_to_add = 3
+        elif now.weekday() == 5:  # 周六
+            days_to_add = 2
+        elif now.weekday() == 6:  # 周日
+            days_to_add = 1
+            
+        # 计算下一个交易日的开盘时间（卡尔加里时间 7:30 AM）
+        next_open = now + timedelta(days=days_to_add)
+        next_open = next_open.replace(hour=7, minute=30, second=0, microsecond=0)
+        
+        return next_open
         
     def generate_daily_summary(self, analysis_results):
         """生成每日总结报告"""
@@ -568,3 +596,123 @@ class StockMonitor:
         """
         
         return html 
+
+    async def update_positions(self):
+        """更新持仓数据"""
+        try:
+            # 从data模块获取最新的持仓数据
+            self.positions = self.data_loader.load_positions()
+            self.logger.info("持仓数据已更新")
+        except Exception as e:
+            self.logger.error(f"更新持仓数据失败: {e}")
+            # 如果更新失败，保持原有持仓数据不变 
+
+    async def check_alerts(self) -> List[Dict]:
+        """
+        检查所有监控股票和观察列表的警报条件
+        :return: 警报列表
+        """
+        alerts = []
+        
+        try:
+            # 检查持仓股票
+            for symbol in self.monitored_stocks:
+                try:
+                    analysis = await self.get_stock_analysis(symbol)
+                    if not analysis or "error" in analysis:
+                        continue
+                        
+                    # 检查价格变化
+                    price_change = float(analysis["price_change"].strip('%')) / 100
+                    if abs(price_change) > 0.02:  # 2%的价格变化
+                        alerts.append({
+                            "type": "price_alert",
+                            "symbol": symbol,
+                            "message": f"{symbol} 价格变化 {analysis['price_change']}，当前价格 ${analysis['current_price']:.2f}",
+                            "severity": "warning" if price_change < 0 else "info"
+                        })
+                        
+                    # 检查RSI状态
+                    if analysis["rsi_status"] == "超买":
+                        alerts.append({
+                            "type": "rsi_alert",
+                            "symbol": symbol,
+                            "message": f"{symbol} RSI超买 ({analysis['rsi']:.2f})，注意回调风险",
+                            "severity": "warning"
+                        })
+                    elif analysis["rsi_status"] == "超卖":
+                        alerts.append({
+                            "type": "rsi_alert",
+                            "symbol": symbol,
+                            "message": f"{symbol} RSI超卖 ({analysis['rsi']:.2f})，可能有反弹机会",
+                            "severity": "info"
+                        })
+                        
+                    # 检查MACD信号
+                    if analysis["macd_status"] == "金叉":
+                        alerts.append({
+                            "type": "macd_alert",
+                            "symbol": symbol,
+                            "message": f"{symbol} MACD金叉，短期趋势向好",
+                            "severity": "info"
+                        })
+                    elif analysis["macd_status"] == "死叉":
+                        alerts.append({
+                            "type": "macd_alert",
+                            "symbol": symbol,
+                            "message": f"{symbol} MACD死叉，短期趋势向弱",
+                            "severity": "warning"
+                        })
+                        
+                except Exception as e:
+                    self.logger.error(f"检查股票 {symbol} 警报时出错: {e}")
+                    
+            # 检查观察列表股票
+            for symbol in self.watchlist_stocks:
+                try:
+                    analysis = await self.get_stock_analysis(symbol)
+                    if not analysis or "error" in analysis:
+                        continue
+                        
+                    # 检查价格变化（观察列表使用更高的阈值）
+                    price_change = float(analysis["price_change"].strip('%')) / 100
+                    if abs(price_change) > 0.05:  # 5%的价格变化
+                        alerts.append({
+                            "type": "watchlist_alert",
+                            "symbol": symbol,
+                            "message": f"观察列表 {symbol} 价格变化 {analysis['price_change']}，当前价格 ${analysis['current_price']:.2f}",
+                            "severity": "warning" if price_change < 0 else "info"
+                        })
+                        
+                except Exception as e:
+                    self.logger.error(f"检查观察列表股票 {symbol} 警报时出错: {e}")
+                    
+        except Exception as e:
+            self.logger.error(f"检查警报时发生错误: {e}")
+            
+        return alerts
+
+    def _load_config(self):
+        """加载配置文件"""
+        try:
+            # 加载持仓数据
+            self.positions = self.data_loader.load_positions()
+            
+            # 设置监控股票和观察列表
+            self.monitored_stocks = set(self.positions.keys())
+            self.watchlist_stocks = {
+                'SPY', 'QQQ', 'IWM',  # 主要指数
+                'AAPL', 'MSFT', 'GOOG', 'AMZN', 'META',  # 科技巨头
+                'NVDA', 'AMD', 'INTC', 'AVGO', 'QCOM',  # 半导体
+                'TSLA', 'BABA', 'PDD',  # 其他关注
+                'BTC', 'ETH',  # 加密货币
+                'GLD', 'SLV'  # 贵金属
+            }
+            
+            self.logger.info(f"已加载持仓股票: {self.monitored_stocks}")
+            self.logger.info(f"已加载观察列表: {self.watchlist_stocks}")
+            
+        except Exception as e:
+            self.logger.error(f"加载配置文件失败: {e}")
+            self.monitored_stocks = set()
+            self.watchlist_stocks = set() 
