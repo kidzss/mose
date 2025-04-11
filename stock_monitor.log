@@ -12733,14 +12733,14 @@ SPY:
 2025-04-10 16:53:26,673 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
 2025-04-10 16:53:26,673 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
 2025-04-10 16:53:26,673 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
-2025-04-10 16:54:26,700 - monitor.examples.semiconductor_trading_strategy - INFO - 
-交易建议:
-2025-04-10 16:54:26,700 - monitor.examples.semiconductor_trading_strategy - INFO - 
-SPY:
-2025-04-10 16:54:26,700 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
-2025-04-10 16:54:26,700 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
-2025-04-10 16:54:26,700 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
 �反弹时使用put期权进行保护
+2025-04-09 21:02:16,433 - monitor.examples.semiconductor_trading_strategy - INFO - 
+交易建议:
+2025-04-09 21:02:16,433 - monitor.examples.semiconductor_trading_strategy - INFO - 
+SPY:
+2025-04-09 21:02:16,433 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
+2025-04-09 21:02:16,433 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
+2025-04-09 21:02:16,433 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
 2025-04-09 21:03:16,477 - monitor.examples.semiconductor_trading_strategy - INFO - 
 交易建议:
 2025-04-09 21:03:16,477 - monitor.examples.semiconductor_trading_strategy - INFO - 
@@ -23284,14 +23284,14 @@ SPY:
 2025-04-10 16:53:34,125 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
 2025-04-10 16:53:34,125 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
 2025-04-10 16:53:34,125 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
-2025-04-10 16:54:34,154 - monitor.examples.semiconductor_trading_strategy - INFO - 
-交易建议:
-2025-04-10 16:54:34,156 - monitor.examples.semiconductor_trading_strategy - INFO - 
-SPY:
-2025-04-10 16:54:34,156 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
-2025-04-10 16:54:34,157 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
-2025-04-10 16:54:34,158 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
 �: 标普500跌破4900.0
+2025-04-10 16:47:33,713 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
+2025-04-10 16:48:33,766 - monitor.examples.semiconductor_trading_strategy - INFO - 
+交易建议:
+2025-04-10 16:48:33,766 - monitor.examples.semiconductor_trading_strategy - INFO - 
+SPY:
+2025-04-10 16:48:33,766 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
+2025-04-10 16:48:33,766 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
 2025-04-10 16:48:33,766 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
 2025-04-10 16:49:33,802 - monitor.examples.semiconductor_trading_strategy - INFO - 
 交易建议:
@@ -23328,10 +23328,3 @@ SPY:
 2025-04-10 16:53:33,903 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
 2025-04-10 16:53:33,903 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
 2025-04-10 16:53:33,903 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
-2025-04-10 16:54:33,936 - monitor.examples.semiconductor_trading_strategy - INFO - 
-交易建议:
-2025-04-10 16:54:33,936 - monitor.examples.semiconductor_trading_strategy - INFO - 
-SPY:
-2025-04-10 16:54:33,937 - monitor.examples.semiconductor_trading_strategy - INFO - 操作: put_protection
-2025-04-10 16:54:33,938 - monitor.examples.semiconductor_trading_strategy - INFO - 原因: 标普500跌破4900.0
-2025-04-10 16:54:33,938 - monitor.examples.semiconductor_trading_strategy - INFO - 详情: 建议在反弹时使用put期权进行保护
