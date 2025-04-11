@@ -1,0 +1,13 @@
+2025-04-10 19:37:26,002 - monitor.stock_monitor - ERROR - 加载持仓数据失败: 'StockMonitor' object has no attribute 'data_loader'
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载持仓股票: {'GOOG', 'TMDX', 'TSLA', 'AMD', 'MSFT', 'NVDA', 'PFE'}
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载观察列表: {'QQQ', 'PDD', 'CRM', 'AVGO', 'IWM', 'BTC', 'AMZN', 'GLD', 'PYPL', 'ETH', 'INTC', 'SLV', 'SPY', 'AAPL', 'BABA', 'ADBE', 'SOFI', 'NFLX', 'META', 'QCOM'}
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载持仓股票: {'GOOG', 'TMDX', 'TSLA', 'AMD', 'MSFT', 'NVDA', 'PFE'}
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载观察列表: {'ETH', 'GOOG', 'INTC', 'QQQ', 'SLV', 'SPY', 'AMD', 'AAPL', 'BABA', 'PDD', 'AVGO', 'IWM', 'BTC', 'AMZN', 'TSLA', 'GLD', 'MSFT', 'NVDA', 'META', 'QCOM'}
+2025-04-10 19:37:26,003 - monitor.stock_monitor - ERROR - 加载持仓数据失败: 'StockMonitor' object has no attribute 'data_loader'
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载持仓股票: {'GOOG', 'TMDX', 'TSLA', 'AMD', 'MSFT', 'NVDA', 'PFE'}
+2025-04-10 19:37:26,003 - monitor.stock_monitor - INFO - 已加载观察列表: {'QQQ', 'PDD', 'CRM', 'AVGO', 'IWM', 'BTC', 'AMZN', 'GLD', 'PYPL', 'ETH', 'INTC', 'SLV', 'SPY', 'AAPL', 'BABA', 'ADBE', 'SOFI', 'NFLX', 'META', 'QCOM'}
+2025-04-10 19:37:26,004 - monitor.stock_monitor - INFO - 已加载持仓股票: {'GOOG', 'TMDX', 'TSLA', 'AMD', 'MSFT', 'NVDA', 'PFE'}
+2025-04-10 19:37:26,004 - monitor.stock_monitor - INFO - 已加载观察列表: {'ETH', 'GOOG', 'INTC', 'QQQ', 'SLV', 'SPY', 'AMD', 'AAPL', 'BABA', 'PDD', 'AVGO', 'IWM', 'BTC', 'AMZN', 'TSLA', 'GLD', 'MSFT', 'NVDA', 'META', 'QCOM'}
+2025-04-10 19:37:28,454 - monitor.notification_system - INFO - 邮件发送成功: 市场底部分析报告
+2025-04-10 19:37:28,454 - __main__ - INFO - 市场底部分析报告已发送
+2025-04-10 19:37:28,454 - __main__ - INFO - 市场底部分析完成: {'timestamp': '2025-04-10 19:37:27', 'market_state': {'is_bottom': False, 'signals': [], 'risk_level': 'info'}, 'semiconductor_state': {'AMD状态': {'趋势': '上升', '强度': '中性', '支撑': '数据不足'}, 'NVDA状态': {'趋势': '上升', '强度': '中性', '支撑': '数据不足'}, '板块趋势': '强势'}, 'indicators': {'rsi': 31.69, 'macd': -7.97, 'signal': 2.74, 'sma20': 581.75, 'sma50': 562.56, 'sma200': nan, 'volume_change': 73.33}}
