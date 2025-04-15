@@ -89,34 +89,32 @@ class CPGWStrategy(Strategy):
         # Generate signals based on RSI, MA crossover, and momentum
         for i in range(1, len(df)):
             # Buy signal conditions
-            buy_condition1 = df['rsi'].iloc[i-1] < 40  # 放宽RSI条件
+            buy_condition1 = df['rsi'].iloc[i-1] < 30  # RSI < 30
             buy_condition2 = df['ma_cross'].iloc[i] == 1
             buy_condition3 = df['momentum'].iloc[i] > 0
             
             # Sell signal conditions
-            sell_condition1 = df['rsi'].iloc[i-1] > 60  # 放宽RSI条件
+            sell_condition1 = df['rsi'].iloc[i-1] > 70  # RSI > 70
             sell_condition2 = df['ma_cross'].iloc[i] == -1
             sell_condition3 = df['momentum'].iloc[i] < 0
             
-            # Generate signals
+            # Generate signals with original conditions
             if (buy_condition1 and buy_condition2) or (buy_condition2 and buy_condition3):
                 df.loc[df.index[i], 'signal'] = 1
+                print(f"\n生成买入信号: {df.index[i]}")
+                print(f"RSI: {df['rsi'].iloc[i-1]:.2f}")
+                print(f"MA Cross: {df['ma_cross'].iloc[i]}")
+                print(f"Momentum: {df['momentum'].iloc[i]:.2%}")
             elif (sell_condition1 and sell_condition2) or (sell_condition2 and sell_condition3):
                 df.loc[df.index[i], 'signal'] = -1
+                print(f"\n生成卖出信号: {df.index[i]}")
+                print(f"RSI: {df['rsi'].iloc[i-1]:.2f}")
+                print(f"MA Cross: {df['ma_cross'].iloc[i]}")
+                print(f"Momentum: {df['momentum'].iloc[i]:.2%}")
         
         # Adjust signals based on market regime if enabled
         if self.use_market_regime:
-            market_regime = self.get_market_regime(df)
-            
-            # Adjust signals based on market regime
-            if market_regime == MarketRegime.BEARISH:
-                # In bearish markets, enhance sell signals and reduce buy signals
-                df['signal'] = np.where(df['signal'] == 1, 0.5, df['signal'])  # 减弱买入信号
-                df['signal'] = np.where(df['signal'] == -1, -1.5, df['signal'])  # 增强卖出信号
-            elif market_regime == MarketRegime.BULLISH:
-                # In bullish markets, enhance buy signals and reduce sell signals
-                df['signal'] = np.where(df['signal'] == 1, 1.5, df['signal'])  # 增强买入信号
-                df['signal'] = np.where(df['signal'] == -1, -0.5, df['signal'])  # 减弱卖出信号
+            df = self.adjust_for_market_regime(df)
         
         return df
     

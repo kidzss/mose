@@ -18073,3 +18073,4 @@ SPY:
 2025-04-14 10:40:16,947 - monitor.market_monitor - ERROR - Redis连接失败: Error 61 connecting to localhost:6379. Connection refused.
 2025-04-14 10:40:16,947 - monitor.market_monitor - INFO - 市场监控器初始化完成
 2025-04-14 10:40:16,947 - __main__ - INFO - 开始回测: 2024-01-01 到 2025-04-13
+2025-04-14 20:37:52,199 - data.data_updater - INFO - 成功保存股票 SPY 的数据，总计 81 条记录

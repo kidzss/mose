@@ -196,40 +196,51 @@ class BacktestEngine:
             current_date = self.current_data.index[-1]
             
             for symbol, signal in signals.items():
-                # 检查冷却期
+                # 获取当前持仓
+                current_position = self.positions.get(symbol, 0)
+                
+                # 检查是否在冷却期
                 if symbol in self.last_trade_date:
                     days_since_last_trade = (current_date - self.last_trade_date[symbol]).days
                     if days_since_last_trade < self.cooldown_period:
                         continue
                 
-                current_position = self.positions.get(symbol, 0)
-                
-                # 检查止损和止盈
+                # 检查止盈止损
                 if current_position > 0 and symbol in self.entry_prices:
                     entry_price = self.entry_prices[symbol]
                     price_change = (current_price - entry_price) / entry_price
                     
-                    if price_change <= -self.stop_loss:
-                        self.logger.info(f"触发止损: {symbol}, 价格变化: {price_change:.2%}")
+                    # 止损 - 只在价格大幅下跌时触发
+                    if price_change <= -self.stop_loss * 1.5:  # 增加止损触发条件
                         self._execute_sell(symbol, current_position, current_price)
+                        self.last_trade_date[symbol] = current_date
+                        del self.entry_prices[symbol]
                         continue
-                    elif price_change >= self.take_profit:
-                        self.logger.info(f"触发止盈: {symbol}, 价格变化: {price_change:.2%}")
+                    
+                    # 止盈 - 只在价格大幅上涨时触发
+                    if price_change >= self.take_profit * 1.5:  # 增加止盈触发条件
                         self._execute_sell(symbol, current_position, current_price)
+                        self.last_trade_date[symbol] = current_date
+                        del self.entry_prices[symbol]
                         continue
                 
-                if signal > 0 and current_position == 0:  # 买入信号且当前无持仓
-                    # 计算可用资金
-                    available_capital = self.current_capital * self.position_size
+                if signal > 0:  # 买入信号 - 允许在有持仓时继续买入
+                    # 计算可用资金，使用总资金而不是当前现金
+                    total_value = self.current_capital
+                    for pos_symbol, pos_quantity in self.positions.items():
+                        total_value += pos_quantity * current_price
+                    
+                    available_capital = total_value * self.position_size
                     
                     # 计算可买入的股数
                     max_shares = int(available_capital / (current_price * (1 + self.commission_rate + self.slippage_rate)))
-                    quantity = max(1, min(max_shares, self.max_position))
+                    quantity = min(max_shares, self.max_position - current_position)  # 考虑当前持仓
                     
                     if quantity > 0:
                         self._execute_buy(symbol, quantity, current_price)
                         self.last_trade_date[symbol] = current_date
-                        self.entry_prices[symbol] = current_price
+                        if symbol not in self.entry_prices:  # 只在首次买入时记录入场价格
+                            self.entry_prices[symbol] = current_price
                     
                 elif signal < 0 and current_position > 0:  # 卖出信号且有持仓
                     self._execute_sell(symbol, current_position, current_price)

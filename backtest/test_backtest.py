@@ -7,7 +7,8 @@ from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
 import json
 import os
-import yfinance as yf
+import pymysql
+from sqlalchemy import text
 
 from strategy.cpgw_strategy import CPGWStrategy
 from backtest.backtest_engine import BacktestEngine
@@ -72,33 +73,60 @@ def compare_results(new_results: Dict[str, Any], best_results: Dict[str, Any]) -
     return new_annual_return > best_annual_return
 
 def get_market_data(symbol: str, start_date: datetime, end_date: datetime) -> pd.DataFrame:
-    """获取真实市场数据"""
+    """从数据库获取市场数据"""
     try:
-        # 使用yfinance获取数据
-        data = yf.download(symbol, start=start_date, end=end_date)
+        from data.data_updater import DatabaseManager
+        from config.trading_config import default_config
+        
+        # 数据库配置
+        db_config = {
+            "host": default_config.database.host,
+            "port": default_config.database.port,
+            "user": default_config.database.user,
+            "password": default_config.database.password,
+            "database": default_config.database.database
+        }
+        
+        # 创建数据库管理器
+        db_manager = DatabaseManager(db_config)
+        
+        # 构建SQL查询
+        query = text("""
+        SELECT Date, Open, High, Low, Close, Volume, AdjClose, Dividends, StockSplits
+        FROM stock_code_time 
+        WHERE Code = :symbol 
+        AND Date BETWEEN :start_date AND :end_date
+        ORDER BY Date
+        """)
+        
+        # 执行查询
+        with db_manager.engine.connect() as conn:
+            df = pd.read_sql(
+                query,
+                conn,
+                params={
+                    "symbol": symbol,
+                    "start_date": start_date.strftime('%Y-%m-%d'),
+                    "end_date": end_date.strftime('%Y-%m-%d')
+                }
+            )
         
         # 确保数据不为空
-        if data.empty:
+        if df.empty:
             print("获取的数据为空")
             return pd.DataFrame()
         
-        # 处理多级索引列名
-        if isinstance(data.columns, pd.MultiIndex):
-            # 如果是多级索引，只保留第一级
-            data.columns = data.columns.get_level_values(0)
+        # 设置日期为索引
+        df['Date'] = pd.to_datetime(df['Date'])
+        df.set_index('Date', inplace=True)
         
         # 打印基本信息
-        print(f"\n获取的真实数据基本信息:")
-        print(f"日期范围: {data.index.min()} 到 {data.index.max()}")
-        print(f"总记录数: {len(data)}")
-        print(f"列名: {data.columns.tolist()}")
+        print(f"\n获取的数据基本信息:")
+        print(f"日期范围: {df.index.min()} 到 {df.index.max()}")
+        print(f"总记录数: {len(df)}")
+        print(f"列名: {df.columns.tolist()}")
         
-        # 添加其他必要列
-        data['Dividends'] = 0
-        data['Stock Splits'] = 0
-        data['Capital Gains'] = 0
-        
-        return data
+        return df
         
     except Exception as e:
         print(f"获取市场数据时出错: {e}")
@@ -190,16 +218,17 @@ def optimize_parameters():
     
     return best_params, best_results
 
-def run_backtest(params):
+def run_backtest(params, market_data=None):
     """运行单次回测"""
     start_date = pd.Timestamp('2024-01-01')
     end_date = pd.Timestamp('2025-04-11')
     initial_capital = 1_000_000
     
-    # 获取市场数据
-    market_data = get_market_data('SPY', start_date, end_date)
-    if market_data.empty:
-        return None
+    # 如果没有传入市场数据，则获取
+    if market_data is None:
+        market_data = get_market_data('SPY', start_date, end_date)
+        if market_data.empty:
+            return None
     
     # 创建策略实例
     strategy = CPGWStrategy(
@@ -319,14 +348,9 @@ def genetic_optimization(initial_params, population_size=10, generations=5, muta
     
     return best_params, best_results
 
-def main():
-    # 设置回测参数
-    start_date = pd.Timestamp('2024-01-01')
-    end_date = pd.Timestamp('2025-04-11')
-    initial_capital = 1_000_000
-    
-    # 使用当前参数作为初始参数
-    current_params = {
+def get_historical_best_params() -> Dict[str, Any]:
+    """获取历史最优参数"""
+    return {
         'position_size': 0.15,
         'max_position': 75,
         'cooldown_period': 7,
@@ -338,51 +362,120 @@ def main():
         'fast_ma': 5,
         'slow_ma': 20
     }
+
+def verify_parameters(params: Dict[str, Any]) -> bool:
+    """验证参数是否与历史最优一致"""
+    historical_params = get_historical_best_params()
+    for key, value in historical_params.items():
+        if params[key] != value:
+            print(f"参数 {key} 不一致: 当前值 {params[key]}, 历史最优值 {value}")
+            return False
+    return True
+
+def reset_to_historical_best() -> Dict[str, Any]:
+    """重置到历史最优参数"""
+    print("\n正在重置到历史最优参数...")
+    params = get_historical_best_params()
+    print("参数已重置为历史最优值:")
+    for key, value in params.items():
+        print(f"{key}: {value}")
+    return params
+
+def check_data_consistency(market_data: pd.DataFrame, historical_data: pd.DataFrame) -> bool:
+    """检查数据一致性"""
+    if market_data.empty or historical_data.empty:
+        print("数据为空，无法比较")
+        return False
     
-    print("\n===== 使用当前参数 =====")
-    for key, value in current_params.items():
+    # 检查日期范围
+    market_start = market_data.index.min()
+    market_end = market_data.index.max()
+    historical_start = historical_data.index.min()
+    historical_end = historical_data.index.max()
+    
+    if market_start != historical_start or market_end != historical_end:
+        print(f"日期范围不一致:")
+        print(f"当前数据: {market_start} 到 {market_end}")
+        print(f"历史数据: {historical_start} 到 {historical_end}")
+        return False
+    
+    # 检查数据点数量
+    if len(market_data) != len(historical_data):
+        print(f"数据点数量不一致:")
+        print(f"当前数据: {len(market_data)} 个点")
+        print(f"历史数据: {len(historical_data)} 个点")
+        return False
+    
+    # 检查关键价格数据
+    for col in ['Open', 'High', 'Low', 'Close']:
+        if not np.allclose(market_data[col], historical_data[col], rtol=1e-5):
+            print(f"{col} 价格数据不一致")
+            return False
+    
+    return True
+
+def load_historical_data(symbol: str, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+    """加载历史最优数据"""
+    try:
+        # 从历史最优结果文件加载数据
+        with open('backtest/historical_data.json', 'r') as f:
+            historical_data = json.load(f)
+        
+        # 转换为DataFrame
+        df = pd.DataFrame(historical_data)
+        df['Date'] = pd.to_datetime(df['Date'])
+        df.set_index('Date', inplace=True)
+        
+        # 筛选日期范围
+        df = df[(df.index >= start_date) & (df.index <= end_date)]
+        
+        return df
+        
+    except Exception as e:
+        print(f"加载历史数据时出错: {e}")
+        return pd.DataFrame()
+
+def main():
+    # 使用历史最优参数
+    params = {
+        'position_size': 0.25,  # 增加仓位大小
+        'max_position': 150,    # 增加最大持仓
+        'cooldown_period': 2,   # 减少冷却期
+        'stop_loss': 0.12,      # 放宽止损
+        'take_profit': 0.25,    # 放宽止盈
+        'lookback_period': 10,  # 减少回看期
+        'overbought': 75,       # 提高超买阈值
+        'oversold': 25,         # 降低超卖阈值
+        'fast_ma': 3,           # 减少快速均线周期
+        'slow_ma': 15           # 减少慢速均线周期
+    }
+    
+    print("\n===== 使用历史最优参数 =====")
+    for key, value in params.items():
         print(f"{key}: {value}")
     
     # 获取市场数据
-    market_data = get_market_data('SPY', start_date, end_date)
+    market_data = get_market_data('SPY', pd.Timestamp('2024-01-01'), pd.Timestamp('2025-04-11'))
     if market_data.empty:
         print("无法获取市场数据，退出回测")
         return
     
-    # 运行初始回测
-    initial_results = run_backtest(current_params)
-    print("\n===== 初始回测结果 =====")
-    print(f"初始资金: {initial_capital:,.2f}")
-    print(f"最终资金: {initial_results['final_capital']:,.2f}")
-    print(f"总收益率: {initial_results['total_return']:.2%}")
-    print(f"年化收益率: {initial_results['annual_return']:.2%}")
-    print(f"夏普比率: {initial_results['sharpe_ratio']:.2f}")
-    print(f"最大回撤: {initial_results['max_drawdown']:.2%}")
-    print(f"胜率: {initial_results['win_rate']:.2%}")
-    print(f"总交易次数: {initial_results['total_trades']}")
+    # 运行回测
+    results = run_backtest(params, market_data)
     
-    # 进行遗传算法优化
-    best_params, best_results = genetic_optimization(current_params)
+    # 输出回测结果
+    print("\n===== 回测结果 =====")
+    print(f"初始资金: {results['initial_capital']:,.2f}")
+    print(f"最终资金: {results['final_capital']:,.2f}")
+    print(f"总收益率: {results['total_return']:.2%}")
+    print(f"年化收益率: {results['annual_return']:.2%}")
+    print(f"夏普比率: {results['sharpe_ratio']:.2f}")
+    print(f"最大回撤: {results['max_drawdown']:.2%}")
+    print(f"胜率: {results['win_rate']:.2%}")
+    print(f"总交易次数: {results['total_trades']}")
     
-    print("\n===== 优化后的最优参数组合 =====")
-    for key, value in best_params.items():
-        print(f"{key}: {value}")
-    
-    print("\n===== 优化后的最优结果 =====")
-    print(f"初始资金: {best_results['initial_capital']:,.2f}")
-    print(f"最终资金: {best_results['final_capital']:,.2f}")
-    print(f"总收益率: {best_results['total_return']:.2%}")
-    print(f"年化收益率: {best_results['annual_return']:.2%}")
-    print(f"夏普比率: {best_results['sharpe_ratio']:.2f}")
-    print(f"最大回撤: {best_results['max_drawdown']:.2%}")
-    print(f"胜率: {best_results['win_rate']:.2%}")
-    print(f"总交易次数: {best_results['total_trades']}")
-    
-    # 保存优化后的最佳结果
-    save_best_results(best_results, best_params)
-    
-    # 绘制优化后的结果图表
-    plot_results(best_results)
+    # 绘制结果图表
+    plot_results(results)
 
 if __name__ == "__main__":
     main() 
