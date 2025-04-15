@@ -1,0 +1,14 @@
+{
+    "timestamp": "2025-04-14 14:37:07",
+    "results": {
+        "initial_capital": 1000000,
+        "final_capital": 21631061.155750927,
+        "total_return": 20.631061155750928,
+        "annual_return": 10.16771479802808,
+        "sharpe_ratio": 6.342513624191999,
+        "max_drawdown": 0.0019316522191401586,
+        "win_rate": 1.0,
+        "total_trades": 34,
+        "trades": [
+            {
+                "datetime": 

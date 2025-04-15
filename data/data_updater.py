@@ -84,10 +84,26 @@ class DatabaseManager:
     def get_existing_stocks(self):
         """获取数据库中已存在的股票列表"""
         try:
-            query = text("SELECT DISTINCT Code FROM stock_time_code")
+            # 修改查询，只获取有效的股票代码
+            query = text("""
+                SELECT DISTINCT Code 
+                FROM stock_time_code 
+                WHERE Code NOT REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+                AND Code IS NOT NULL
+                AND Code != ''
+            """)
+            
             with self.engine.connect() as conn:
                 result = conn.execute(query)
                 existing_stocks = [row[0] for row in result]
+                
+            # 过滤掉任何看起来像日期的代码
+            existing_stocks = [
+                code for code in existing_stocks 
+                if not (isinstance(code, str) and len(code) == 10 and code.count('-') == 2)
+            ]
+            
+            logger.info(f"从数据库加载了 {len(existing_stocks)} 只股票")
             return existing_stocks
         except Exception as e:
             logger.error(f"获取已存在股票列表时出错: {str(e)}")
@@ -595,9 +611,24 @@ class MarketDataUpdater:
             # 详细记录数据类型，便于调试
             logger.info(f"股票 {symbol} 原始数据类型: {df.dtypes.to_dict()}")
             
+            # 过滤掉无效日期
+            df = df[df['Date'].notna()]  # 移除空日期
+            df = df[~df['Date'].str.contains('0000-00-00', na=False)]  # 移除无效日期
+            
+            if df.empty:
+                logger.warning(f"股票 {symbol} 过滤后没有有效数据")
+                return False
+            
             # 明确转换所有列的数据类型
             # 1. 先转换日期列
-            df['Date'] = pd.to_datetime(df['Date']).dt.strftime('%Y-%m-%d')
+            df['Date'] = pd.to_datetime(df['Date'], errors='coerce')  # 使用coerce处理无效日期
+            df = df[df['Date'].notna()]  # 再次移除转换后仍为无效的日期
+            
+            if df.empty:
+                logger.warning(f"股票 {symbol} 日期转换后没有有效数据")
+                return False
+                
+            df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')  # 转换为字符串格式
             
             # 2. 转换数值列
             numeric_columns = ['Open', 'High', 'Low', 'Close', 'Volume', 'AdjClose', 'Dividends', 'StockSplits', 'Capital_Gains', 'Amount']
@@ -777,11 +808,20 @@ class MarketDataUpdater:
             try:
                 # 检查是否需要更新
                 last_update = self.get_last_update_time(symbol)
-                if not force_update and last_update and (datetime.now() - last_update).days < 1:
-                    report['skipped'] += 1
-                    report['details'][symbol] = 'skipped (up to date)'
-                    continue
+                if not force_update and last_update:
+                    # 确保last_update是datetime对象
+                    if isinstance(last_update, str):
+                        last_update = pd.to_datetime(last_update)
+                    elif isinstance(last_update, date) and not isinstance(last_update, datetime):
+                        last_update = datetime.combine(last_update, datetime.min.time())
                     
+                    # 计算时间差
+                    time_diff = datetime.now() - last_update
+                    if time_diff.days < 1:
+                        report['skipped'] += 1
+                        report['details'][symbol] = 'skipped (up to date)'
+                        continue
+                        
                 # 更新数据
                 success = self._update_single_stock(symbol)
                 if success:
@@ -804,8 +844,8 @@ class MarketDataUpdater:
         try:
             # 获取最新数据
             end_date = datetime.now()
-            # 增加获取数据的时间范围，确保有足够的数据
-            start_date = self.get_last_update_time(symbol) or (end_date - timedelta(days=60))
+            # 直接获取120天的历史数据，避免数据不足的警告
+            start_date = end_date - timedelta(days=120)
             
             # 从Yahoo Finance获取数据
             ticker = yf.Ticker(symbol)
@@ -824,28 +864,8 @@ class MarketDataUpdater:
             # 处理数据
             df = self._process_data(df, symbol)
             
-            # 验证数据
-            if len(df) < 20:  # 如果数据点不足20个
-                logger.warning(f"股票 {symbol} 数据点不足: {len(df)} < 20")
-                # 尝试获取更多历史数据
-                extended_start_date = end_date - timedelta(days=120)  # 扩展到120天
-                extended_df = ticker.history(
-                    start=extended_start_date,
-                    end=end_date,
-                    interval="1d",
-                    prepost=False,
-                    actions=True
-                )
-                if not extended_df.empty:
-                    extended_df = self._process_data(extended_df, symbol)
-                    if len(extended_df) > len(df):
-                        df = extended_df
-                        logger.info(f"成功获取更多历史数据，现在有 {len(df)} 个数据点")
-            
             # 保存到数据库
-            self.db_manager.save_stock_data(symbol, df)
-            
-            return True
+            return self.db_manager.save_stock_data(symbol, df)
             
         except Exception as e:
             logger.error(f"更新股票 {symbol} 数据时出错: {str(e)}")

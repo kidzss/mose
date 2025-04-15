@@ -15976,3 +15976,2100 @@ SPY:
 2025-04-08 22:30:43,551 - __main__ - INFO - 操作: put_protection
 2025-04-08 22:30:43,551 - __main__ - INFO - 原因: 标普500跌破4900.0
 2025-04-08 22:30:43,551 - __main__ - INFO - 详情: 建议在反弹时使用put期权进行保护
+2025-04-11 07:54:22,554 - __main__ - ERROR - 更新股票 2020-11-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,573 - __main__ - ERROR - 更新股票 2020-11-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,592 - __main__ - ERROR - 更新股票 2020-11-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,611 - __main__ - ERROR - 更新股票 2020-12-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,632 - __main__ - ERROR - 更新股票 2020-12-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,655 - __main__ - ERROR - 更新股票 2020-12-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,675 - __main__ - ERROR - 更新股票 2020-12-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,697 - __main__ - ERROR - 更新股票 2020-12-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,719 - __main__ - ERROR - 更新股票 2020-12-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,739 - __main__ - ERROR - 更新股票 2020-12-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,759 - __main__ - ERROR - 更新股票 2020-12-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,778 - __main__ - ERROR - 更新股票 2020-12-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,799 - __main__ - ERROR - 更新股票 2020-12-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,852 - __main__ - ERROR - 更新股票 2020-12-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,871 - __main__ - ERROR - 更新股票 2020-12-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,892 - __main__ - ERROR - 更新股票 2020-12-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,911 - __main__ - ERROR - 更新股票 2020-12-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,930 - __main__ - ERROR - 更新股票 2020-12-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,952 - __main__ - ERROR - 更新股票 2020-12-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,977 - __main__ - ERROR - 更新股票 2020-12-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:22,998 - __main__ - ERROR - 更新股票 2020-12-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,027 - __main__ - ERROR - 更新股票 2020-12-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,053 - __main__ - ERROR - 更新股票 2020-12-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,074 - __main__ - ERROR - 更新股票 2020-12-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,095 - __main__ - ERROR - 更新股票 2020-12-31 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,118 - __main__ - ERROR - 更新股票 2021-01-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,139 - __main__ - ERROR - 更新股票 2021-01-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,158 - __main__ - ERROR - 更新股票 2021-01-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,179 - __main__ - ERROR - 更新股票 2021-01-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,202 - __main__ - ERROR - 更新股票 2021-01-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,225 - __main__ - ERROR - 更新股票 2021-01-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,248 - __main__ - ERROR - 更新股票 2021-01-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,270 - __main__ - ERROR - 更新股票 2021-01-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,290 - __main__ - ERROR - 更新股票 2021-01-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,308 - __main__ - ERROR - 更新股票 2021-01-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,327 - __main__ - ERROR - 更新股票 2021-01-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,346 - __main__ - ERROR - 更新股票 2021-01-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,365 - __main__ - ERROR - 更新股票 2021-01-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,385 - __main__ - ERROR - 更新股票 2021-01-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,403 - __main__ - ERROR - 更新股票 2021-01-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,422 - __main__ - ERROR - 更新股票 2021-01-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,440 - __main__ - ERROR - 更新股票 2021-01-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,459 - __main__ - ERROR - 更新股票 2021-01-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,477 - __main__ - ERROR - 更新股票 2021-01-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,496 - __main__ - ERROR - 更新股票 2021-02-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,514 - __main__ - ERROR - 更新股票 2021-02-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,533 - __main__ - ERROR - 更新股票 2021-02-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,552 - __main__ - ERROR - 更新股票 2021-02-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,571 - __main__ - ERROR - 更新股票 2021-02-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,589 - __main__ - ERROR - 更新股票 2021-02-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,608 - __main__ - ERROR - 更新股票 2021-02-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,627 - __main__ - ERROR - 更新股票 2021-02-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,645 - __main__ - ERROR - 更新股票 2021-02-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,664 - __main__ - ERROR - 更新股票 2021-02-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,683 - __main__ - ERROR - 更新股票 2021-02-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,701 - __main__ - ERROR - 更新股票 2021-02-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,719 - __main__ - ERROR - 更新股票 2021-02-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,738 - __main__ - ERROR - 更新股票 2021-02-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,756 - __main__ - ERROR - 更新股票 2021-02-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,774 - __main__ - ERROR - 更新股票 2021-02-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,792 - __main__ - ERROR - 更新股票 2021-02-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,810 - __main__ - ERROR - 更新股票 2021-02-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,828 - __main__ - ERROR - 更新股票 2021-02-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,846 - __main__ - ERROR - 更新股票 2021-03-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,867 - __main__ - ERROR - 更新股票 2021-03-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,885 - __main__ - ERROR - 更新股票 2021-03-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,904 - __main__ - ERROR - 更新股票 2021-03-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,922 - __main__ - ERROR - 更新股票 2021-03-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,940 - __main__ - ERROR - 更新股票 2021-03-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,958 - __main__ - ERROR - 更新股票 2021-03-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,976 - __main__ - ERROR - 更新股票 2021-03-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:23,994 - __main__ - ERROR - 更新股票 2021-03-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,013 - __main__ - ERROR - 更新股票 2021-03-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,031 - __main__ - ERROR - 更新股票 2021-03-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,050 - __main__ - ERROR - 更新股票 2021-03-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,069 - __main__ - ERROR - 更新股票 2021-03-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,088 - __main__ - ERROR - 更新股票 2021-03-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,106 - __main__ - ERROR - 更新股票 2021-03-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,126 - __main__ - ERROR - 更新股票 2021-03-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,144 - __main__ - ERROR - 更新股票 2021-03-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,162 - __main__ - ERROR - 更新股票 2021-03-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,180 - __main__ - ERROR - 更新股票 2021-03-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,200 - __main__ - ERROR - 更新股票 2021-03-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,219 - __main__ - ERROR - 更新股票 2021-03-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,237 - __main__ - ERROR - 更新股票 2021-03-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,256 - __main__ - ERROR - 更新股票 2021-03-31 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,274 - __main__ - ERROR - 更新股票 2021-04-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,293 - __main__ - ERROR - 更新股票 2021-04-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,311 - __main__ - ERROR - 更新股票 2021-04-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,329 - __main__ - ERROR - 更新股票 2021-04-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,347 - __main__ - ERROR - 更新股票 2021-04-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,366 - __main__ - ERROR - 更新股票 2021-04-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,385 - __main__ - ERROR - 更新股票 2021-04-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,404 - __main__ - ERROR - 更新股票 2021-04-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,422 - __main__ - ERROR - 更新股票 2021-04-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,440 - __main__ - ERROR - 更新股票 2021-04-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,458 - __main__ - ERROR - 更新股票 2021-04-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,476 - __main__ - ERROR - 更新股票 2021-04-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,495 - __main__ - ERROR - 更新股票 2021-04-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,513 - __main__ - ERROR - 更新股票 2021-04-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,532 - __main__ - ERROR - 更新股票 2021-04-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,551 - __main__ - ERROR - 更新股票 2021-04-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,570 - __main__ - ERROR - 更新股票 2021-04-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,589 - __main__ - ERROR - 更新股票 2021-04-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,609 - __main__ - ERROR - 更新股票 2021-04-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,628 - __main__ - ERROR - 更新股票 2021-04-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,648 - __main__ - ERROR - 更新股票 2021-04-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,667 - __main__ - ERROR - 更新股票 2021-05-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,686 - __main__ - ERROR - 更新股票 2021-05-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,705 - __main__ - ERROR - 更新股票 2021-05-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,723 - __main__ - ERROR - 更新股票 2021-05-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,743 - __main__ - ERROR - 更新股票 2021-05-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,762 - __main__ - ERROR - 更新股票 2021-05-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,780 - __main__ - ERROR - 更新股票 2021-05-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,800 - __main__ - ERROR - 更新股票 2021-05-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,819 - __main__ - ERROR - 更新股票 2021-05-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,837 - __main__ - ERROR - 更新股票 2021-05-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,857 - __main__ - ERROR - 更新股票 2021-05-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,876 - __main__ - ERROR - 更新股票 2021-05-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,894 - __main__ - ERROR - 更新股票 2021-05-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,913 - __main__ - ERROR - 更新股票 2021-05-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,932 - __main__ - ERROR - 更新股票 2021-05-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,951 - __main__ - ERROR - 更新股票 2021-05-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,970 - __main__ - ERROR - 更新股票 2021-05-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:24,988 - __main__ - ERROR - 更新股票 2021-05-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,008 - __main__ - ERROR - 更新股票 2021-05-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,026 - __main__ - ERROR - 更新股票 2021-05-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,045 - __main__ - ERROR - 更新股票 2021-06-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,063 - __main__ - ERROR - 更新股票 2021-06-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,083 - __main__ - ERROR - 更新股票 2021-06-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,102 - __main__ - ERROR - 更新股票 2021-06-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,122 - __main__ - ERROR - 更新股票 2021-06-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,142 - __main__ - ERROR - 更新股票 2021-06-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,161 - __main__ - ERROR - 更新股票 2021-06-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,181 - __main__ - ERROR - 更新股票 2021-06-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,205 - __main__ - ERROR - 更新股票 2021-06-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,225 - __main__ - ERROR - 更新股票 2021-06-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,246 - __main__ - ERROR - 更新股票 2021-06-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,269 - __main__ - ERROR - 更新股票 2021-06-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,291 - __main__ - ERROR - 更新股票 2021-06-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,313 - __main__ - ERROR - 更新股票 2021-06-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,337 - __main__ - ERROR - 更新股票 2021-06-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,359 - __main__ - ERROR - 更新股票 2021-06-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,378 - __main__ - ERROR - 更新股票 2021-06-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,399 - __main__ - ERROR - 更新股票 2021-06-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,419 - __main__ - ERROR - 更新股票 2021-06-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,441 - __main__ - ERROR - 更新股票 2021-06-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,462 - __main__ - ERROR - 更新股票 2021-06-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,483 - __main__ - ERROR - 更新股票 2021-06-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,504 - __main__ - ERROR - 更新股票 2021-07-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,525 - __main__ - ERROR - 更新股票 2021-07-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,544 - __main__ - ERROR - 更新股票 2021-07-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,564 - __main__ - ERROR - 更新股票 2021-07-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,585 - __main__ - ERROR - 更新股票 2021-07-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,606 - __main__ - ERROR - 更新股票 2021-07-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,627 - __main__ - ERROR - 更新股票 2021-07-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,648 - __main__ - ERROR - 更新股票 2021-07-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,669 - __main__ - ERROR - 更新股票 2021-07-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,687 - __main__ - ERROR - 更新股票 2021-07-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,707 - __main__ - ERROR - 更新股票 2021-07-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,726 - __main__ - ERROR - 更新股票 2021-07-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,745 - __main__ - ERROR - 更新股票 2021-07-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,765 - __main__ - ERROR - 更新股票 2021-07-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,787 - __main__ - ERROR - 更新股票 2021-07-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,810 - __main__ - ERROR - 更新股票 2021-07-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,836 - __main__ - ERROR - 更新股票 2021-07-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,860 - __main__ - ERROR - 更新股票 2021-07-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,885 - __main__ - ERROR - 更新股票 2021-07-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:25,908 - __main__ - ERROR - 更新股票 2021-07-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,349 - __main__ - ERROR - 更新股票 2020-11-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,367 - __main__ - ERROR - 更新股票 2020-11-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,385 - __main__ - ERROR - 更新股票 2020-11-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,403 - __main__ - ERROR - 更新股票 2020-12-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,421 - __main__ - ERROR - 更新股票 2020-12-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,440 - __main__ - ERROR - 更新股票 2020-12-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,459 - __main__ - ERROR - 更新股票 2020-12-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,478 - __main__ - ERROR - 更新股票 2020-12-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,496 - __main__ - ERROR - 更新股票 2020-12-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,514 - __main__ - ERROR - 更新股票 2020-12-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,533 - __main__ - ERROR - 更新股票 2020-12-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,552 - __main__ - ERROR - 更新股票 2020-12-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,571 - __main__ - ERROR - 更新股票 2020-12-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,591 - __main__ - ERROR - 更新股票 2020-12-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,611 - __main__ - ERROR - 更新股票 2020-12-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,630 - __main__ - ERROR - 更新股票 2020-12-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,651 - __main__ - ERROR - 更新股票 2020-12-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,671 - __main__ - ERROR - 更新股票 2020-12-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,690 - __main__ - ERROR - 更新股票 2020-12-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,708 - __main__ - ERROR - 更新股票 2020-12-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,728 - __main__ - ERROR - 更新股票 2020-12-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,749 - __main__ - ERROR - 更新股票 2020-12-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,769 - __main__ - ERROR - 更新股票 2020-12-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,788 - __main__ - ERROR - 更新股票 2020-12-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,807 - __main__ - ERROR - 更新股票 2020-12-31 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,828 - __main__ - ERROR - 更新股票 2021-01-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,848 - __main__ - ERROR - 更新股票 2021-01-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,867 - __main__ - ERROR - 更新股票 2021-01-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,887 - __main__ - ERROR - 更新股票 2021-01-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,909 - __main__ - ERROR - 更新股票 2021-01-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,929 - __main__ - ERROR - 更新股票 2021-01-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,950 - __main__ - ERROR - 更新股票 2021-01-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,968 - __main__ - ERROR - 更新股票 2021-01-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:47,988 - __main__ - ERROR - 更新股票 2021-01-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,008 - __main__ - ERROR - 更新股票 2021-01-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,028 - __main__ - ERROR - 更新股票 2021-01-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,047 - __main__ - ERROR - 更新股票 2021-01-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,066 - __main__ - ERROR - 更新股票 2021-01-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,086 - __main__ - ERROR - 更新股票 2021-01-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,104 - __main__ - ERROR - 更新股票 2021-01-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,123 - __main__ - ERROR - 更新股票 2021-01-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,142 - __main__ - ERROR - 更新股票 2021-01-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,161 - __main__ - ERROR - 更新股票 2021-01-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,178 - __main__ - ERROR - 更新股票 2021-01-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,197 - __main__ - ERROR - 更新股票 2021-02-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,216 - __main__ - ERROR - 更新股票 2021-02-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,236 - __main__ - ERROR - 更新股票 2021-02-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,254 - __main__ - ERROR - 更新股票 2021-02-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,273 - __main__ - ERROR - 更新股票 2021-02-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,293 - __main__ - ERROR - 更新股票 2021-02-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,312 - __main__ - ERROR - 更新股票 2021-02-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,335 - __main__ - ERROR - 更新股票 2021-02-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,355 - __main__ - ERROR - 更新股票 2021-02-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,375 - __main__ - ERROR - 更新股票 2021-02-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,394 - __main__ - ERROR - 更新股票 2021-02-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,413 - __main__ - ERROR - 更新股票 2021-02-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,434 - __main__ - ERROR - 更新股票 2021-02-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,454 - __main__ - ERROR - 更新股票 2021-02-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,475 - __main__ - ERROR - 更新股票 2021-02-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,493 - __main__ - ERROR - 更新股票 2021-02-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,512 - __main__ - ERROR - 更新股票 2021-02-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,531 - __main__ - ERROR - 更新股票 2021-02-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,551 - __main__ - ERROR - 更新股票 2021-02-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,570 - __main__ - ERROR - 更新股票 2021-03-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,589 - __main__ - ERROR - 更新股票 2021-03-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,608 - __main__ - ERROR - 更新股票 2021-03-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,627 - __main__ - ERROR - 更新股票 2021-03-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,645 - __main__ - ERROR - 更新股票 2021-03-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,663 - __main__ - ERROR - 更新股票 2021-03-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,683 - __main__ - ERROR - 更新股票 2021-03-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,703 - __main__ - ERROR - 更新股票 2021-03-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,722 - __main__ - ERROR - 更新股票 2021-03-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,742 - __main__ - ERROR - 更新股票 2021-03-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,761 - __main__ - ERROR - 更新股票 2021-03-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,779 - __main__ - ERROR - 更新股票 2021-03-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,798 - __main__ - ERROR - 更新股票 2021-03-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,817 - __main__ - ERROR - 更新股票 2021-03-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,835 - __main__ - ERROR - 更新股票 2021-03-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,853 - __main__ - ERROR - 更新股票 2021-03-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,871 - __main__ - ERROR - 更新股票 2021-03-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,889 - __main__ - ERROR - 更新股票 2021-03-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,910 - __main__ - ERROR - 更新股票 2021-03-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,930 - __main__ - ERROR - 更新股票 2021-03-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,950 - __main__ - ERROR - 更新股票 2021-03-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,970 - __main__ - ERROR - 更新股票 2021-03-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:48,989 - __main__ - ERROR - 更新股票 2021-03-31 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,009 - __main__ - ERROR - 更新股票 2021-04-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,030 - __main__ - ERROR - 更新股票 2021-04-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,053 - __main__ - ERROR - 更新股票 2021-04-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,073 - __main__ - ERROR - 更新股票 2021-04-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,096 - __main__ - ERROR - 更新股票 2021-04-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,118 - __main__ - ERROR - 更新股票 2021-04-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,138 - __main__ - ERROR - 更新股票 2021-04-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,159 - __main__ - ERROR - 更新股票 2021-04-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,178 - __main__ - ERROR - 更新股票 2021-04-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,197 - __main__ - ERROR - 更新股票 2021-04-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,217 - __main__ - ERROR - 更新股票 2021-04-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,237 - __main__ - ERROR - 更新股票 2021-04-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,259 - __main__ - ERROR - 更新股票 2021-04-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,279 - __main__ - ERROR - 更新股票 2021-04-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,298 - __main__ - ERROR - 更新股票 2021-04-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,317 - __main__ - ERROR - 更新股票 2021-04-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,336 - __main__ - ERROR - 更新股票 2021-04-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,355 - __main__ - ERROR - 更新股票 2021-04-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,375 - __main__ - ERROR - 更新股票 2021-04-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,395 - __main__ - ERROR - 更新股票 2021-04-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,416 - __main__ - ERROR - 更新股票 2021-04-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,438 - __main__ - ERROR - 更新股票 2021-05-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,456 - __main__ - ERROR - 更新股票 2021-05-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,476 - __main__ - ERROR - 更新股票 2021-05-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,497 - __main__ - ERROR - 更新股票 2021-05-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,516 - __main__ - ERROR - 更新股票 2021-05-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,534 - __main__ - ERROR - 更新股票 2021-05-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,553 - __main__ - ERROR - 更新股票 2021-05-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,571 - __main__ - ERROR - 更新股票 2021-05-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,590 - __main__ - ERROR - 更新股票 2021-05-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,610 - __main__ - ERROR - 更新股票 2021-05-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,629 - __main__ - ERROR - 更新股票 2021-05-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,649 - __main__ - ERROR - 更新股票 2021-05-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,668 - __main__ - ERROR - 更新股票 2021-05-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,687 - __main__ - ERROR - 更新股票 2021-05-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,706 - __main__ - ERROR - 更新股票 2021-05-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,727 - __main__ - ERROR - 更新股票 2021-05-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,746 - __main__ - ERROR - 更新股票 2021-05-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,766 - __main__ - ERROR - 更新股票 2021-05-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,786 - __main__ - ERROR - 更新股票 2021-05-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,804 - __main__ - ERROR - 更新股票 2021-05-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,822 - __main__ - ERROR - 更新股票 2021-06-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,842 - __main__ - ERROR - 更新股票 2021-06-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,861 - __main__ - ERROR - 更新股票 2021-06-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,880 - __main__ - ERROR - 更新股票 2021-06-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,899 - __main__ - ERROR - 更新股票 2021-06-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,920 - __main__ - ERROR - 更新股票 2021-06-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,940 - __main__ - ERROR - 更新股票 2021-06-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,959 - __main__ - ERROR - 更新股票 2021-06-10 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,978 - __main__ - ERROR - 更新股票 2021-06-11 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:49,996 - __main__ - ERROR - 更新股票 2021-06-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,015 - __main__ - ERROR - 更新股票 2021-06-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,035 - __main__ - ERROR - 更新股票 2021-06-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,054 - __main__ - ERROR - 更新股票 2021-06-17 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,072 - __main__ - ERROR - 更新股票 2021-06-18 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,091 - __main__ - ERROR - 更新股票 2021-06-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,110 - __main__ - ERROR - 更新股票 2021-06-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,128 - __main__ - ERROR - 更新股票 2021-06-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,147 - __main__ - ERROR - 更新股票 2021-06-24 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,166 - __main__ - ERROR - 更新股票 2021-06-25 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,184 - __main__ - ERROR - 更新股票 2021-06-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,203 - __main__ - ERROR - 更新股票 2021-06-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,221 - __main__ - ERROR - 更新股票 2021-06-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,240 - __main__ - ERROR - 更新股票 2021-07-01 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,259 - __main__ - ERROR - 更新股票 2021-07-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,278 - __main__ - ERROR - 更新股票 2021-07-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,298 - __main__ - ERROR - 更新股票 2021-07-07 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,318 - __main__ - ERROR - 更新股票 2021-07-08 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,337 - __main__ - ERROR - 更新股票 2021-07-09 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,355 - __main__ - ERROR - 更新股票 2021-07-12 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,375 - __main__ - ERROR - 更新股票 2021-07-13 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,394 - __main__ - ERROR - 更新股票 2021-07-14 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,412 - __main__ - ERROR - 更新股票 2021-07-15 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,430 - __main__ - ERROR - 更新股票 2021-07-16 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,450 - __main__ - ERROR - 更新股票 2021-07-19 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,469 - __main__ - ERROR - 更新股票 2021-07-20 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,488 - __main__ - ERROR - 更新股票 2021-07-21 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,506 - __main__ - ERROR - 更新股票 2021-07-22 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,526 - __main__ - ERROR - 更新股票 2021-07-23 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,545 - __main__ - ERROR - 更新股票 2021-07-26 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,564 - __main__ - ERROR - 更新股票 2021-07-27 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,583 - __main__ - ERROR - 更新股票 2021-07-28 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,604 - __main__ - ERROR - 更新股票 2021-07-29 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,624 - __main__ - ERROR - 更新股票 2021-07-30 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,644 - __main__ - ERROR - 更新股票 2021-08-02 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,664 - __main__ - ERROR - 更新股票 2021-08-03 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,686 - __main__ - ERROR - 更新股票 2021-08-04 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,706 - __main__ - ERROR - 更新股票 2021-08-05 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:54:50,726 - __main__ - ERROR - 更新股票 2021-08-06 数据时出错: year 0 is out of range: 0000-00-00, at position 0
+2025-04-11 07:55:23,244 - __main__ - INFO - 从数据库加载了 573 只股票
+2025-04-11 07:55:23,755 - __main__ - WARNING - 股票 ^VIX 数据点不足: 1 < 20
+2025-04-11 07:55:24,038 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:24,094 - __main__ - INFO - 成功保存股票 ^VIX 的数据，总计 81 条记录
+2025-04-11 07:55:24,221 - __main__ - WARNING - 股票 A 数据点不足: 1 < 20
+2025-04-11 07:55:24,380 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:24,435 - __main__ - INFO - 成功保存股票 A 的数据，总计 81 条记录
+2025-04-11 07:55:24,609 - __main__ - WARNING - 股票 AAPL 数据点不足: 1 < 20
+2025-04-11 07:55:24,754 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:24,811 - __main__ - INFO - 成功保存股票 AAPL 的数据，总计 81 条记录
+2025-04-11 07:55:25,026 - __main__ - WARNING - 股票 ABBV 数据点不足: 1 < 20
+2025-04-11 07:55:25,112 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:25,164 - __main__ - INFO - 成功保存股票 ABBV 的数据，总计 81 条记录
+2025-04-11 07:55:25,304 - __main__ - WARNING - 股票 ABT 数据点不足: 1 < 20
+2025-04-11 07:55:25,458 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:25,513 - __main__ - INFO - 成功保存股票 ABT 的数据，总计 81 条记录
+2025-04-11 07:55:25,602 - __main__ - WARNING - 股票 ACGL 数据点不足: 1 < 20
+2025-04-11 07:55:25,677 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:25,729 - __main__ - INFO - 成功保存股票 ACGL 的数据，总计 81 条记录
+2025-04-11 07:55:25,853 - __main__ - WARNING - 股票 ACN 数据点不足: 1 < 20
+2025-04-11 07:55:26,076 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:26,125 - __main__ - INFO - 成功保存股票 ACN 的数据，总计 81 条记录
+2025-04-11 07:55:26,245 - __main__ - WARNING - 股票 ADBE 数据点不足: 1 < 20
+2025-04-11 07:55:26,333 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:26,387 - __main__ - INFO - 成功保存股票 ADBE 的数据，总计 81 条记录
+2025-04-11 07:55:26,494 - __main__ - WARNING - 股票 ADI 数据点不足: 1 < 20
+2025-04-11 07:55:26,676 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:26,732 - __main__ - INFO - 成功保存股票 ADI 的数据，总计 81 条记录
+2025-04-11 07:55:26,881 - __main__ - WARNING - 股票 ADM 数据点不足: 1 < 20
+2025-04-11 07:55:27,022 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:27,078 - __main__ - INFO - 成功保存股票 ADM 的数据，总计 81 条记录
+2025-04-11 07:55:27,250 - __main__ - WARNING - 股票 ADP 数据点不足: 1 < 20
+2025-04-11 07:55:27,403 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:27,458 - __main__ - INFO - 成功保存股票 ADP 的数据，总计 81 条记录
+2025-04-11 07:55:27,650 - __main__ - WARNING - 股票 ADSK 数据点不足: 1 < 20
+2025-04-11 07:55:27,733 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:27,941 - __main__ - INFO - 成功保存股票 ADSK 的数据，总计 81 条记录
+2025-04-11 07:55:28,208 - __main__ - WARNING - 股票 AEE 数据点不足: 1 < 20
+2025-04-11 07:55:28,304 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:28,358 - __main__ - INFO - 成功保存股票 AEE 的数据，总计 81 条记录
+2025-04-11 07:55:28,702 - __main__ - WARNING - 股票 AEP 数据点不足: 1 < 20
+2025-04-11 07:55:28,835 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:28,887 - __main__ - INFO - 成功保存股票 AEP 的数据，总计 81 条记录
+2025-04-11 07:55:29,225 - __main__ - WARNING - 股票 AES 数据点不足: 1 < 20
+2025-04-11 07:55:29,364 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:29,419 - __main__ - INFO - 成功保存股票 AES 的数据，总计 81 条记录
+2025-04-11 07:55:29,749 - __main__ - WARNING - 股票 AFL 数据点不足: 1 < 20
+2025-04-11 07:55:29,887 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:29,940 - __main__ - INFO - 成功保存股票 AFL 的数据，总计 81 条记录
+2025-04-11 07:55:30,273 - __main__ - WARNING - 股票 AIG 数据点不足: 1 < 20
+2025-04-11 07:55:30,389 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:30,442 - __main__ - INFO - 成功保存股票 AIG 的数据，总计 81 条记录
+2025-04-11 07:55:30,571 - __main__ - WARNING - 股票 AIZ 数据点不足: 1 < 20
+2025-04-11 07:55:30,802 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:30,855 - __main__ - INFO - 成功保存股票 AIZ 的数据，总计 81 条记录
+2025-04-11 07:55:30,991 - __main__ - WARNING - 股票 AJG 数据点不足: 1 < 20
+2025-04-11 07:55:31,195 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:31,247 - __main__ - INFO - 成功保存股票 AJG 的数据，总计 81 条记录
+2025-04-11 07:55:31,370 - __main__ - WARNING - 股票 AKAM 数据点不足: 1 < 20
+2025-04-11 07:55:31,441 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:31,494 - __main__ - INFO - 成功保存股票 AKAM 的数据，总计 81 条记录
+2025-04-11 07:55:31,614 - __main__ - WARNING - 股票 ALB 数据点不足: 1 < 20
+2025-04-11 07:55:31,729 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:31,784 - __main__ - INFO - 成功保存股票 ALB 的数据，总计 81 条记录
+2025-04-11 07:55:31,901 - __main__ - WARNING - 股票 ALGN 数据点不足: 1 < 20
+2025-04-11 07:55:31,961 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:32,007 - __main__ - INFO - 成功保存股票 ALGN 的数据，总计 81 条记录
+2025-04-11 07:55:32,236 - __main__ - WARNING - 股票 ALL 数据点不足: 1 < 20
+2025-04-11 07:55:32,375 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:32,427 - __main__ - INFO - 成功保存股票 ALL 的数据，总计 81 条记录
+2025-04-11 07:55:32,522 - __main__ - WARNING - 股票 ALLE 数据点不足: 1 < 20
+2025-04-11 07:55:32,612 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:32,671 - __main__ - INFO - 成功保存股票 ALLE 的数据，总计 81 条记录
+2025-04-11 07:55:32,777 - __main__ - WARNING - 股票 AMAT 数据点不足: 1 < 20
+2025-04-11 07:55:32,897 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:32,947 - __main__ - INFO - 成功保存股票 AMAT 的数据，总计 81 条记录
+2025-04-11 07:55:33,049 - __main__ - WARNING - 股票 AMCR 数据点不足: 1 < 20
+2025-04-11 07:55:33,420 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:33,473 - __main__ - INFO - 成功保存股票 AMCR 的数据，总计 81 条记录
+2025-04-11 07:55:33,565 - __main__ - WARNING - 股票 AMD 数据点不足: 1 < 20
+2025-04-11 07:55:33,634 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:33,690 - __main__ - INFO - 成功保存股票 AMD 的数据，总计 81 条记录
+2025-04-11 07:55:33,847 - __main__ - WARNING - 股票 AME 数据点不足: 1 < 20
+2025-04-11 07:55:34,058 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:34,145 - __main__ - INFO - 成功保存股票 AME 的数据，总计 81 条记录
+2025-04-11 07:55:34,331 - __main__ - WARNING - 股票 AMGN 数据点不足: 1 < 20
+2025-04-11 07:55:34,467 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:34,516 - __main__ - INFO - 成功保存股票 AMGN 的数据，总计 81 条记录
+2025-04-11 07:55:34,631 - __main__ - WARNING - 股票 AMP 数据点不足: 1 < 20
+2025-04-11 07:55:34,731 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:34,783 - __main__ - INFO - 成功保存股票 AMP 的数据，总计 81 条记录
+2025-04-11 07:55:34,897 - __main__ - WARNING - 股票 AMT 数据点不足: 1 < 20
+2025-04-11 07:55:35,060 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:35,111 - __main__ - INFO - 成功保存股票 AMT 的数据，总计 81 条记录
+2025-04-11 07:55:35,207 - __main__ - WARNING - 股票 AMZN 数据点不足: 1 < 20
+2025-04-11 07:55:35,282 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:35,334 - __main__ - INFO - 成功保存股票 AMZN 的数据，总计 81 条记录
+2025-04-11 07:55:35,513 - __main__ - WARNING - 股票 ANET 数据点不足: 1 < 20
+2025-04-11 07:55:35,592 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:35,647 - __main__ - INFO - 成功保存股票 ANET 的数据，总计 81 条记录
+2025-04-11 07:55:35,732 - __main__ - WARNING - 股票 ANSS 数据点不足: 1 < 20
+2025-04-11 07:55:35,798 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:35,852 - __main__ - INFO - 成功保存股票 ANSS 的数据，总计 81 条记录
+2025-04-11 07:55:36,036 - __main__ - WARNING - 股票 AON 数据点不足: 1 < 20
+2025-04-11 07:55:36,166 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:36,218 - __main__ - INFO - 成功保存股票 AON 的数据，总计 81 条记录
+2025-04-11 07:55:36,431 - __main__ - WARNING - 股票 AOS 数据点不足: 1 < 20
+2025-04-11 07:55:36,566 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:36,617 - __main__ - INFO - 成功保存股票 AOS 的数据，总计 81 条记录
+2025-04-11 07:55:36,779 - __main__ - WARNING - 股票 APA 数据点不足: 1 < 20
+2025-04-11 07:55:36,928 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:36,979 - __main__ - INFO - 成功保存股票 APA 的数据，总计 81 条记录
+2025-04-11 07:55:37,202 - __main__ - WARNING - 股票 APD 数据点不足: 1 < 20
+2025-04-11 07:55:37,341 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:37,393 - __main__ - INFO - 成功保存股票 APD 的数据，总计 81 条记录
+2025-04-11 07:55:37,703 - __main__ - WARNING - 股票 APH 数据点不足: 1 < 20
+2025-04-11 07:55:37,810 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:37,862 - __main__ - INFO - 成功保存股票 APH 的数据，总计 81 条记录
+2025-04-11 07:55:38,206 - __main__ - WARNING - 股票 APTV 数据点不足: 1 < 20
+2025-04-11 07:55:38,286 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:38,337 - __main__ - INFO - 成功保存股票 APTV 的数据，总计 81 条记录
+2025-04-11 07:55:38,660 - __main__ - WARNING - 股票 ARE 数据点不足: 1 < 20
+2025-04-11 07:55:38,768 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:38,821 - __main__ - INFO - 成功保存股票 ARE 的数据，总计 81 条记录
+2025-04-11 07:55:38,941 - __main__ - WARNING - 股票 ASML 数据点不足: 1 < 20
+2025-04-11 07:55:39,187 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:39,241 - __main__ - INFO - 成功保存股票 ASML 的数据，总计 81 条记录
+2025-04-11 07:55:39,421 - __main__ - WARNING - 股票 ATO 数据点不足: 1 < 20
+2025-04-11 07:55:39,717 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:39,770 - __main__ - INFO - 成功保存股票 ATO 的数据，总计 81 条记录
+2025-04-11 07:55:39,886 - __main__ - WARNING - 股票 AVB 数据点不足: 1 < 20
+2025-04-11 07:55:39,996 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:40,053 - __main__ - INFO - 成功保存股票 AVB 的数据，总计 81 条记录
+2025-04-11 07:55:40,231 - __main__ - WARNING - 股票 AVGO 数据点不足: 1 < 20
+2025-04-11 07:55:40,356 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:40,415 - __main__ - INFO - 成功保存股票 AVGO 的数据，总计 81 条记录
+2025-04-11 07:55:40,621 - __main__ - WARNING - 股票 AVY 数据点不足: 1 < 20
+2025-04-11 07:55:40,761 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:40,816 - __main__ - INFO - 成功保存股票 AVY 的数据，总计 81 条记录
+2025-04-11 07:55:40,922 - __main__ - WARNING - 股票 AWK 数据点不足: 1 < 20
+2025-04-11 07:55:41,016 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:41,068 - __main__ - INFO - 成功保存股票 AWK 的数据，总计 81 条记录
+2025-04-11 07:55:41,163 - __main__ - WARNING - 股票 AXON 数据点不足: 1 < 20
+2025-04-11 07:55:41,282 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:41,335 - __main__ - INFO - 成功保存股票 AXON 的数据，总计 81 条记录
+2025-04-11 07:55:41,483 - __main__ - WARNING - 股票 AXP 数据点不足: 1 < 20
+2025-04-11 07:55:41,676 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:41,730 - __main__ - INFO - 成功保存股票 AXP 的数据，总计 81 条记录
+2025-04-11 07:55:41,902 - __main__ - WARNING - 股票 AZN 数据点不足: 1 < 20
+2025-04-11 07:55:42,008 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:42,065 - __main__ - INFO - 成功保存股票 AZN 的数据，总计 81 条记录
+2025-04-11 07:55:42,150 - __main__ - WARNING - 股票 AZO 数据点不足: 1 < 20
+2025-04-11 07:55:42,214 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:42,268 - __main__ - INFO - 成功保存股票 AZO 的数据，总计 81 条记录
+2025-04-11 07:55:42,432 - __main__ - WARNING - 股票 BA 数据点不足: 1 < 20
+2025-04-11 07:55:42,602 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:42,652 - __main__ - INFO - 成功保存股票 BA 的数据，总计 81 条记录
+2025-04-11 07:55:42,851 - __main__ - WARNING - 股票 BABA 数据点不足: 1 < 20
+2025-04-11 07:55:42,921 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:42,973 - __main__ - INFO - 成功保存股票 BABA 的数据，总计 81 条记录
+2025-04-11 07:55:43,116 - __main__ - WARNING - 股票 BAC 数据点不足: 1 < 20
+2025-04-11 07:55:43,257 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:43,309 - __main__ - INFO - 成功保存股票 BAC 的数据，总计 81 条记录
+2025-04-11 07:55:43,489 - __main__ - WARNING - 股票 BALL 数据点不足: 1 < 20
+2025-04-11 07:55:43,614 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:43,666 - __main__ - INFO - 成功保存股票 BALL 的数据，总计 81 条记录
+2025-04-11 07:55:44,081 - __main__ - WARNING - 股票 BAX 数据点不足: 1 < 20
+2025-04-11 07:55:44,202 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:44,254 - __main__ - INFO - 成功保存股票 BAX 的数据，总计 81 条记录
+2025-04-11 07:55:44,515 - __main__ - WARNING - 股票 BBY 数据点不足: 1 < 20
+2025-04-11 07:55:44,667 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:44,720 - __main__ - INFO - 成功保存股票 BBY 的数据，总计 81 条记录
+2025-04-11 07:55:45,070 - __main__ - WARNING - 股票 BDX 数据点不足: 1 < 20
+2025-04-11 07:55:45,482 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:45,536 - __main__ - INFO - 成功保存股票 BDX 的数据，总计 81 条记录
+2025-04-11 07:55:45,708 - __main__ - WARNING - 股票 BEN 数据点不足: 1 < 20
+2025-04-11 07:55:46,005 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:46,058 - __main__ - INFO - 成功保存股票 BEN 的数据，总计 81 条记录
+2025-04-11 07:55:46,187 - __main__ - WARNING - 股票 BG 数据点不足: 1 < 20
+2025-04-11 07:55:46,530 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:46,583 - __main__ - INFO - 成功保存股票 BG 的数据，总计 81 条记录
+2025-04-11 07:55:46,665 - __main__ - WARNING - 股票 BIIB 数据点不足: 1 < 20
+2025-04-11 07:55:46,735 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:46,790 - __main__ - INFO - 成功保存股票 BIIB 的数据，总计 81 条记录
+2025-04-11 07:55:47,150 - __main__ - WARNING - 股票 BK 数据点不足: 1 < 20
+2025-04-11 07:55:47,312 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:47,364 - __main__ - INFO - 成功保存股票 BK 的数据，总计 81 条记录
+2025-04-11 07:55:47,711 - __main__ - WARNING - 股票 BKNG 数据点不足: 1 < 20
+2025-04-11 07:55:48,317 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:48,369 - __main__ - INFO - 成功保存股票 BKNG 的数据，总计 81 条记录
+2025-04-11 07:55:48,723 - __main__ - WARNING - 股票 BKR 数据点不足: 1 < 20
+2025-04-11 07:55:48,859 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:48,911 - __main__ - INFO - 成功保存股票 BKR 的数据，总计 81 条记录
+2025-04-11 07:55:49,197 - __main__ - WARNING - 股票 BLDR 数据点不足: 1 < 20
+2025-04-11 07:55:49,419 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:49,473 - __main__ - INFO - 成功保存股票 BLDR 的数据，总计 81 条记录
+2025-04-11 07:55:49,741 - __main__ - WARNING - 股票 BLK 数据点不足: 1 < 20
+2025-04-11 07:55:49,843 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:49,895 - __main__ - INFO - 成功保存股票 BLK 的数据，总计 81 条记录
+2025-04-11 07:55:50,201 - __main__ - WARNING - 股票 BMY 数据点不足: 1 < 20
+2025-04-11 07:55:50,335 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:50,389 - __main__ - INFO - 成功保存股票 BMY 的数据，总计 81 条记录
+2025-04-11 07:55:50,720 - __main__ - WARNING - 股票 BND 数据点不足: 1 < 20
+2025-04-11 07:55:50,874 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:50,928 - __main__ - INFO - 成功保存股票 BND 的数据，总计 81 条记录
+2025-04-11 07:55:51,245 - __main__ - WARNING - 股票 BR 数据点不足: 1 < 20
+2025-04-11 07:55:51,338 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:51,390 - __main__ - INFO - 成功保存股票 BR 的数据，总计 81 条记录
+2025-04-11 07:55:51,481 - __main__ - WARNING - 股票 BRK-B 数据点不足: 1 < 20
+2025-04-11 07:55:51,770 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:51,821 - __main__ - INFO - 成功保存股票 BRK-B 的数据，总计 81 条记录
+2025-04-11 07:55:51,997 - __main__ - WARNING - 股票 BRO 数据点不足: 1 < 20
+2025-04-11 07:55:52,299 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:52,352 - __main__ - INFO - 成功保存股票 BRO 的数据，总计 81 条记录
+2025-04-11 07:55:52,468 - __main__ - WARNING - 股票 BSX 数据点不足: 1 < 20
+2025-04-11 07:55:52,537 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:52,589 - __main__ - INFO - 成功保存股票 BSX 的数据，总计 81 条记录
+2025-04-11 07:55:52,909 - __main__ - WARNING - 股票 BWA 数据点不足: 1 < 20
+2025-04-11 07:55:53,026 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:53,079 - __main__ - INFO - 成功保存股票 BWA 的数据，总计 81 条记录
+2025-04-11 07:55:53,411 - __main__ - WARNING - 股票 BX 数据点不足: 1 < 20
+2025-04-11 07:55:53,504 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:53,558 - __main__ - INFO - 成功保存股票 BX 的数据，总计 81 条记录
+2025-04-11 07:55:53,733 - __main__ - WARNING - 股票 BXP 数据点不足: 1 < 20
+2025-04-11 07:55:53,866 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:53,918 - __main__ - INFO - 成功保存股票 BXP 的数据，总计 81 条记录
+2025-04-11 07:55:54,044 - __main__ - WARNING - 股票 C 数据点不足: 1 < 20
+2025-04-11 07:55:54,172 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:54,224 - __main__ - INFO - 成功保存股票 C 的数据，总计 81 条记录
+2025-04-11 07:55:54,503 - __main__ - WARNING - 股票 CAG 数据点不足: 1 < 20
+2025-04-11 07:55:54,622 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:54,676 - __main__ - INFO - 成功保存股票 CAG 的数据，总计 81 条记录
+2025-04-11 07:55:54,913 - __main__ - WARNING - 股票 CAH 数据点不足: 1 < 20
+2025-04-11 07:55:55,031 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:55,082 - __main__ - INFO - 成功保存股票 CAH 的数据，总计 81 条记录
+2025-04-11 07:55:55,435 - __main__ - WARNING - 股票 CAT 数据点不足: 1 < 20
+2025-04-11 07:55:55,605 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:55,659 - __main__ - INFO - 成功保存股票 CAT 的数据，总计 81 条记录
+2025-04-11 07:55:55,849 - __main__ - WARNING - 股票 CB 数据点不足: 1 < 20
+2025-04-11 07:55:55,969 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:56,022 - __main__ - INFO - 成功保存股票 CB 的数据，总计 81 条记录
+2025-04-11 07:55:56,124 - __main__ - WARNING - 股票 CBOE 数据点不足: 1 < 20
+2025-04-11 07:55:56,207 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:56,264 - __main__ - INFO - 成功保存股票 CBOE 的数据，总计 81 条记录
+2025-04-11 07:55:56,543 - __main__ - WARNING - 股票 CBRE 数据点不足: 1 < 20
+2025-04-11 07:55:56,608 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:56,661 - __main__ - INFO - 成功保存股票 CBRE 的数据，总计 81 条记录
+2025-04-11 07:55:56,880 - __main__ - WARNING - 股票 CCEP 数据点不足: 1 < 20
+2025-04-11 07:55:57,010 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:57,063 - __main__ - INFO - 成功保存股票 CCEP 的数据，总计 81 条记录
+2025-04-11 07:55:57,168 - __main__ - WARNING - 股票 CCI 数据点不足: 1 < 20
+2025-04-11 07:55:57,255 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:57,308 - __main__ - INFO - 成功保存股票 CCI 的数据，总计 81 条记录
+2025-04-11 07:55:57,631 - __main__ - WARNING - 股票 CCL 数据点不足: 1 < 20
+2025-04-11 07:55:57,757 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:57,808 - __main__ - INFO - 成功保存股票 CCL 的数据，总计 81 条记录
+2025-04-11 07:55:58,058 - __main__ - WARNING - 股票 CDNS 数据点不足: 1 < 20
+2025-04-11 07:55:58,134 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:58,187 - __main__ - INFO - 成功保存股票 CDNS 的数据，总计 81 条记录
+2025-04-11 07:55:58,604 - __main__ - WARNING - 股票 CDW 数据点不足: 1 < 20
+2025-04-11 07:55:58,697 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:58,751 - __main__ - INFO - 成功保存股票 CDW 的数据，总计 81 条记录
+2025-04-11 07:55:58,859 - __main__ - WARNING - 股票 CE 数据点不足: 1 < 20
+2025-04-11 07:55:58,979 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:59,030 - __main__ - INFO - 成功保存股票 CE 的数据，总计 81 条记录
+2025-04-11 07:55:59,194 - __main__ - WARNING - 股票 CF 数据点不足: 1 < 20
+2025-04-11 07:55:59,290 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:59,341 - __main__ - INFO - 成功保存股票 CF 的数据，总计 81 条记录
+2025-04-11 07:55:59,638 - __main__ - WARNING - 股票 CFG 数据点不足: 1 < 20
+2025-04-11 07:55:59,723 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:55:59,774 - __main__ - INFO - 成功保存股票 CFG 的数据，总计 81 条记录
+2025-04-11 07:55:59,928 - __main__ - WARNING - 股票 CHD 数据点不足: 1 < 20
+2025-04-11 07:56:00,159 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:00,212 - __main__ - INFO - 成功保存股票 CHD 的数据，总计 81 条记录
+2025-04-11 07:56:00,336 - __main__ - WARNING - 股票 CHRW 数据点不足: 1 < 20
+2025-04-11 07:56:00,443 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:00,493 - __main__ - INFO - 成功保存股票 CHRW 的数据，总计 81 条记录
+2025-04-11 07:56:00,679 - __main__ - WARNING - 股票 CHTR 数据点不足: 1 < 20
+2025-04-11 07:56:00,753 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:00,809 - __main__ - INFO - 成功保存股票 CHTR 的数据，总计 81 条记录
+2025-04-11 07:56:00,973 - __main__ - WARNING - 股票 CI 数据点不足: 1 < 20
+2025-04-11 07:56:01,206 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:01,261 - __main__ - INFO - 成功保存股票 CI 的数据，总计 81 条记录
+2025-04-11 07:56:01,409 - __main__ - WARNING - 股票 CINF 数据点不足: 1 < 20
+2025-04-11 07:56:01,602 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:01,660 - __main__ - INFO - 成功保存股票 CINF 的数据，总计 81 条记录
+2025-04-11 07:56:01,870 - __main__ - WARNING - 股票 CL 数据点不足: 1 < 20
+2025-04-11 07:56:02,028 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:02,079 - __main__ - INFO - 成功保存股票 CL 的数据，总计 81 条记录
+2025-04-11 07:56:02,273 - __main__ - WARNING - 股票 CLX 数据点不足: 1 < 20
+2025-04-11 07:56:02,398 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:02,454 - __main__ - INFO - 成功保存股票 CLX 的数据，总计 81 条记录
+2025-04-11 07:56:02,643 - __main__ - WARNING - 股票 CMCSA 数据点不足: 1 < 20
+2025-04-11 07:56:02,781 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:02,833 - __main__ - INFO - 成功保存股票 CMCSA 的数据，总计 81 条记录
+2025-04-11 07:56:02,947 - __main__ - WARNING - 股票 CME 数据点不足: 1 < 20
+2025-04-11 07:56:03,042 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:03,097 - __main__ - INFO - 成功保存股票 CME 的数据，总计 81 条记录
+2025-04-11 07:56:03,203 - __main__ - WARNING - 股票 CMG 数据点不足: 1 < 20
+2025-04-11 07:56:03,366 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:03,422 - __main__ - INFO - 成功保存股票 CMG 的数据，总计 81 条记录
+2025-04-11 07:56:03,595 - __main__ - WARNING - 股票 CMI 数据点不足: 1 < 20
+2025-04-11 07:56:03,831 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:03,885 - __main__ - INFO - 成功保存股票 CMI 的数据，总计 81 条记录
+2025-04-11 07:56:04,037 - __main__ - WARNING - 股票 CMS 数据点不足: 1 < 20
+2025-04-11 07:56:04,178 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:04,229 - __main__ - INFO - 成功保存股票 CMS 的数据，总计 81 条记录
+2025-04-11 07:56:04,394 - __main__ - WARNING - 股票 CNC 数据点不足: 1 < 20
+2025-04-11 07:56:04,470 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:04,523 - __main__ - INFO - 成功保存股票 CNC 的数据，总计 81 条记录
+2025-04-11 07:56:04,742 - __main__ - WARNING - 股票 CNP 数据点不足: 1 < 20
+2025-04-11 07:56:04,919 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:04,972 - __main__ - INFO - 成功保存股票 CNP 的数据，总计 81 条记录
+2025-04-11 07:56:05,099 - __main__ - WARNING - 股票 COF 数据点不足: 1 < 20
+2025-04-11 07:56:05,238 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:05,291 - __main__ - INFO - 成功保存股票 COF 的数据，总计 81 条记录
+2025-04-11 07:56:05,514 - __main__ - WARNING - 股票 COO 数据点不足: 1 < 20
+2025-04-11 07:56:05,649 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:05,711 - __main__ - INFO - 成功保存股票 COO 的数据，总计 81 条记录
+2025-04-11 07:56:05,921 - __main__ - WARNING - 股票 COP 数据点不足: 1 < 20
+2025-04-11 07:56:06,045 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:06,096 - __main__ - INFO - 成功保存股票 COP 的数据，总计 81 条记录
+2025-04-11 07:56:06,219 - __main__ - WARNING - 股票 COR 数据点不足: 1 < 20
+2025-04-11 07:56:06,327 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:06,380 - __main__ - INFO - 成功保存股票 COR 的数据，总计 81 条记录
+2025-04-11 07:56:06,512 - __main__ - WARNING - 股票 COST 数据点不足: 1 < 20
+2025-04-11 07:56:06,649 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:06,703 - __main__ - INFO - 成功保存股票 COST 的数据，总计 81 条记录
+2025-04-11 07:56:06,837 - __main__ - WARNING - 股票 CPAY 数据点不足: 1 < 20
+2025-04-11 07:56:06,971 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:07,024 - __main__ - INFO - 成功保存股票 CPAY 的数据，总计 81 条记录
+2025-04-11 07:56:07,189 - __main__ - WARNING - 股票 CPB 数据点不足: 1 < 20
+2025-04-11 07:56:07,336 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:07,388 - __main__ - INFO - 成功保存股票 CPB 的数据，总计 81 条记录
+2025-04-11 07:56:07,553 - __main__ - WARNING - 股票 CPRT 数据点不足: 1 < 20
+2025-04-11 07:56:07,627 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:07,686 - __main__ - INFO - 成功保存股票 CPRT 的数据，总计 81 条记录
+2025-04-11 07:56:07,887 - __main__ - WARNING - 股票 CPT 数据点不足: 1 < 20
+2025-04-11 07:56:08,043 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:08,095 - __main__ - INFO - 成功保存股票 CPT 的数据，总计 81 条记录
+2025-04-11 07:56:08,181 - __main__ - WARNING - 股票 CRL 数据点不足: 1 < 20
+2025-04-11 07:56:08,254 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:08,305 - __main__ - INFO - 成功保存股票 CRL 的数据，总计 81 条记录
+2025-04-11 07:56:08,419 - __main__ - WARNING - 股票 CRM 数据点不足: 1 < 20
+2025-04-11 07:56:08,548 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:08,600 - __main__ - INFO - 成功保存股票 CRM 的数据，总计 81 条记录
+2025-04-11 07:56:08,704 - __main__ - WARNING - 股票 CSCO 数据点不足: 1 < 20
+2025-04-11 07:56:08,792 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:08,844 - __main__ - INFO - 成功保存股票 CSCO 的数据，总计 81 条记录
+2025-04-11 07:56:09,133 - __main__ - WARNING - 股票 CSGP 数据点不足: 1 < 20
+2025-04-11 07:56:09,208 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:09,261 - __main__ - INFO - 成功保存股票 CSGP 的数据，总计 81 条记录
+2025-04-11 07:56:09,484 - __main__ - WARNING - 股票 CSX 数据点不足: 1 < 20
+2025-04-11 07:56:09,635 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:09,687 - __main__ - INFO - 成功保存股票 CSX 的数据，总计 81 条记录
+2025-04-11 07:56:09,984 - __main__ - WARNING - 股票 CTAS 数据点不足: 1 < 20
+2025-04-11 07:56:10,212 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:10,264 - __main__ - INFO - 成功保存股票 CTAS 的数据，总计 81 条记录
+2025-04-11 07:56:10,646 - __main__ - WARNING - 股票 CTRA 数据点不足: 1 < 20
+2025-04-11 07:56:10,784 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:10,835 - __main__ - INFO - 成功保存股票 CTRA 的数据，总计 81 条记录
+2025-04-11 07:56:11,166 - __main__ - WARNING - 股票 CTSH 数据点不足: 1 < 20
+2025-04-11 07:56:11,258 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:11,309 - __main__ - INFO - 成功保存股票 CTSH 的数据，总计 81 条记录
+2025-04-11 07:56:11,445 - __main__ - WARNING - 股票 CVS 数据点不足: 1 < 20
+2025-04-11 07:56:11,700 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:11,761 - __main__ - INFO - 成功保存股票 CVS 的数据，总计 81 条记录
+2025-04-11 07:56:11,937 - __main__ - WARNING - 股票 CVX 数据点不足: 1 < 20
+2025-04-11 07:56:12,222 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:12,275 - __main__ - INFO - 成功保存股票 CVX 的数据，总计 81 条记录
+2025-04-11 07:56:12,364 - __main__ - WARNING - 股票 CZR 数据点不足: 1 < 20
+2025-04-11 07:56:12,451 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:12,503 - __main__ - INFO - 成功保存股票 CZR 的数据，总计 81 条记录
+2025-04-11 07:56:12,838 - __main__ - WARNING - 股票 D 数据点不足: 1 < 20
+2025-04-11 07:56:12,980 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:13,044 - __main__ - INFO - 成功保存股票 D 的数据，总计 81 条记录
+2025-04-11 07:56:13,347 - __main__ - WARNING - 股票 DAL 数据点不足: 1 < 20
+2025-04-11 07:56:13,526 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:13,674 - __main__ - INFO - 成功保存股票 DAL 的数据，总计 81 条记录
+2025-04-11 07:56:13,853 - __main__ - WARNING - 股票 DBC 数据点不足: 1 < 20
+2025-04-11 07:56:13,942 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:13,994 - __main__ - INFO - 成功保存股票 DBC 的数据，总计 81 条记录
+2025-04-11 07:56:14,179 - __main__ - WARNING - 股票 DD 数据点不足: 1 < 20
+2025-04-11 07:56:14,355 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:14,408 - __main__ - INFO - 成功保存股票 DD 的数据，总计 81 条记录
+2025-04-11 07:56:14,583 - __main__ - WARNING - 股票 DE 数据点不足: 1 < 20
+2025-04-11 07:56:14,719 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:14,772 - __main__ - INFO - 成功保存股票 DE 的数据，总计 81 条记录
+2025-04-11 07:56:14,879 - __main__ - WARNING - 股票 DECK 数据点不足: 1 < 20
+2025-04-11 07:56:14,956 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:15,009 - __main__ - INFO - 成功保存股票 DECK 的数据，总计 81 条记录
+2025-04-11 07:56:15,113 - __main__ - WARNING - 股票 DFS 数据点不足: 1 < 20
+2025-04-11 07:56:15,232 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:15,284 - __main__ - INFO - 成功保存股票 DFS 的数据，总计 81 条记录
+2025-04-11 07:56:15,429 - __main__ - WARNING - 股票 DG 数据点不足: 1 < 20
+2025-04-11 07:56:15,510 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:15,561 - __main__ - INFO - 成功保存股票 DG 的数据，总计 81 条记录
+2025-04-11 07:56:15,682 - __main__ - WARNING - 股票 DGX 数据点不足: 1 < 20
+2025-04-11 07:56:15,798 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:15,849 - __main__ - INFO - 成功保存股票 DGX 的数据，总计 81 条记录
+2025-04-11 07:56:15,979 - __main__ - WARNING - 股票 DHI 数据点不足: 1 < 20
+2025-04-11 07:56:16,123 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:16,175 - __main__ - INFO - 成功保存股票 DHI 的数据，总计 81 条记录
+2025-04-11 07:56:16,406 - __main__ - WARNING - 股票 DHR 数据点不足: 1 < 20
+2025-04-11 07:56:16,516 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:16,568 - __main__ - INFO - 成功保存股票 DHR 的数据，总计 81 条记录
+2025-04-11 07:56:16,694 - __main__ - WARNING - 股票 DIA 数据点不足: 1 < 20
+2025-04-11 07:56:16,809 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:16,861 - __main__ - INFO - 成功保存股票 DIA 的数据，总计 81 条记录
+2025-04-11 07:56:17,047 - __main__ - WARNING - 股票 DIS 数据点不足: 1 < 20
+2025-04-11 07:56:17,186 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:17,241 - __main__ - INFO - 成功保存股票 DIS 的数据，总计 81 条记录
+2025-04-11 07:56:17,455 - __main__ - WARNING - 股票 DLR 数据点不足: 1 < 20
+2025-04-11 07:56:17,542 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:17,594 - __main__ - INFO - 成功保存股票 DLR 的数据，总计 81 条记录
+2025-04-11 07:56:17,681 - __main__ - WARNING - 股票 DLTR 数据点不足: 1 < 20
+2025-04-11 07:56:17,748 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:17,802 - __main__ - INFO - 成功保存股票 DLTR 的数据，总计 81 条记录
+2025-04-11 07:56:17,981 - __main__ - WARNING - 股票 DOC 数据点不足: 1 < 20
+2025-04-11 07:56:18,090 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:18,145 - __main__ - INFO - 成功保存股票 DOC 的数据，总计 81 条记录
+2025-04-11 07:56:18,377 - __main__ - WARNING - 股票 DOV 数据点不足: 1 < 20
+2025-04-11 07:56:18,521 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:18,575 - __main__ - INFO - 成功保存股票 DOV 的数据，总计 81 条记录
+2025-04-11 07:56:18,678 - __main__ - WARNING - 股票 DPZ 数据点不足: 1 < 20
+2025-04-11 07:56:18,770 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:18,826 - __main__ - INFO - 成功保存股票 DPZ 的数据，总计 81 条记录
+2025-04-11 07:56:19,030 - __main__ - WARNING - 股票 DRI 数据点不足: 1 < 20
+2025-04-11 07:56:19,145 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:19,203 - __main__ - INFO - 成功保存股票 DRI 的数据，总计 81 条记录
+2025-04-11 07:56:19,419 - __main__ - WARNING - 股票 DTE 数据点不足: 1 < 20
+2025-04-11 07:56:19,593 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:19,644 - __main__ - INFO - 成功保存股票 DTE 的数据，总计 81 条记录
+2025-04-11 07:56:19,782 - __main__ - WARNING - 股票 DUK 数据点不足: 1 < 20
+2025-04-11 07:56:19,934 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:19,986 - __main__ - INFO - 成功保存股票 DUK 的数据，总计 81 条记录
+2025-04-11 07:56:20,136 - __main__ - WARNING - 股票 DVA 数据点不足: 1 < 20
+2025-04-11 07:56:20,205 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:20,258 - __main__ - INFO - 成功保存股票 DVA 的数据，总计 81 条记录
+2025-04-11 07:56:20,374 - __main__ - WARNING - 股票 DVN 数据点不足: 1 < 20
+2025-04-11 07:56:20,607 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:20,659 - __main__ - INFO - 成功保存股票 DVN 的数据，总计 81 条记录
+2025-04-11 07:56:20,745 - __main__ - WARNING - 股票 DXCM 数据点不足: 1 < 20
+2025-04-11 07:56:20,814 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:20,870 - __main__ - INFO - 成功保存股票 DXCM 的数据，总计 81 条记录
+2025-04-11 07:56:20,973 - __main__ - WARNING - 股票 EA 数据点不足: 1 < 20
+2025-04-11 07:56:21,130 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:21,181 - __main__ - INFO - 成功保存股票 EA 的数据，总计 81 条记录
+2025-04-11 07:56:21,290 - __main__ - WARNING - 股票 EBAY 数据点不足: 1 < 20
+2025-04-11 07:56:21,374 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:21,425 - __main__ - INFO - 成功保存股票 EBAY 的数据，总计 81 条记录
+2025-04-11 07:56:21,649 - __main__ - WARNING - 股票 ECL 数据点不足: 1 < 20
+2025-04-11 07:56:21,774 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:21,831 - __main__ - INFO - 成功保存股票 ECL 的数据，总计 81 条记录
+2025-04-11 07:56:21,994 - __main__ - WARNING - 股票 ED 数据点不足: 1 < 20
+2025-04-11 07:56:22,185 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:22,237 - __main__ - INFO - 成功保存股票 ED 的数据，总计 81 条记录
+2025-04-11 07:56:22,382 - __main__ - WARNING - 股票 EFX 数据点不足: 1 < 20
+2025-04-11 07:56:22,706 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:22,759 - __main__ - INFO - 成功保存股票 EFX 的数据，总计 81 条记录
+2025-04-11 07:56:22,904 - __main__ - WARNING - 股票 EG 数据点不足: 1 < 20
+2025-04-11 07:56:23,015 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:23,066 - __main__ - INFO - 成功保存股票 EG 的数据，总计 81 条记录
+2025-04-11 07:56:23,413 - __main__ - WARNING - 股票 EIX 数据点不足: 1 < 20
+2025-04-11 07:56:23,755 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:23,808 - __main__ - INFO - 成功保存股票 EIX 的数据，总计 81 条记录
+2025-04-11 07:56:23,942 - __main__ - WARNING - 股票 EL 数据点不足: 1 < 20
+2025-04-11 07:56:24,277 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:24,329 - __main__ - INFO - 成功保存股票 EL 的数据，总计 81 条记录
+2025-04-11 07:56:24,433 - __main__ - WARNING - 股票 ELV 数据点不足: 1 < 20
+2025-04-11 07:56:24,521 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:24,575 - __main__ - INFO - 成功保存股票 ELV 的数据，总计 81 条记录
+2025-04-11 07:56:24,885 - __main__ - WARNING - 股票 EMN 数据点不足: 1 < 20
+2025-04-11 07:56:25,007 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:25,057 - __main__ - INFO - 成功保存股票 EMN 的数据，总计 81 条记录
+2025-04-11 07:56:25,321 - __main__ - WARNING - 股票 EMR 数据点不足: 1 < 20
+2025-04-11 07:56:25,451 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:25,499 - __main__ - INFO - 成功保存股票 EMR 的数据，总计 81 条记录
+2025-04-11 07:56:25,584 - __main__ - WARNING - 股票 ENPH 数据点不足: 1 < 20
+2025-04-11 07:56:25,854 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:25,915 - __main__ - INFO - 成功保存股票 ENPH 的数据，总计 81 条记录
+2025-04-11 07:56:26,064 - __main__ - WARNING - 股票 EOG 数据点不足: 1 < 20
+2025-04-11 07:56:26,376 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:26,427 - __main__ - INFO - 成功保存股票 EOG 的数据，总计 81 条记录
+2025-04-11 07:56:26,523 - __main__ - WARNING - 股票 EPAM 数据点不足: 1 < 20
+2025-04-11 07:56:26,607 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:26,661 - __main__ - INFO - 成功保存股票 EPAM 的数据，总计 81 条记录
+2025-04-11 07:56:26,957 - __main__ - WARNING - 股票 EQIX 数据点不足: 1 < 20
+2025-04-11 07:56:27,056 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:27,114 - __main__ - INFO - 成功保存股票 EQIX 的数据，总计 81 条记录
+2025-04-11 07:56:27,288 - __main__ - WARNING - 股票 EQR 数据点不足: 1 < 20
+2025-04-11 07:56:27,423 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:27,475 - __main__ - INFO - 成功保存股票 EQR 的数据，总计 81 条记录
+2025-04-11 07:56:27,611 - __main__ - WARNING - 股票 EQT 数据点不足: 1 < 20
+2025-04-11 07:56:27,949 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:28,000 - __main__ - INFO - 成功保存股票 EQT 的数据，总计 81 条记录
+2025-04-11 07:56:28,129 - __main__ - WARNING - 股票 ERIE 数据点不足: 1 < 20
+2025-04-11 07:56:28,343 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:28,394 - __main__ - INFO - 成功保存股票 ERIE 的数据，总计 81 条记录
+2025-04-11 07:56:28,626 - __main__ - WARNING - 股票 ES 数据点不足: 1 < 20
+2025-04-11 07:56:28,766 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:28,818 - __main__ - INFO - 成功保存股票 ES 的数据，总计 81 条记录
+2025-04-11 07:56:29,086 - __main__ - WARNING - 股票 ESS 数据点不足: 1 < 20
+2025-04-11 07:56:29,203 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:29,257 - __main__ - INFO - 成功保存股票 ESS 的数据，总计 81 条记录
+2025-04-11 07:56:29,514 - __main__ - WARNING - 股票 ETN 数据点不足: 1 < 20
+2025-04-11 07:56:29,667 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:29,718 - __main__ - INFO - 成功保存股票 ETN 的数据，总计 81 条记录
+2025-04-11 07:56:29,907 - __main__ - WARNING - 股票 ETR 数据点不足: 1 < 20
+2025-04-11 07:56:30,045 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:30,098 - __main__ - INFO - 成功保存股票 ETR 的数据，总计 81 条记录
+2025-04-11 07:56:30,263 - __main__ - WARNING - 股票 EVRG 数据点不足: 1 < 20
+2025-04-11 07:56:30,382 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:30,433 - __main__ - INFO - 成功保存股票 EVRG 的数据，总计 81 条记录
+2025-04-11 07:56:30,716 - __main__ - WARNING - 股票 EW 数据点不足: 1 < 20
+2025-04-11 07:56:30,789 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:30,842 - __main__ - INFO - 成功保存股票 EW 的数据，总计 81 条记录
+2025-04-11 07:56:31,088 - __main__ - WARNING - 股票 EXC 数据点不足: 1 < 20
+2025-04-11 07:56:31,246 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:31,296 - __main__ - INFO - 成功保存股票 EXC 的数据，总计 81 条记录
+2025-04-11 07:56:31,450 - __main__ - WARNING - 股票 EXPD 数据点不足: 1 < 20
+2025-04-11 07:56:31,614 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:31,665 - __main__ - INFO - 成功保存股票 EXPD 的数据，总计 81 条记录
+2025-04-11 07:56:31,784 - __main__ - WARNING - 股票 EXPE 数据点不足: 1 < 20
+2025-04-11 07:56:31,882 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:31,933 - __main__ - INFO - 成功保存股票 EXPE 的数据，总计 81 条记录
+2025-04-11 07:56:32,131 - __main__ - WARNING - 股票 EXR 数据点不足: 1 < 20
+2025-04-11 07:56:32,296 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:32,472 - __main__ - INFO - 成功保存股票 EXR 的数据，总计 81 条记录
+2025-04-11 07:56:32,660 - __main__ - WARNING - 股票 F 数据点不足: 1 < 20
+2025-04-11 07:56:32,852 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:32,909 - __main__ - INFO - 成功保存股票 F 的数据，总计 81 条记录
+2025-04-11 07:56:33,053 - __main__ - WARNING - 股票 FANG 数据点不足: 1 < 20
+2025-04-11 07:56:33,187 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:33,244 - __main__ - INFO - 成功保存股票 FANG 的数据，总计 81 条记录
+2025-04-11 07:56:33,380 - __main__ - WARNING - 股票 FAST 数据点不足: 1 < 20
+2025-04-11 07:56:33,499 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:33,552 - __main__ - INFO - 成功保存股票 FAST 的数据，总计 81 条记录
+2025-04-11 07:56:33,797 - __main__ - WARNING - 股票 FCX 数据点不足: 1 < 20
+2025-04-11 07:56:33,899 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:33,954 - __main__ - INFO - 成功保存股票 FCX 的数据，总计 81 条记录
+2025-04-11 07:56:34,237 - __main__ - WARNING - 股票 FDS 数据点不足: 1 < 20
+2025-04-11 07:56:34,336 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:34,389 - __main__ - INFO - 成功保存股票 FDS 的数据，总计 81 条记录
+2025-04-11 07:56:34,759 - __main__ - WARNING - 股票 FDX 数据点不足: 1 < 20
+2025-04-11 07:56:34,869 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:34,921 - __main__ - INFO - 成功保存股票 FDX 的数据，总计 81 条记录
+2025-04-11 07:56:35,048 - __main__ - WARNING - 股票 FE 数据点不足: 1 < 20
+2025-04-11 07:56:35,368 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:35,423 - __main__ - INFO - 成功保存股票 FE 的数据，总计 81 条记录
+2025-04-11 07:56:35,517 - __main__ - WARNING - 股票 FFIV 数据点不足: 1 < 20
+2025-04-11 07:56:35,587 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:35,641 - __main__ - INFO - 成功保存股票 FFIV 的数据，总计 81 条记录
+2025-04-11 07:56:35,860 - __main__ - WARNING - 股票 FI 数据点不足: 1 < 20
+2025-04-11 07:56:35,936 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:35,988 - __main__ - INFO - 成功保存股票 FI 的数据，总计 81 条记录
+2025-04-11 07:56:36,331 - __main__ - WARNING - 股票 FICO 数据点不足: 1 < 20
+2025-04-11 07:56:36,486 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:36,539 - __main__ - INFO - 成功保存股票 FICO 的数据，总计 81 条记录
+2025-04-11 07:56:36,856 - __main__ - WARNING - 股票 FIS 数据点不足: 1 < 20
+2025-04-11 07:56:36,970 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:37,023 - __main__ - INFO - 成功保存股票 FIS 的数据，总计 81 条记录
+2025-04-11 07:56:37,381 - __main__ - WARNING - 股票 FITB 数据点不足: 1 < 20
+2025-04-11 07:56:37,545 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:37,595 - __main__ - INFO - 成功保存股票 FITB 的数据，总计 81 条记录
+2025-04-11 07:56:37,904 - __main__ - WARNING - 股票 FMC 数据点不足: 1 < 20
+2025-04-11 07:56:38,178 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:38,229 - __main__ - INFO - 成功保存股票 FMC 的数据，总计 81 条记录
+2025-04-11 07:56:38,531 - __main__ - WARNING - 股票 FRT 数据点不足: 1 < 20
+2025-04-11 07:56:38,672 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:38,725 - __main__ - INFO - 成功保存股票 FRT 的数据，总计 81 条记录
+2025-04-11 07:56:39,006 - __main__ - WARNING - 股票 FSLR 数据点不足: 1 < 20
+2025-04-11 07:56:39,105 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:39,159 - __main__ - INFO - 成功保存股票 FSLR 的数据，总计 81 条记录
+2025-04-11 07:56:39,251 - __main__ - WARNING - 股票 FTNT 数据点不足: 1 < 20
+2025-04-11 07:56:39,528 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:39,580 - __main__ - INFO - 成功保存股票 FTNT 的数据，总计 81 条记录
+2025-04-11 07:56:39,722 - __main__ - WARNING - 股票 FXI 数据点不足: 1 < 20
+2025-04-11 07:56:39,876 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:39,929 - __main__ - INFO - 成功保存股票 FXI 的数据，总计 81 条记录
+2025-04-11 07:56:40,164 - __main__ - WARNING - 股票 GD 数据点不足: 1 < 20
+2025-04-11 07:56:40,532 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:40,581 - __main__ - INFO - 成功保存股票 GD 的数据，总计 81 条记录
+2025-04-11 07:56:40,761 - __main__ - WARNING - 股票 GE 数据点不足: 1 < 20
+2025-04-11 07:56:40,939 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:40,992 - __main__ - INFO - 成功保存股票 GE 的数据，总计 81 条记录
+2025-04-11 07:56:41,113 - __main__ - WARNING - 股票 GEN 数据点不足: 1 < 20
+2025-04-11 07:56:41,214 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:41,266 - __main__ - INFO - 成功保存股票 GEN 的数据，总计 81 条记录
+2025-04-11 07:56:41,578 - __main__ - WARNING - 股票 GILD 数据点不足: 1 < 20
+2025-04-11 07:56:41,674 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:41,728 - __main__ - INFO - 成功保存股票 GILD 的数据，总计 81 条记录
+2025-04-11 07:56:41,968 - __main__ - WARNING - 股票 GIS 数据点不足: 1 < 20
+2025-04-11 07:56:42,125 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:42,179 - __main__ - INFO - 成功保存股票 GIS 的数据，总计 81 条记录
+2025-04-11 07:56:42,331 - __main__ - WARNING - 股票 GL 数据点不足: 1 < 20
+2025-04-11 07:56:42,630 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:42,681 - __main__ - INFO - 成功保存股票 GL 的数据，总计 81 条记录
+2025-04-11 07:56:42,783 - __main__ - WARNING - 股票 GLD 数据点不足: 1 < 20
+2025-04-11 07:56:42,853 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:42,906 - __main__ - INFO - 成功保存股票 GLD 的数据，总计 81 条记录
+2025-04-11 07:56:43,149 - __main__ - WARNING - 股票 GLW 数据点不足: 1 < 20
+2025-04-11 07:56:43,295 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:43,352 - __main__ - INFO - 成功保存股票 GLW 的数据，总计 81 条记录
+2025-04-11 07:56:43,673 - __main__ - WARNING - 股票 GM 数据点不足: 1 < 20
+2025-04-11 07:56:43,766 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:43,816 - __main__ - INFO - 成功保存股票 GM 的数据，总计 81 条记录
+2025-04-11 07:56:43,913 - __main__ - WARNING - 股票 GNRC 数据点不足: 1 < 20
+2025-04-11 07:56:44,066 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:44,119 - __main__ - INFO - 成功保存股票 GNRC 的数据，总计 81 条记录
+2025-04-11 07:56:44,244 - __main__ - WARNING - 股票 GOOG 数据点不足: 1 < 20
+2025-04-11 07:56:44,322 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:44,378 - __main__ - INFO - 成功保存股票 GOOG 的数据，总计 81 条记录
+2025-04-11 07:56:44,469 - __main__ - WARNING - 股票 GOOGL 数据点不足: 1 < 20
+2025-04-11 07:56:44,728 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:44,779 - __main__ - INFO - 成功保存股票 GOOGL 的数据，总计 81 条记录
+2025-04-11 07:56:44,919 - __main__ - WARNING - 股票 GPC 数据点不足: 1 < 20
+2025-04-11 07:56:45,117 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:45,169 - __main__ - INFO - 成功保存股票 GPC 的数据，总计 81 条记录
+2025-04-11 07:56:45,323 - __main__ - WARNING - 股票 GPN 数据点不足: 1 < 20
+2025-04-11 07:56:45,427 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:45,486 - __main__ - INFO - 成功保存股票 GPN 的数据，总计 81 条记录
+2025-04-11 07:56:45,638 - __main__ - WARNING - 股票 GRMN 数据点不足: 1 < 20
+2025-04-11 07:56:45,769 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:45,824 - __main__ - INFO - 成功保存股票 GRMN 的数据，总计 81 条记录
+2025-04-11 07:56:45,957 - __main__ - WARNING - 股票 GS 数据点不足: 1 < 20
+2025-04-11 07:56:46,054 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:46,108 - __main__ - INFO - 成功保存股票 GS 的数据，总计 81 条记录
+2025-04-11 07:56:46,463 - __main__ - WARNING - 股票 GWW 数据点不足: 1 < 20
+2025-04-11 07:56:46,920 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:46,975 - __main__ - INFO - 成功保存股票 GWW 的数据，总计 81 条记录
+2025-04-11 07:56:47,342 - __main__ - WARNING - 股票 HAL 数据点不足: 1 < 20
+2025-04-11 07:56:47,518 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:47,569 - __main__ - INFO - 成功保存股票 HAL 的数据，总计 81 条记录
+2025-04-11 07:56:47,864 - __main__ - WARNING - 股票 HAS 数据点不足: 1 < 20
+2025-04-11 07:56:47,985 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:48,043 - __main__ - INFO - 成功保存股票 HAS 的数据，总计 81 条记录
+2025-04-11 07:56:48,262 - __main__ - WARNING - 股票 HBAN 数据点不足: 1 < 20
+2025-04-11 07:56:48,395 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:48,449 - __main__ - INFO - 成功保存股票 HBAN 的数据，总计 81 条记录
+2025-04-11 07:56:48,602 - __main__ - WARNING - 股票 HCA 数据点不足: 1 < 20
+2025-04-11 07:56:48,692 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:48,746 - __main__ - INFO - 成功保存股票 HCA 的数据，总计 81 条记录
+2025-04-11 07:56:48,915 - __main__ - WARNING - 股票 HD 数据点不足: 1 < 20
+2025-04-11 07:56:49,246 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:49,299 - __main__ - INFO - 成功保存股票 HD 的数据，总计 81 条记录
+2025-04-11 07:56:49,578 - __main__ - WARNING - 股票 HES 数据点不足: 1 < 20
+2025-04-11 07:56:49,715 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:49,770 - __main__ - INFO - 成功保存股票 HES 的数据，总计 81 条记录
+2025-04-11 07:56:50,054 - __main__ - WARNING - 股票 HIG 数据点不足: 1 < 20
+2025-04-11 07:56:50,185 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:50,237 - __main__ - INFO - 成功保存股票 HIG 的数据，总计 81 条记录
+2025-04-11 07:56:50,576 - __main__ - WARNING - 股票 HII 数据点不足: 1 < 20
+2025-04-11 07:56:50,664 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:50,719 - __main__ - INFO - 成功保存股票 HII 的数据，总计 81 条记录
+2025-04-11 07:56:51,019 - __main__ - WARNING - 股票 HLT 数据点不足: 1 < 20
+2025-04-11 07:56:51,107 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:51,159 - __main__ - INFO - 成功保存股票 HLT 的数据，总计 81 条记录
+2025-04-11 07:56:51,252 - __main__ - WARNING - 股票 HOLX 数据点不足: 1 < 20
+2025-04-11 07:56:51,537 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:51,590 - __main__ - INFO - 成功保存股票 HOLX 的数据，总计 81 条记录
+2025-04-11 07:56:51,792 - __main__ - WARNING - 股票 HON 数据点不足: 1 < 20
+2025-04-11 07:56:52,069 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:52,123 - __main__ - INFO - 成功保存股票 HON 的数据，总计 81 条记录
+2025-04-11 07:56:52,282 - __main__ - WARNING - 股票 HPQ 数据点不足: 1 < 20
+2025-04-11 07:56:52,589 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:52,641 - __main__ - INFO - 成功保存股票 HPQ 的数据，总计 81 条记录
+2025-04-11 07:56:52,781 - __main__ - WARNING - 股票 HRL 数据点不足: 1 < 20
+2025-04-11 07:56:52,889 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:52,942 - __main__ - INFO - 成功保存股票 HRL 的数据，总计 81 条记录
+2025-04-11 07:56:53,171 - __main__ - WARNING - 股票 HSIC 数据点不足: 1 < 20
+2025-04-11 07:56:53,247 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:53,309 - __main__ - INFO - 成功保存股票 HSIC 的数据，总计 81 条记录
+2025-04-11 07:56:53,632 - __main__ - WARNING - 股票 HST 数据点不足: 1 < 20
+2025-04-11 07:56:53,754 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:53,808 - __main__ - INFO - 成功保存股票 HST 的数据，总计 81 条记录
+2025-04-11 07:56:54,157 - __main__ - WARNING - 股票 HSY 数据点不足: 1 < 20
+2025-04-11 07:56:54,276 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:54,326 - __main__ - INFO - 成功保存股票 HSY 的数据，总计 81 条记录
+2025-04-11 07:56:54,682 - __main__ - WARNING - 股票 HUBB 数据点不足: 1 < 20
+2025-04-11 07:56:54,818 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:54,870 - __main__ - INFO - 成功保存股票 HUBB 的数据，总计 81 条记录
+2025-04-11 07:56:55,207 - __main__ - WARNING - 股票 HUM 数据点不足: 1 < 20
+2025-04-11 07:56:55,332 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:55,402 - __main__ - INFO - 成功保存股票 HUM 的数据，总计 81 条记录
+2025-04-11 07:56:55,599 - __main__ - WARNING - 股票 IBM 数据点不足: 1 < 20
+2025-04-11 07:56:55,757 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:55,830 - __main__ - INFO - 成功保存股票 IBM 的数据，总计 81 条记录
+2025-04-11 07:56:55,940 - __main__ - WARNING - 股票 ICE 数据点不足: 1 < 20
+2025-04-11 07:56:56,260 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:56,312 - __main__ - INFO - 成功保存股票 ICE 的数据，总计 81 条记录
+2025-04-11 07:56:56,421 - __main__ - WARNING - 股票 IDXX 数据点不足: 1 < 20
+2025-04-11 07:56:56,488 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:56,541 - __main__ - INFO - 成功保存股票 IDXX 的数据，总计 81 条记录
+2025-04-11 07:56:56,776 - __main__ - WARNING - 股票 IEI 数据点不足: 1 < 20
+2025-04-11 07:56:56,889 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:56,944 - __main__ - INFO - 成功保存股票 IEI 的数据，总计 81 条记录
+2025-04-11 07:56:57,385 - __main__ - WARNING - 股票 IEX 数据点不足: 1 < 20
+2025-04-11 07:56:57,734 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:57,787 - __main__ - INFO - 成功保存股票 IEX 的数据，总计 81 条记录
+2025-04-11 07:56:57,933 - __main__ - WARNING - 股票 IFF 数据点不足: 1 < 20
+2025-04-11 07:56:58,103 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:58,155 - __main__ - INFO - 成功保存股票 IFF 的数据，总计 81 条记录
+2025-04-11 07:56:58,429 - __main__ - WARNING - 股票 IJH 数据点不足: 1 < 20
+2025-04-11 07:56:58,527 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:58,582 - __main__ - INFO - 成功保存股票 IJH 的数据，总计 81 条记录
+2025-04-11 07:56:58,747 - __main__ - WARNING - 股票 IJR 数据点不足: 1 < 20
+2025-04-11 07:56:58,910 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:58,963 - __main__ - INFO - 成功保存股票 IJR 的数据，总计 81 条记录
+2025-04-11 07:56:59,068 - __main__ - WARNING - 股票 ILMN 数据点不足: 1 < 20
+2025-04-11 07:56:59,156 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:59,210 - __main__ - INFO - 成功保存股票 ILMN 的数据，总计 81 条记录
+2025-04-11 07:56:59,451 - __main__ - WARNING - 股票 INCY 数据点不足: 1 < 20
+2025-04-11 07:56:59,518 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:59,571 - __main__ - INFO - 成功保存股票 INCY 的数据，总计 81 条记录
+2025-04-11 07:56:59,792 - __main__ - WARNING - 股票 INTC 数据点不足: 1 < 20
+2025-04-11 07:56:59,923 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:56:59,979 - __main__ - INFO - 成功保存股票 INTC 的数据，总计 81 条记录
+2025-04-11 07:57:00,090 - __main__ - WARNING - 股票 INTU 数据点不足: 1 < 20
+2025-04-11 07:57:00,171 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:00,224 - __main__ - INFO - 成功保存股票 INTU 的数据，总计 81 条记录
+2025-04-11 07:57:00,596 - __main__ - WARNING - 股票 IP 数据点不足: 1 < 20
+2025-04-11 07:57:00,843 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:00,894 - __main__ - INFO - 成功保存股票 IP 的数据，总计 81 条记录
+2025-04-11 07:57:01,092 - __main__ - WARNING - 股票 IPG 数据点不足: 1 < 20
+2025-04-11 07:57:01,228 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:01,283 - __main__ - INFO - 成功保存股票 IPG 的数据，总计 81 条记录
+2025-04-11 07:57:01,551 - __main__ - WARNING - 股票 IQV 数据点不足: 1 < 20
+2025-04-11 07:57:01,623 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:01,676 - __main__ - INFO - 成功保存股票 IQV 的数据，总计 81 条记录
+2025-04-11 07:57:01,789 - __main__ - WARNING - 股票 IRM 数据点不足: 1 < 20
+2025-04-11 07:57:02,028 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:02,085 - __main__ - INFO - 成功保存股票 IRM 的数据，总计 81 条记录
+2025-04-11 07:57:02,187 - __main__ - WARNING - 股票 ISRG 数据点不足: 1 < 20
+2025-04-11 07:57:02,255 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:02,307 - __main__ - INFO - 成功保存股票 ISRG 的数据，总计 81 条记录
+2025-04-11 07:57:02,598 - __main__ - WARNING - 股票 IT 数据点不足: 1 < 20
+2025-04-11 07:57:02,666 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:02,717 - __main__ - INFO - 成功保存股票 IT 的数据，总计 81 条记录
+2025-04-11 07:57:02,938 - __main__ - WARNING - 股票 ITW 数据点不足: 1 < 20
+2025-04-11 07:57:03,265 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:03,316 - __main__ - INFO - 成功保存股票 ITW 的数据，总计 81 条记录
+2025-04-11 07:57:03,789 - __main__ - WARNING - 股票 IVZ 数据点不足: 1 < 20
+2025-04-11 07:57:03,903 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:03,954 - __main__ - INFO - 成功保存股票 IVZ 的数据，总计 81 条记录
+2025-04-11 07:57:04,215 - __main__ - WARNING - 股票 IWB 数据点不足: 1 < 20
+2025-04-11 07:57:04,314 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:04,367 - __main__ - INFO - 成功保存股票 IWB 的数据，总计 81 条记录
+2025-04-11 07:57:04,645 - __main__ - WARNING - 股票 IWM 数据点不足: 1 < 20
+2025-04-11 07:57:04,804 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:04,857 - __main__ - INFO - 成功保存股票 IWM 的数据，总计 81 条记录
+2025-04-11 07:57:05,037 - __main__ - WARNING - 股票 IWV 数据点不足: 1 < 20
+2025-04-11 07:57:05,175 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:05,229 - __main__ - INFO - 成功保存股票 IWV 的数据，总计 81 条记录
+2025-04-11 07:57:05,330 - __main__ - WARNING - 股票 J 数据点不足: 1 < 20
+2025-04-11 07:57:05,422 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:05,476 - __main__ - INFO - 成功保存股票 J 的数据，总计 81 条记录
+2025-04-11 07:57:05,826 - __main__ - WARNING - 股票 JBHT 数据点不足: 1 < 20
+2025-04-11 07:57:05,962 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:06,015 - __main__ - INFO - 成功保存股票 JBHT 的数据，总计 81 条记录
+2025-04-11 07:57:06,214 - __main__ - WARNING - 股票 JBL 数据点不足: 1 < 20
+2025-04-11 07:57:06,373 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:06,426 - __main__ - INFO - 成功保存股票 JBL 的数据，总计 81 条记录
+2025-04-11 07:57:06,747 - __main__ - WARNING - 股票 JCI 数据点不足: 1 < 20
+2025-04-11 07:57:06,859 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:06,911 - __main__ - INFO - 成功保存股票 JCI 的数据，总计 81 条记录
+2025-04-11 07:57:07,131 - __main__ - WARNING - 股票 JKHY 数据点不足: 1 < 20
+2025-04-11 07:57:07,270 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:07,323 - __main__ - INFO - 成功保存股票 JKHY 的数据，总计 81 条记录
+2025-04-11 07:57:07,539 - __main__ - WARNING - 股票 JNJ 数据点不足: 1 < 20
+2025-04-11 07:57:07,793 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:07,844 - __main__ - INFO - 成功保存股票 JNJ 的数据，总计 81 条记录
+2025-04-11 07:57:07,958 - __main__ - WARNING - 股票 JNPR 数据点不足: 1 < 20
+2025-04-11 07:57:08,054 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:08,112 - __main__ - INFO - 成功保存股票 JNPR 的数据，总计 81 条记录
+2025-04-11 07:57:08,422 - __main__ - WARNING - 股票 JPM 数据点不足: 1 < 20
+2025-04-11 07:57:08,576 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:08,629 - __main__ - INFO - 成功保存股票 JPM 的数据，总计 81 条记录
+2025-04-11 07:57:08,990 - __main__ - WARNING - 股票 K 数据点不足: 1 < 20
+2025-04-11 07:57:09,370 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:09,424 - __main__ - INFO - 成功保存股票 K 的数据，总计 81 条记录
+2025-04-11 07:57:09,601 - __main__ - WARNING - 股票 KDP 数据点不足: 1 < 20
+2025-04-11 07:57:09,891 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:09,945 - __main__ - INFO - 成功保存股票 KDP 的数据，总计 81 条记录
+2025-04-11 07:57:10,412 - __main__ - WARNING - 股票 KEY 数据点不足: 1 < 20
+2025-04-11 07:57:10,517 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:10,570 - __main__ - INFO - 成功保存股票 KEY 的数据，总计 81 条记录
+2025-04-11 07:57:10,684 - __main__ - WARNING - 股票 KEYS 数据点不足: 1 < 20
+2025-04-11 07:57:10,937 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:10,991 - __main__ - INFO - 成功保存股票 KEYS 的数据，总计 81 条记录
+2025-04-11 07:57:11,149 - __main__ - WARNING - 股票 KIM 数据点不足: 1 < 20
+2025-04-11 07:57:11,332 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:11,385 - __main__ - INFO - 成功保存股票 KIM 的数据，总计 81 条记录
+2025-04-11 07:57:11,533 - __main__ - WARNING - 股票 KKR 数据点不足: 1 < 20
+2025-04-11 07:57:11,628 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:11,687 - __main__ - INFO - 成功保存股票 KKR 的数据，总计 81 条记录
+2025-04-11 07:57:11,847 - __main__ - WARNING - 股票 KLAC 数据点不足: 1 < 20
+2025-04-11 07:57:11,985 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:12,040 - __main__ - INFO - 成功保存股票 KLAC 的数据，总计 81 条记录
+2025-04-11 07:57:12,185 - __main__ - WARNING - 股票 KMB 数据点不足: 1 < 20
+2025-04-11 07:57:12,322 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:12,377 - __main__ - INFO - 成功保存股票 KMB 的数据，总计 81 条记录
+2025-04-11 07:57:12,577 - __main__ - WARNING - 股票 KMI 数据点不足: 1 < 20
+2025-04-11 07:57:12,669 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:12,724 - __main__ - INFO - 成功保存股票 KMI 的数据，总计 81 条记录
+2025-04-11 07:57:12,895 - __main__ - WARNING - 股票 KMX 数据点不足: 1 < 20
+2025-04-11 07:57:13,032 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:13,087 - __main__ - INFO - 成功保存股票 KMX 的数据，总计 81 条记录
+2025-04-11 07:57:13,328 - __main__ - WARNING - 股票 KO 数据点不足: 1 < 20
+2025-04-11 07:57:13,568 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:13,622 - __main__ - INFO - 成功保存股票 KO 的数据，总计 81 条记录
+2025-04-11 07:57:13,787 - __main__ - WARNING - 股票 KR 数据点不足: 1 < 20
+2025-04-11 07:57:14,088 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:14,140 - __main__ - INFO - 成功保存股票 KR 的数据，总计 81 条记录
+2025-04-11 07:57:14,275 - __main__ - WARNING - 股票 L 数据点不足: 1 < 20
+2025-04-11 07:57:14,611 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:14,665 - __main__ - INFO - 成功保存股票 L 的数据，总计 81 条记录
+2025-04-11 07:57:14,766 - __main__ - WARNING - 股票 LDOS 数据点不足: 1 < 20
+2025-04-11 07:57:14,857 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:14,911 - __main__ - INFO - 成功保存股票 LDOS 的数据，总计 81 条记录
+2025-04-11 07:57:15,213 - __main__ - WARNING - 股票 LEN 数据点不足: 1 < 20
+2025-04-11 07:57:15,338 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:15,394 - __main__ - INFO - 成功保存股票 LEN 的数据，总计 81 条记录
+2025-04-11 07:57:15,758 - __main__ - WARNING - 股票 LH 数据点不足: 1 < 20
+2025-04-11 07:57:15,882 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:15,937 - __main__ - INFO - 成功保存股票 LH 的数据，总计 81 条记录
+2025-04-11 07:57:16,262 - __main__ - WARNING - 股票 LHX 数据点不足: 1 < 20
+2025-04-11 07:57:16,386 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:16,438 - __main__ - INFO - 成功保存股票 LHX 的数据，总计 81 条记录
+2025-04-11 07:57:16,811 - __main__ - WARNING - 股票 LIN 数据点不足: 1 < 20
+2025-04-11 07:57:16,953 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:17,005 - __main__ - INFO - 成功保存股票 LIN 的数据，总计 81 条记录
+2025-04-11 07:57:17,282 - __main__ - WARNING - 股票 LKQ 数据点不足: 1 < 20
+2025-04-11 07:57:17,361 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:17,415 - __main__ - INFO - 成功保存股票 LKQ 的数据，总计 81 条记录
+2025-04-11 07:57:17,751 - __main__ - WARNING - 股票 LLY 数据点不足: 1 < 20
+2025-04-11 07:57:17,879 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:17,930 - __main__ - INFO - 成功保存股票 LLY 的数据，总计 81 条记录
+2025-04-11 07:57:18,277 - __main__ - WARNING - 股票 LMT 数据点不足: 1 < 20
+2025-04-11 07:57:18,441 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:18,494 - __main__ - INFO - 成功保存股票 LMT 的数据，总计 81 条记录
+2025-04-11 07:57:18,799 - __main__ - WARNING - 股票 LNT 数据点不足: 1 < 20
+2025-04-11 07:57:19,067 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:19,159 - __main__ - INFO - 成功保存股票 LNT 的数据，总计 81 条记录
+2025-04-11 07:57:19,416 - __main__ - WARNING - 股票 LOW 数据点不足: 1 < 20
+2025-04-11 07:57:19,555 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:19,608 - __main__ - INFO - 成功保存股票 LOW 的数据，总计 81 条记录
+2025-04-11 07:57:19,845 - __main__ - WARNING - 股票 LRCX 数据点不足: 1 < 20
+2025-04-11 07:57:19,967 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:20,021 - __main__ - INFO - 成功保存股票 LRCX 的数据，总计 81 条记录
+2025-04-11 07:57:20,111 - __main__ - WARNING - 股票 LULU 数据点不足: 1 < 20
+2025-04-11 07:57:20,375 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:20,429 - __main__ - INFO - 成功保存股票 LULU 的数据，总计 81 条记录
+2025-04-11 07:57:20,593 - __main__ - WARNING - 股票 LUV 数据点不足: 1 < 20
+2025-04-11 07:57:20,767 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:20,818 - __main__ - INFO - 成功保存股票 LUV 的数据，总计 81 条记录
+2025-04-11 07:57:21,003 - __main__ - WARNING - 股票 LVMUY 数据点不足: 1 < 20
+2025-04-11 07:57:21,093 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:21,150 - __main__ - INFO - 成功保存股票 LVMUY 的数据，总计 81 条记录
+2025-04-11 07:57:21,421 - __main__ - WARNING - 股票 LVS 数据点不足: 1 < 20
+2025-04-11 07:57:21,527 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:21,581 - __main__ - INFO - 成功保存股票 LVS 的数据，总计 81 条记录
+2025-04-11 07:57:21,685 - __main__ - WARNING - 股票 LYB 数据点不足: 1 < 20
+2025-04-11 07:57:21,815 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:21,870 - __main__ - INFO - 成功保存股票 LYB 的数据，总计 81 条记录
+2025-04-11 07:57:22,198 - __main__ - WARNING - 股票 LYV 数据点不足: 1 < 20
+2025-04-11 07:57:22,340 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:22,393 - __main__ - INFO - 成功保存股票 LYV 的数据，总计 81 条记录
+2025-04-11 07:57:22,540 - __main__ - WARNING - 股票 MA 数据点不足: 1 < 20
+2025-04-11 07:57:22,638 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:22,692 - __main__ - INFO - 成功保存股票 MA 的数据，总计 81 条记录
+2025-04-11 07:57:22,854 - __main__ - WARNING - 股票 MAA 数据点不足: 1 < 20
+2025-04-11 07:57:22,999 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:23,053 - __main__ - INFO - 成功保存股票 MAA 的数据，总计 81 条记录
+2025-04-11 07:57:23,196 - __main__ - WARNING - 股票 MAR 数据点不足: 1 < 20
+2025-04-11 07:57:23,391 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:23,446 - __main__ - INFO - 成功保存股票 MAR 的数据，总计 81 条记录
+2025-04-11 07:57:23,635 - __main__ - WARNING - 股票 MAS 数据点不足: 1 < 20
+2025-04-11 07:57:23,770 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:23,829 - __main__ - INFO - 成功保存股票 MAS 的数据，总计 81 条记录
+2025-04-11 07:57:24,037 - __main__ - WARNING - 股票 MCD 数据点不足: 1 < 20
+2025-04-11 07:57:24,189 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:24,242 - __main__ - INFO - 成功保存股票 MCD 的数据，总计 81 条记录
+2025-04-11 07:57:24,436 - __main__ - WARNING - 股票 MCHP 数据点不足: 1 < 20
+2025-04-11 07:57:24,569 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:24,624 - __main__ - INFO - 成功保存股票 MCHP 的数据，总计 81 条记录
+2025-04-11 07:57:24,766 - __main__ - WARNING - 股票 MCK 数据点不足: 1 < 20
+2025-04-11 07:57:24,893 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:24,944 - __main__ - INFO - 成功保存股票 MCK 的数据，总计 81 条记录
+2025-04-11 07:57:25,176 - __main__ - WARNING - 股票 MCO 数据点不足: 1 < 20
+2025-04-11 07:57:25,282 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:25,331 - __main__ - INFO - 成功保存股票 MCO 的数据，总计 81 条记录
+2025-04-11 07:57:25,614 - __main__ - WARNING - 股票 MDLZ 数据点不足: 1 < 20
+2025-04-11 07:57:25,713 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:25,788 - __main__ - INFO - 成功保存股票 MDLZ 的数据，总计 81 条记录
+2025-04-11 07:57:26,140 - __main__ - WARNING - 股票 MDT 数据点不足: 1 < 20
+2025-04-11 07:57:26,277 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:26,329 - __main__ - INFO - 成功保存股票 MDT 的数据，总计 81 条记录
+2025-04-11 07:57:26,435 - __main__ - WARNING - 股票 MELI 数据点不足: 1 < 20
+2025-04-11 07:57:26,715 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:26,767 - __main__ - INFO - 成功保存股票 MELI 的数据，总计 81 条记录
+2025-04-11 07:57:26,891 - __main__ - WARNING - 股票 MET 数据点不足: 1 < 20
+2025-04-11 07:57:27,191 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:27,241 - __main__ - INFO - 成功保存股票 MET 的数据，总计 81 条记录
+2025-04-11 07:57:27,331 - __main__ - WARNING - 股票 META 数据点不足: 1 < 20
+2025-04-11 07:57:27,404 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:27,465 - __main__ - INFO - 成功保存股票 META 的数据，总计 81 条记录
+2025-04-11 07:57:27,799 - __main__ - WARNING - 股票 MGM 数据点不足: 1 < 20
+2025-04-11 07:57:27,914 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:27,968 - __main__ - INFO - 成功保存股票 MGM 的数据，总计 81 条记录
+2025-04-11 07:57:28,290 - __main__ - WARNING - 股票 MHK 数据点不足: 1 < 20
+2025-04-11 07:57:28,357 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:28,420 - __main__ - INFO - 成功保存股票 MHK 的数据，总计 81 条记录
+2025-04-11 07:57:28,762 - __main__ - WARNING - 股票 MKC 数据点不足: 1 < 20
+2025-04-11 07:57:28,933 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:28,984 - __main__ - INFO - 成功保存股票 MKC 的数据，总计 81 条记录
+2025-04-11 07:57:29,285 - __main__ - WARNING - 股票 MKTX 数据点不足: 1 < 20
+2025-04-11 07:57:29,398 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:29,452 - __main__ - INFO - 成功保存股票 MKTX 的数据，总计 81 条记录
+2025-04-11 07:57:29,812 - __main__ - WARNING - 股票 MLM 数据点不足: 1 < 20
+2025-04-11 07:57:29,940 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:29,994 - __main__ - INFO - 成功保存股票 MLM 的数据，总计 81 条记录
+2025-04-11 07:57:30,204 - __main__ - WARNING - 股票 MMC 数据点不足: 1 < 20
+2025-04-11 07:57:30,340 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:30,393 - __main__ - INFO - 成功保存股票 MMC 的数据，总计 81 条记录
+2025-04-11 07:57:30,550 - __main__ - WARNING - 股票 MMM 数据点不足: 1 < 20
+2025-04-11 07:57:30,864 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:30,918 - __main__ - INFO - 成功保存股票 MMM 的数据，总计 81 条记录
+2025-04-11 07:57:31,011 - __main__ - WARNING - 股票 MNST 数据点不足: 1 < 20
+2025-04-11 07:57:31,102 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:31,156 - __main__ - INFO - 成功保存股票 MNST 的数据，总计 81 条记录
+2025-04-11 07:57:31,383 - __main__ - WARNING - 股票 MO 数据点不足: 1 < 20
+2025-04-11 07:57:31,556 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:31,608 - __main__ - INFO - 成功保存股票 MO 的数据，总计 81 条记录
+2025-04-11 07:57:31,772 - __main__ - WARNING - 股票 MOH 数据点不足: 1 < 20
+2025-04-11 07:57:31,905 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:31,956 - __main__ - INFO - 成功保存股票 MOH 的数据，总计 81 条记录
+2025-04-11 07:57:32,102 - __main__ - WARNING - 股票 MOS 数据点不足: 1 < 20
+2025-04-11 07:57:32,228 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:32,278 - __main__ - INFO - 成功保存股票 MOS 的数据，总计 81 条记录
+2025-04-11 07:57:32,428 - __main__ - WARNING - 股票 MPC 数据点不足: 1 < 20
+2025-04-11 07:57:32,522 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:32,575 - __main__ - INFO - 成功保存股票 MPC 的数据，总计 81 条记录
+2025-04-11 07:57:32,683 - __main__ - WARNING - 股票 MPWR 数据点不足: 1 < 20
+2025-04-11 07:57:32,825 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:32,879 - __main__ - INFO - 成功保存股票 MPWR 的数据，总计 81 条记录
+2025-04-11 07:57:33,126 - __main__ - WARNING - 股票 MRK 数据点不足: 1 < 20
+2025-04-11 07:57:33,302 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:33,355 - __main__ - INFO - 成功保存股票 MRK 的数据，总计 81 条记录
+2025-04-11 07:57:33,541 - __main__ - WARNING - 股票 MRVL 数据点不足: 1 < 20
+2025-04-11 07:57:33,650 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:33,703 - __main__ - INFO - 成功保存股票 MRVL 的数据，总计 81 条记录
+2025-04-11 07:57:34,000 - __main__ - WARNING - 股票 MS 数据点不足: 1 < 20
+2025-04-11 07:57:34,130 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:34,185 - __main__ - INFO - 成功保存股票 MS 的数据，总计 81 条记录
+2025-04-11 07:57:34,307 - __main__ - WARNING - 股票 MSCI 数据点不足: 1 < 20
+2025-04-11 07:57:34,753 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:34,842 - __main__ - INFO - 成功保存股票 MSCI 的数据，总计 81 条记录
+2025-04-11 07:57:35,218 - __main__ - WARNING - 股票 MSFT 数据点不足: 1 < 20
+2025-04-11 07:57:35,587 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:35,641 - __main__ - INFO - 成功保存股票 MSFT 的数据，总计 81 条记录
+2025-04-11 07:57:35,806 - __main__ - WARNING - 股票 MSI 数据点不足: 1 < 20
+2025-04-11 07:57:36,107 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:36,160 - __main__ - INFO - 成功保存股票 MSI 的数据，总计 81 条记录
+2025-04-11 07:57:36,303 - __main__ - WARNING - 股票 MTB 数据点不足: 1 < 20
+2025-04-11 07:57:36,627 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:36,681 - __main__ - INFO - 成功保存股票 MTB 的数据，总计 81 条记录
+2025-04-11 07:57:36,799 - __main__ - WARNING - 股票 MTCH 数据点不足: 1 < 20
+2025-04-11 07:57:36,909 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:36,964 - __main__ - INFO - 成功保存股票 MTCH 的数据，总计 81 条记录
+2025-04-11 07:57:37,203 - __main__ - WARNING - 股票 MTD 数据点不足: 1 < 20
+2025-04-11 07:57:37,275 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:37,329 - __main__ - INFO - 成功保存股票 MTD 的数据，总计 81 条记录
+2025-04-11 07:57:37,669 - __main__ - WARNING - 股票 MU 数据点不足: 1 < 20
+2025-04-11 07:57:37,771 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:37,823 - __main__ - INFO - 成功保存股票 MU 的数据，总计 81 条记录
+2025-04-11 07:57:37,912 - __main__ - WARNING - 股票 NCLH 数据点不足: 1 < 20
+2025-04-11 07:57:38,201 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:38,252 - __main__ - INFO - 成功保存股票 NCLH 的数据，总计 81 条记录
+2025-04-11 07:57:38,359 - __main__ - WARNING - 股票 NDAQ 数据点不足: 1 < 20
+2025-04-11 07:57:38,438 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:38,491 - __main__ - INFO - 成功保存股票 NDAQ 的数据，总计 81 条记录
+2025-04-11 07:57:38,716 - __main__ - WARNING - 股票 NDSN 数据点不足: 1 < 20
+2025-04-11 07:57:38,835 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:38,886 - __main__ - INFO - 成功保存股票 NDSN 的数据，总计 81 条记录
+2025-04-11 07:57:39,110 - __main__ - WARNING - 股票 NEE 数据点不足: 1 < 20
+2025-04-11 07:57:39,247 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:39,299 - __main__ - INFO - 成功保存股票 NEE 的数据，总计 81 条记录
+2025-04-11 07:57:39,443 - __main__ - WARNING - 股票 NEM 数据点不足: 1 < 20
+2025-04-11 07:57:39,769 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:39,821 - __main__ - INFO - 成功保存股票 NEM 的数据，总计 81 条记录
+2025-04-11 07:57:39,930 - __main__ - WARNING - 股票 NFLX 数据点不足: 1 < 20
+2025-04-11 07:57:40,002 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:40,054 - __main__ - INFO - 成功保存股票 NFLX 的数据，总计 81 条记录
+2025-04-11 07:57:40,384 - __main__ - WARNING - 股票 NI 数据点不足: 1 < 20
+2025-04-11 07:57:40,526 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:40,581 - __main__ - INFO - 成功保存股票 NI 的数据，总计 81 条记录
+2025-04-11 07:57:40,917 - __main__ - WARNING - 股票 NKE 数据点不足: 1 < 20
+2025-04-11 07:57:41,064 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:41,115 - __main__ - INFO - 成功保存股票 NKE 的数据，总计 81 条记录
+2025-04-11 07:57:41,429 - __main__ - WARNING - 股票 NOC 数据点不足: 1 < 20
+2025-04-11 07:57:41,551 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:41,603 - __main__ - INFO - 成功保存股票 NOC 的数据，总计 81 条记录
+2025-04-11 07:57:41,923 - __main__ - WARNING - 股票 NOW 数据点不足: 1 < 20
+2025-04-11 07:57:41,991 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:42,043 - __main__ - INFO - 成功保存股票 NOW 的数据，总计 81 条记录
+2025-04-11 07:57:42,388 - __main__ - WARNING - 股票 NRG 数据点不足: 1 < 20
+2025-04-11 07:57:42,476 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:42,530 - __main__ - INFO - 成功保存股票 NRG 的数据，总计 81 条记录
+2025-04-11 07:57:42,682 - __main__ - WARNING - 股票 NSC 数据点不足: 1 < 20
+2025-04-11 07:57:43,018 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:43,070 - __main__ - INFO - 成功保存股票 NSC 的数据，总计 81 条记录
+2025-04-11 07:57:43,188 - __main__ - WARNING - 股票 NTAP 数据点不足: 1 < 20
+2025-04-11 07:57:43,444 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:43,498 - __main__ - INFO - 成功保存股票 NTAP 的数据，总计 81 条记录
+2025-04-11 07:57:43,638 - __main__ - WARNING - 股票 NTRS 数据点不足: 1 < 20
+2025-04-11 07:57:43,964 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:44,025 - __main__ - INFO - 成功保存股票 NTRS 的数据，总计 81 条记录
+2025-04-11 07:57:44,185 - __main__ - WARNING - 股票 NUE 数据点不足: 1 < 20
+2025-04-11 07:57:44,489 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:44,541 - __main__ - INFO - 成功保存股票 NUE 的数据，总计 81 条记录
+2025-04-11 07:57:44,644 - __main__ - WARNING - 股票 NVDA 数据点不足: 1 < 20
+2025-04-11 07:57:44,729 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:44,781 - __main__ - INFO - 成功保存股票 NVDA 的数据，总计 81 条记录
+2025-04-11 07:57:45,065 - __main__ - WARNING - 股票 NVR 数据点不足: 1 < 20
+2025-04-11 07:57:45,154 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:45,210 - __main__ - INFO - 成功保存股票 NVR 的数据，总计 81 条记录
+2025-04-11 07:57:45,538 - __main__ - WARNING - 股票 NWS 数据点不足: 1 < 20
+2025-04-11 07:57:45,628 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:45,682 - __main__ - INFO - 成功保存股票 NWS 的数据，总计 81 条记录
+2025-04-11 07:57:45,794 - __main__ - WARNING - 股票 NWSA 数据点不足: 1 < 20
+2025-04-11 07:57:45,928 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:45,983 - __main__ - INFO - 成功保存股票 NWSA 的数据，总计 81 条记录
+2025-04-11 07:57:46,113 - __main__ - WARNING - 股票 NXPI 数据点不足: 1 < 20
+2025-04-11 07:57:46,199 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:46,254 - __main__ - INFO - 成功保存股票 NXPI 的数据，总计 81 条记录
+2025-04-11 07:57:46,446 - __main__ - WARNING - 股票 O 数据点不足: 1 < 20
+2025-04-11 07:57:46,583 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:46,636 - __main__ - INFO - 成功保存股票 O 的数据，总计 81 条记录
+2025-04-11 07:57:46,742 - __main__ - WARNING - 股票 ODFL 数据点不足: 1 < 20
+2025-04-11 07:57:46,826 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:46,884 - __main__ - INFO - 成功保存股票 ODFL 的数据，总计 81 条记录
+2025-04-11 07:57:47,103 - __main__ - WARNING - 股票 OKE 数据点不足: 1 < 20
+2025-04-11 07:57:47,236 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:47,290 - __main__ - INFO - 成功保存股票 OKE 的数据，总计 81 条记录
+2025-04-11 07:57:47,494 - __main__ - WARNING - 股票 OMC 数据点不足: 1 < 20
+2025-04-11 07:57:47,630 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:47,683 - __main__ - INFO - 成功保存股票 OMC 的数据，总计 81 条记录
+2025-04-11 07:57:47,774 - __main__ - WARNING - 股票 ON 数据点不足: 1 < 20
+2025-04-11 07:57:47,836 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:47,889 - __main__ - INFO - 成功保存股票 ON 的数据，总计 81 条记录
+2025-04-11 07:57:48,159 - __main__ - WARNING - 股票 ORCL 数据点不足: 1 < 20
+2025-04-11 07:57:48,247 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:48,300 - __main__ - INFO - 成功保存股票 ORCL 的数据，总计 81 条记录
+2025-04-11 07:57:48,392 - __main__ - WARNING - 股票 ORLY 数据点不足: 1 < 20
+2025-04-11 07:57:48,679 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:48,732 - __main__ - INFO - 成功保存股票 ORLY 的数据，总计 81 条记录
+2025-04-11 07:57:48,876 - __main__ - WARNING - 股票 OXY 数据点不足: 1 < 20
+2025-04-11 07:57:49,205 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:49,260 - __main__ - INFO - 成功保存股票 OXY 的数据，总计 81 条记录
+2025-04-11 07:57:49,347 - __main__ - WARNING - 股票 PANW 数据点不足: 1 < 20
+2025-04-11 07:57:49,424 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:49,476 - __main__ - INFO - 成功保存股票 PANW 的数据，总计 81 条记录
+2025-04-11 07:57:49,798 - __main__ - WARNING - 股票 PARA 数据点不足: 1 < 20
+2025-04-11 07:57:49,896 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:49,949 - __main__ - INFO - 成功保存股票 PARA 的数据，总计 81 条记录
+2025-04-11 07:57:50,247 - __main__ - WARNING - 股票 PAYC 数据点不足: 1 < 20
+2025-04-11 07:57:50,558 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:50,611 - __main__ - INFO - 成功保存股票 PAYC 的数据，总计 81 条记录
+2025-04-11 07:57:50,914 - __main__ - WARNING - 股票 PAYX 数据点不足: 1 < 20
+2025-04-11 07:57:51,029 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:51,077 - __main__ - INFO - 成功保存股票 PAYX 的数据，总计 81 条记录
+2025-04-11 07:57:51,405 - __main__ - WARNING - 股票 PCAR 数据点不足: 1 < 20
+2025-04-11 07:57:51,539 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:51,592 - __main__ - INFO - 成功保存股票 PCAR 的数据，总计 81 条记录
+2025-04-11 07:57:51,931 - __main__ - WARNING - 股票 PCG 数据点不足: 1 < 20
+2025-04-11 07:57:52,067 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:52,121 - __main__ - INFO - 成功保存股票 PCG 的数据，总计 81 条记录
+2025-04-11 07:57:52,445 - __main__ - WARNING - 股票 PEG 数据点不足: 1 < 20
+2025-04-11 07:57:52,575 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:52,627 - __main__ - INFO - 成功保存股票 PEG 的数据，总计 81 条记录
+2025-04-11 07:57:52,992 - __main__ - WARNING - 股票 PEP 数据点不足: 1 < 20
+2025-04-11 07:57:53,116 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:53,169 - __main__ - INFO - 成功保存股票 PEP 的数据，总计 81 条记录
+2025-04-11 07:57:53,554 - __main__ - WARNING - 股票 PFE 数据点不足: 1 < 20
+2025-04-11 07:57:53,925 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:53,978 - __main__ - INFO - 成功保存股票 PFE 的数据，总计 81 条记录
+2025-04-11 07:57:54,094 - __main__ - WARNING - 股票 PFG 数据点不足: 1 < 20
+2025-04-11 07:57:54,198 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:54,252 - __main__ - INFO - 成功保存股票 PFG 的数据，总计 81 条记录
+2025-04-11 07:57:54,606 - __main__ - WARNING - 股票 PG 数据点不足: 1 < 20
+2025-04-11 07:57:54,971 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:55,020 - __main__ - INFO - 成功保存股票 PG 的数据，总计 81 条记录
+2025-04-11 07:57:55,223 - __main__ - WARNING - 股票 PGR 数据点不足: 1 < 20
+2025-04-11 07:57:55,496 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:55,547 - __main__ - INFO - 成功保存股票 PGR 的数据，总计 81 条记录
+2025-04-11 07:57:55,689 - __main__ - WARNING - 股票 PH 数据点不足: 1 < 20
+2025-04-11 07:57:56,024 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:56,076 - __main__ - INFO - 成功保存股票 PH 的数据，总计 81 条记录
+2025-04-11 07:57:56,247 - __main__ - WARNING - 股票 PHM 数据点不足: 1 < 20
+2025-04-11 07:57:56,545 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:56,595 - __main__ - INFO - 成功保存股票 PHM 的数据，总计 81 条记录
+2025-04-11 07:57:56,717 - __main__ - WARNING - 股票 PKG 数据点不足: 1 < 20
+2025-04-11 07:57:57,069 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:57,120 - __main__ - INFO - 成功保存股票 PKG 的数据，总计 81 条记录
+2025-04-11 07:57:57,325 - __main__ - WARNING - 股票 PLD 数据点不足: 1 < 20
+2025-04-11 07:57:57,461 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:57,514 - __main__ - INFO - 成功保存股票 PLD 的数据，总计 81 条记录
+2025-04-11 07:57:57,656 - __main__ - WARNING - 股票 PM 数据点不足: 1 < 20
+2025-04-11 07:57:57,748 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:57,801 - __main__ - INFO - 成功保存股票 PM 的数据，总计 81 条记录
+2025-04-11 07:57:58,113 - __main__ - WARNING - 股票 PNC 数据点不足: 1 < 20
+2025-04-11 07:57:58,218 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:58,271 - __main__ - INFO - 成功保存股票 PNC 的数据，总计 81 条记录
+2025-04-11 07:57:58,506 - __main__ - WARNING - 股票 PNR 数据点不足: 1 < 20
+2025-04-11 07:57:58,697 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:58,752 - __main__ - INFO - 成功保存股票 PNR 的数据，总计 81 条记录
+2025-04-11 07:57:59,165 - __main__ - WARNING - 股票 PNW 数据点不足: 1 < 20
+2025-04-11 07:57:59,313 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:59,366 - __main__ - INFO - 成功保存股票 PNW 的数据，总计 81 条记录
+2025-04-11 07:57:59,456 - __main__ - WARNING - 股票 PODD 数据点不足: 1 < 20
+2025-04-11 07:57:59,686 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:57:59,739 - __main__ - INFO - 成功保存股票 PODD 的数据，总计 81 条记录
+2025-04-11 07:57:59,857 - __main__ - WARNING - 股票 POOL 数据点不足: 1 < 20
+2025-04-11 07:57:59,960 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:00,014 - __main__ - INFO - 成功保存股票 POOL 的数据，总计 81 条记录
+2025-04-11 07:58:00,321 - __main__ - WARNING - 股票 PPG 数据点不足: 1 < 20
+2025-04-11 07:58:00,471 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:00,524 - __main__ - INFO - 成功保存股票 PPG 的数据，总计 81 条记录
+2025-04-11 07:58:00,735 - __main__ - WARNING - 股票 PPL 数据点不足: 1 < 20
+2025-04-11 07:58:00,851 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:00,904 - __main__ - INFO - 成功保存股票 PPL 的数据，总计 81 条记录
+2025-04-11 07:58:01,258 - __main__ - WARNING - 股票 PRU 数据点不足: 1 < 20
+2025-04-11 07:58:01,350 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:01,405 - __main__ - INFO - 成功保存股票 PRU 的数据，总计 81 条记录
+2025-04-11 07:58:01,550 - __main__ - WARNING - 股票 PSA 数据点不足: 1 < 20
+2025-04-11 07:58:01,788 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:01,842 - __main__ - INFO - 成功保存股票 PSA 的数据，总计 81 条记录
+2025-04-11 07:58:01,951 - __main__ - WARNING - 股票 PSX 数据点不足: 1 < 20
+2025-04-11 07:58:02,043 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:02,094 - __main__ - INFO - 成功保存股票 PSX 的数据，总计 81 条记录
+2025-04-11 07:58:02,363 - __main__ - WARNING - 股票 PTC 数据点不足: 1 < 20
+2025-04-11 07:58:02,428 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:02,481 - __main__ - INFO - 成功保存股票 PTC 的数据，总计 81 条记录
+2025-04-11 07:58:02,602 - __main__ - WARNING - 股票 PWR 数据点不足: 1 < 20
+2025-04-11 07:58:02,835 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:02,889 - __main__ - INFO - 成功保存股票 PWR 的数据，总计 81 条记录
+2025-04-11 07:58:03,016 - __main__ - WARNING - 股票 QCOM 数据点不足: 1 < 20
+2025-04-11 07:58:03,130 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:03,181 - __main__ - INFO - 成功保存股票 QCOM 的数据，总计 81 条记录
+2025-04-11 07:58:03,443 - __main__ - WARNING - 股票 QQQ 数据点不足: 1 < 20
+2025-04-11 07:58:03,543 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:03,596 - __main__ - INFO - 成功保存股票 QQQ 的数据，总计 81 条记录
+2025-04-11 07:58:03,875 - __main__ - WARNING - 股票 QRVO 数据点不足: 1 < 20
+2025-04-11 07:58:03,955 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:04,008 - __main__ - INFO - 成功保存股票 QRVO 的数据，总计 81 条记录
+2025-04-11 07:58:04,137 - __main__ - WARNING - 股票 RCL 数据点不足: 1 < 20
+2025-04-11 07:58:04,407 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:04,458 - __main__ - INFO - 成功保存股票 RCL 的数据，总计 81 条记录
+2025-04-11 07:58:04,597 - __main__ - WARNING - 股票 REG 数据点不足: 1 < 20
+2025-04-11 07:58:04,713 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:04,765 - __main__ - INFO - 成功保存股票 REG 的数据，总计 81 条记录
+2025-04-11 07:58:04,930 - __main__ - WARNING - 股票 REGN 数据点不足: 1 < 20
+2025-04-11 07:58:05,122 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:05,174 - __main__ - INFO - 成功保存股票 REGN 的数据，总计 81 条记录
+2025-04-11 07:58:05,643 - __main__ - WARNING - 股票 RF 数据点不足: 1 < 20
+2025-04-11 07:58:05,752 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:05,803 - __main__ - INFO - 成功保存股票 RF 的数据，总计 81 条记录
+2025-04-11 07:58:06,159 - __main__ - WARNING - 股票 RJF 数据点不足: 1 < 20
+2025-04-11 07:58:06,513 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:06,567 - __main__ - INFO - 成功保存股票 RJF 的数据，总计 81 条记录
+2025-04-11 07:58:06,694 - __main__ - WARNING - 股票 RL 数据点不足: 1 < 20
+2025-04-11 07:58:06,926 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:06,980 - __main__ - INFO - 成功保存股票 RL 的数据，总计 81 条记录
+2025-04-11 07:58:07,146 - __main__ - WARNING - 股票 RMD 数据点不足: 1 < 20
+2025-04-11 07:58:07,230 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:07,282 - __main__ - INFO - 成功保存股票 RMD 的数据，总计 81 条记录
+2025-04-11 07:58:07,610 - __main__ - WARNING - 股票 ROK 数据点不足: 1 < 20
+2025-04-11 07:58:07,773 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:07,825 - __main__ - INFO - 成功保存股票 ROK 的数据，总计 81 条记录
+2025-04-11 07:58:08,177 - __main__ - WARNING - 股票 ROL 数据点不足: 1 < 20
+2025-04-11 07:58:08,355 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:08,409 - __main__ - INFO - 成功保存股票 ROL 的数据，总计 81 条记录
+2025-04-11 07:58:08,593 - __main__ - WARNING - 股票 ROP 数据点不足: 1 < 20
+2025-04-11 07:58:08,756 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:08,811 - __main__ - INFO - 成功保存股票 ROP 的数据，总计 81 条记录
+2025-04-11 07:58:08,957 - __main__ - WARNING - 股票 ROST 数据点不足: 1 < 20
+2025-04-11 07:58:09,234 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:09,289 - __main__ - INFO - 成功保存股票 ROST 的数据，总计 81 条记录
+2025-04-11 07:58:09,419 - __main__ - WARNING - 股票 RSG 数据点不足: 1 < 20
+2025-04-11 07:58:09,735 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:09,789 - __main__ - INFO - 成功保存股票 RSG 的数据，总计 81 条记录
+2025-04-11 07:58:10,173 - __main__ - WARNING - 股票 RSP 数据点不足: 1 < 20
+2025-04-11 07:58:10,331 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:10,386 - __main__ - INFO - 成功保存股票 RSP 的数据，总计 81 条记录
+2025-04-11 07:58:10,695 - __main__ - WARNING - 股票 RTX 数据点不足: 1 < 20
+2025-04-11 07:58:10,888 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:10,942 - __main__ - INFO - 成功保存股票 RTX 的数据，总计 81 条记录
+2025-04-11 07:58:11,221 - __main__ - WARNING - 股票 RVTY 数据点不足: 1 < 20
+2025-04-11 07:58:11,361 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:11,415 - __main__ - INFO - 成功保存股票 RVTY 的数据，总计 81 条记录
+2025-04-11 07:58:11,524 - __main__ - WARNING - 股票 SBAC 数据点不足: 1 < 20
+2025-04-11 07:58:11,812 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:11,868 - __main__ - INFO - 成功保存股票 SBAC 的数据，总计 81 条记录
+2025-04-11 07:58:12,039 - __main__ - WARNING - 股票 SBUX 数据点不足: 1 < 20
+2025-04-11 07:58:12,343 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:12,397 - __main__ - INFO - 成功保存股票 SBUX 的数据，总计 81 条记录
+2025-04-11 07:58:12,514 - __main__ - WARNING - 股票 SCHG 数据点不足: 1 < 20
+2025-04-11 07:58:12,799 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:12,854 - __main__ - INFO - 成功保存股票 SCHG 的数据，总计 81 条记录
+2025-04-11 07:58:12,988 - __main__ - WARNING - 股票 SCHW 数据点不足: 1 < 20
+2025-04-11 07:58:13,324 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:13,378 - __main__ - INFO - 成功保存股票 SCHW 的数据，总计 81 条记录
+2025-04-11 07:58:13,550 - __main__ - WARNING - 股票 SHW 数据点不足: 1 < 20
+2025-04-11 07:58:13,848 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:13,901 - __main__ - INFO - 成功保存股票 SHW 的数据，总计 81 条记录
+2025-04-11 07:58:14,048 - __main__ - WARNING - 股票 SJM 数据点不足: 1 < 20
+2025-04-11 07:58:14,239 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:14,297 - __main__ - INFO - 成功保存股票 SJM 的数据，总计 81 条记录
+2025-04-11 07:58:14,458 - __main__ - WARNING - 股票 SLB 数据点不足: 1 < 20
+2025-04-11 07:58:14,588 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:14,641 - __main__ - INFO - 成功保存股票 SLB 的数据，总计 81 条记录
+2025-04-11 07:58:14,941 - __main__ - WARNING - 股票 SMCI 数据点不足: 1 < 20
+2025-04-11 07:58:15,013 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:15,066 - __main__ - INFO - 成功保存股票 SMCI 的数据，总计 81 条记录
+2025-04-11 07:58:15,280 - __main__ - WARNING - 股票 SNA 数据点不足: 1 < 20
+2025-04-11 07:58:15,483 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:15,537 - __main__ - INFO - 成功保存股票 SNA 的数据，总计 81 条记录
+2025-04-11 07:58:15,634 - __main__ - WARNING - 股票 SNPS 数据点不足: 1 < 20
+2025-04-11 07:58:15,699 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:15,752 - __main__ - INFO - 成功保存股票 SNPS 的数据，总计 81 条记录
+2025-04-11 07:58:16,045 - __main__ - WARNING - 股票 SO 数据点不足: 1 < 20
+2025-04-11 07:58:16,151 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:16,202 - __main__ - INFO - 成功保存股票 SO 的数据，总计 81 条记录
+2025-04-11 07:58:16,468 - __main__ - WARNING - 股票 SOXL 数据点不足: 1 < 20
+2025-04-11 07:58:16,562 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:16,614 - __main__ - INFO - 成功保存股票 SOXL 的数据，总计 81 条记录
+2025-04-11 07:58:16,727 - __main__ - WARNING - 股票 SOXX 数据点不足: 1 < 20
+2025-04-11 07:58:16,992 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:17,047 - __main__ - INFO - 成功保存股票 SOXX 的数据，总计 81 条记录
+2025-04-11 07:58:17,182 - __main__ - WARNING - 股票 SPG 数据点不足: 1 < 20
+2025-04-11 07:58:17,281 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:17,335 - __main__ - INFO - 成功保存股票 SPG 的数据，总计 81 条记录
+2025-04-11 07:58:17,507 - __main__ - WARNING - 股票 SPGI 数据点不足: 1 < 20
+2025-04-11 07:58:17,650 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:17,702 - __main__ - INFO - 成功保存股票 SPGI 的数据，总计 81 条记录
+2025-04-11 07:58:17,902 - __main__ - WARNING - 股票 SPLG 数据点不足: 1 < 20
+2025-04-11 07:58:18,036 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:18,089 - __main__ - INFO - 成功保存股票 SPLG 的数据，总计 81 条记录
+2025-04-11 07:58:18,227 - __main__ - WARNING - 股票 SPY 数据点不足: 1 < 20
+2025-04-11 07:58:18,341 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:18,397 - __main__ - INFO - 成功保存股票 SPY 的数据，总计 81 条记录
+2025-04-11 07:58:18,624 - __main__ - WARNING - 股票 SQQQ 数据点不足: 1 < 20
+2025-04-11 07:58:18,732 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:18,785 - __main__ - INFO - 成功保存股票 SQQQ 的数据，总计 81 条记录
+2025-04-11 07:58:19,082 - __main__ - WARNING - 股票 SRE 数据点不足: 1 < 20
+2025-04-11 07:58:19,193 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:19,244 - __main__ - INFO - 成功保存股票 SRE 的数据，总计 81 条记录
+2025-04-11 07:58:19,608 - __main__ - WARNING - 股票 STE 数据点不足: 1 < 20
+2025-04-11 07:58:19,700 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:19,756 - __main__ - INFO - 成功保存股票 STE 的数据，总计 81 条记录
+2025-04-11 07:58:20,006 - __main__ - WARNING - 股票 STLD 数据点不足: 1 < 20
+2025-04-11 07:58:20,204 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:20,257 - __main__ - INFO - 成功保存股票 STLD 的数据，总计 81 条记录
+2025-04-11 07:58:20,656 - __main__ - WARNING - 股票 STT 数据点不足: 1 < 20
+2025-04-11 07:58:20,817 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:20,870 - __main__ - INFO - 成功保存股票 STT 的数据，总计 81 条记录
+2025-04-11 07:58:21,182 - __main__ - WARNING - 股票 STX 数据点不足: 1 < 20
+2025-04-11 07:58:21,421 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:21,474 - __main__ - INFO - 成功保存股票 STX 的数据，总计 81 条记录
+2025-04-11 07:58:21,828 - __main__ - WARNING - 股票 STZ 数据点不足: 1 < 20
+2025-04-11 07:58:21,930 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:21,982 - __main__ - INFO - 成功保存股票 STZ 的数据，总计 81 条记录
+2025-04-11 07:58:22,341 - __main__ - WARNING - 股票 SWK 数据点不足: 1 < 20
+2025-04-11 07:58:22,477 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:22,529 - __main__ - INFO - 成功保存股票 SWK 的数据，总计 81 条记录
+2025-04-11 07:58:22,814 - __main__ - WARNING - 股票 SWKS 数据点不足: 1 < 20
+2025-04-11 07:58:22,912 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:22,963 - __main__ - INFO - 成功保存股票 SWKS 的数据，总计 81 条记录
+2025-04-11 07:58:23,281 - __main__ - WARNING - 股票 SYF 数据点不足: 1 < 20
+2025-04-11 07:58:23,369 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:23,426 - __main__ - INFO - 成功保存股票 SYF 的数据，总计 81 条记录
+2025-04-11 07:58:23,668 - __main__ - WARNING - 股票 SYK 数据点不足: 1 < 20
+2025-04-11 07:58:23,806 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:23,859 - __main__ - INFO - 成功保存股票 SYK 的数据，总计 81 条记录
+2025-04-11 07:58:23,990 - __main__ - WARNING - 股票 SYY 数据点不足: 1 < 20
+2025-04-11 07:58:24,196 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:24,248 - __main__ - INFO - 成功保存股票 SYY 的数据，总计 81 条记录
+2025-04-11 07:58:24,446 - __main__ - WARNING - 股票 T 数据点不足: 1 < 20
+2025-04-11 07:58:24,564 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:24,618 - __main__ - INFO - 成功保存股票 T 的数据，总计 81 条记录
+2025-04-11 07:58:24,848 - __main__ - WARNING - 股票 TAP 数据点不足: 1 < 20
+2025-04-11 07:58:24,958 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:25,011 - __main__ - INFO - 成功保存股票 TAP 的数据，总计 81 条记录
+2025-04-11 07:58:25,118 - __main__ - WARNING - 股票 TDG 数据点不足: 1 < 20
+2025-04-11 07:58:25,377 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:25,429 - __main__ - INFO - 成功保存股票 TDG 的数据，总计 81 条记录
+2025-04-11 07:58:25,540 - __main__ - WARNING - 股票 TDY 数据点不足: 1 < 20
+2025-04-11 07:58:25,610 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:25,661 - __main__ - INFO - 成功保存股票 TDY 的数据，总计 81 条记录
+2025-04-11 07:58:25,899 - __main__ - WARNING - 股票 TECH 数据点不足: 1 < 20
+2025-04-11 07:58:26,003 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:26,058 - __main__ - INFO - 成功保存股票 TECH 的数据，总计 81 条记录
+2025-04-11 07:58:26,172 - __main__ - WARNING - 股票 TEL 数据点不足: 1 < 20
+2025-04-11 07:58:26,291 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:26,341 - __main__ - INFO - 成功保存股票 TEL 的数据，总计 81 条记录
+2025-04-11 07:58:26,480 - __main__ - WARNING - 股票 TER 数据点不足: 1 < 20
+2025-04-11 07:58:26,560 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:26,613 - __main__ - INFO - 成功保存股票 TER 的数据，总计 81 条记录
+2025-04-11 07:58:26,746 - __main__ - WARNING - 股票 TFC 数据点不足: 1 < 20
+2025-04-11 07:58:26,950 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:27,005 - __main__ - INFO - 成功保存股票 TFC 的数据，总计 81 条记录
+2025-04-11 07:58:27,136 - __main__ - WARNING - 股票 TFX 数据点不足: 1 < 20
+2025-04-11 07:58:27,341 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:27,392 - __main__ - INFO - 成功保存股票 TFX 的数据，总计 81 条记录
+2025-04-11 07:58:27,595 - __main__ - WARNING - 股票 TGT 数据点不足: 1 < 20
+2025-04-11 07:58:27,718 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:27,766 - __main__ - INFO - 成功保存股票 TGT 的数据，总计 81 条记录
+2025-04-11 07:58:27,992 - __main__ - WARNING - 股票 TJX 数据点不足: 1 < 20
+2025-04-11 07:58:28,127 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:28,179 - __main__ - INFO - 成功保存股票 TJX 的数据，总计 81 条记录
+2025-04-11 07:58:28,391 - __main__ - WARNING - 股票 TLT 数据点不足: 1 < 20
+2025-04-11 07:58:28,521 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:28,578 - __main__ - INFO - 成功保存股票 TLT 的数据，总计 81 条记录
+2025-04-11 07:58:28,694 - __main__ - WARNING - 股票 TMF 数据点不足: 1 < 20
+2025-04-11 07:58:28,783 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:28,836 - __main__ - INFO - 成功保存股票 TMF 的数据，总计 81 条记录
+2025-04-11 07:58:29,043 - __main__ - WARNING - 股票 TMO 数据点不足: 1 < 20
+2025-04-11 07:58:29,161 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:29,216 - __main__ - INFO - 成功保存股票 TMO 的数据，总计 81 条记录
+2025-04-11 07:58:29,337 - __main__ - WARNING - 股票 TMUS 数据点不足: 1 < 20
+2025-04-11 07:58:29,653 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:29,706 - __main__ - INFO - 成功保存股票 TMUS 的数据，总计 81 条记录
+2025-04-11 07:58:29,830 - __main__ - WARNING - 股票 TNA 数据点不足: 1 < 20
+2025-04-11 07:58:30,099 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:30,154 - __main__ - INFO - 成功保存股票 TNA 的数据，总计 81 条记录
+2025-04-11 07:58:30,280 - __main__ - WARNING - 股票 TPR 数据点不足: 1 < 20
+2025-04-11 07:58:30,372 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:30,431 - __main__ - INFO - 成功保存股票 TPR 的数据，总计 81 条记录
+2025-04-11 07:58:30,687 - __main__ - WARNING - 股票 TQQQ 数据点不足: 1 < 20
+2025-04-11 07:58:30,772 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:30,827 - __main__ - INFO - 成功保存股票 TQQQ 的数据，总计 81 条记录
+2025-04-11 07:58:31,012 - __main__ - WARNING - 股票 TRGP 数据点不足: 1 < 20
+2025-04-11 07:58:31,145 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:31,195 - __main__ - INFO - 成功保存股票 TRGP 的数据，总计 81 条记录
+2025-04-11 07:58:31,298 - __main__ - WARNING - 股票 TRMB 数据点不足: 1 < 20
+2025-04-11 07:58:31,363 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:31,417 - __main__ - INFO - 成功保存股票 TRMB 的数据，总计 81 条记录
+2025-04-11 07:58:31,676 - __main__ - WARNING - 股票 TROW 数据点不足: 1 < 20
+2025-04-11 07:58:31,814 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:31,868 - __main__ - INFO - 成功保存股票 TROW 的数据，总计 81 条记录
+2025-04-11 07:58:32,012 - __main__ - WARNING - 股票 TRV 数据点不足: 1 < 20
+2025-04-11 07:58:32,194 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:32,247 - __main__ - INFO - 成功保存股票 TRV 的数据，总计 81 条记录
+2025-04-11 07:58:32,374 - __main__ - WARNING - 股票 TSCO 数据点不足: 1 < 20
+2025-04-11 07:58:32,469 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:32,517 - __main__ - INFO - 成功保存股票 TSCO 的数据，总计 81 条记录
+2025-04-11 07:58:32,709 - __main__ - WARNING - 股票 TSLA 数据点不足: 1 < 20
+2025-04-11 07:58:32,776 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:32,830 - __main__ - INFO - 成功保存股票 TSLA 的数据，总计 81 条记录
+2025-04-11 07:58:32,970 - __main__ - WARNING - 股票 TSN 数据点不足: 1 < 20
+2025-04-11 07:58:33,099 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:33,152 - __main__ - INFO - 成功保存股票 TSN 的数据，总计 81 条记录
+2025-04-11 07:58:33,325 - __main__ - WARNING - 股票 TT 数据点不足: 1 < 20
+2025-04-11 07:58:33,454 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:33,507 - __main__ - INFO - 成功保存股票 TT 的数据，总计 81 条记录
+2025-04-11 07:58:33,759 - __main__ - WARNING - 股票 TTWO 数据点不足: 1 < 20
+2025-04-11 07:58:33,831 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:33,883 - __main__ - INFO - 成功保存股票 TTWO 的数据，总计 81 条记录
+2025-04-11 07:58:34,083 - __main__ - WARNING - 股票 TXN 数据点不足: 1 < 20
+2025-04-11 07:58:34,293 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:34,345 - __main__ - INFO - 成功保存股票 TXN 的数据，总计 81 条记录
+2025-04-11 07:58:34,613 - __main__ - WARNING - 股票 TXT 数据点不足: 1 < 20
+2025-04-11 07:58:34,958 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:35,012 - __main__ - INFO - 成功保存股票 TXT 的数据，总计 81 条记录
+2025-04-11 07:58:35,338 - __main__ - WARNING - 股票 TYL 数据点不足: 1 < 20
+2025-04-11 07:58:35,447 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:35,501 - __main__ - INFO - 成功保存股票 TYL 的数据，总计 81 条记录
+2025-04-11 07:58:35,612 - __main__ - WARNING - 股票 UAL 数据点不足: 1 < 20
+2025-04-11 07:58:35,861 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:35,912 - __main__ - INFO - 成功保存股票 UAL 的数据，总计 81 条记录
+2025-04-11 07:58:36,115 - __main__ - WARNING - 股票 UDR 数据点不足: 1 < 20
+2025-04-11 07:58:36,391 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:36,444 - __main__ - INFO - 成功保存股票 UDR 的数据，总计 81 条记录
+2025-04-11 07:58:36,573 - __main__ - WARNING - 股票 UHS 数据点不足: 1 < 20
+2025-04-11 07:58:36,916 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:36,967 - __main__ - INFO - 成功保存股票 UHS 的数据，总计 81 条记录
+2025-04-11 07:58:37,058 - __main__ - WARNING - 股票 ULTA 数据点不足: 1 < 20
+2025-04-11 07:58:37,143 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:37,196 - __main__ - INFO - 成功保存股票 ULTA 的数据，总计 81 条记录
+2025-04-11 07:58:37,548 - __main__ - WARNING - 股票 UNH 数据点不足: 1 < 20
+2025-04-11 07:58:37,680 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:37,733 - __main__ - INFO - 成功保存股票 UNH 的数据，总计 81 条记录
+2025-04-11 07:58:38,088 - __main__ - WARNING - 股票 UNP 数据点不足: 1 < 20
+2025-04-11 07:58:38,201 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:38,254 - __main__ - INFO - 成功保存股票 UNP 的数据，总计 81 条记录
+2025-04-11 07:58:38,574 - __main__ - WARNING - 股票 UPS 数据点不足: 1 < 20
+2025-04-11 07:58:38,675 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:38,727 - __main__ - INFO - 成功保存股票 UPS 的数据，总计 81 条记录
+2025-04-11 07:58:39,005 - __main__ - WARNING - 股票 URI 数据点不足: 1 < 20
+2025-04-11 07:58:39,082 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:39,139 - __main__ - INFO - 成功保存股票 URI 的数据，总计 81 条记录
+2025-04-11 07:58:39,272 - __main__ - WARNING - 股票 USB 数据点不足: 1 < 20
+2025-04-11 07:58:39,532 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:39,585 - __main__ - INFO - 成功保存股票 USB 的数据，总计 81 条记录
+2025-04-11 07:58:39,686 - __main__ - WARNING - 股票 USFR 数据点不足: 1 < 20
+2025-04-11 07:58:39,779 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:39,836 - __main__ - INFO - 成功保存股票 USFR 的数据，总计 81 条记录
+2025-04-11 07:58:40,131 - __main__ - WARNING - 股票 V 数据点不足: 1 < 20
+2025-04-11 07:58:40,216 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:40,269 - __main__ - INFO - 成功保存股票 V 的数据，总计 81 条记录
+2025-04-11 07:58:40,447 - __main__ - WARNING - 股票 VEA 数据点不足: 1 < 20
+2025-04-11 07:58:40,580 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:40,634 - __main__ - INFO - 成功保存股票 VEA 的数据，总计 81 条记录
+2025-04-11 07:58:40,724 - yfinance - ERROR - $VIX: possibly delisted; no price data found  (1d 2025-03-12 00:00:00 -> 2025-04-11 07:58:40.660381)
+2025-04-11 07:58:40,724 - __main__ - WARNING - 未获取到股票 VIX 的新数据
+2025-04-11 07:58:40,873 - __main__ - WARNING - 股票 VLO 数据点不足: 1 < 20
+2025-04-11 07:58:41,260 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:41,310 - __main__ - INFO - 成功保存股票 VLO 的数据，总计 81 条记录
+2025-04-11 07:58:41,492 - __main__ - WARNING - 股票 VMC 数据点不足: 1 < 20
+2025-04-11 07:58:41,665 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:41,738 - __main__ - INFO - 成功保存股票 VMC 的数据，总计 81 条记录
+2025-04-11 07:58:41,829 - __main__ - WARNING - 股票 VRSK 数据点不足: 1 < 20
+2025-04-11 07:58:41,903 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:41,954 - __main__ - INFO - 成功保存股票 VRSK 的数据，总计 81 条记录
+2025-04-11 07:58:42,197 - __main__ - WARNING - 股票 VRSN 数据点不足: 1 < 20
+2025-04-11 07:58:42,272 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:42,325 - __main__ - INFO - 成功保存股票 VRSN 的数据，总计 81 条记录
+2025-04-11 07:58:42,429 - __main__ - WARNING - 股票 VRTX 数据点不足: 1 < 20
+2025-04-11 07:58:42,557 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:42,608 - __main__ - INFO - 成功保存股票 VRTX 的数据，总计 81 条记录
+2025-04-11 07:58:42,781 - __main__ - WARNING - 股票 VT 数据点不足: 1 < 20
+2025-04-11 07:58:42,871 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:42,927 - __main__ - INFO - 成功保存股票 VT 的数据，总计 81 条记录
+2025-04-11 07:58:43,201 - __main__ - WARNING - 股票 VTI 数据点不足: 1 < 20
+2025-04-11 07:58:43,330 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:43,385 - __main__ - INFO - 成功保存股票 VTI 的数据，总计 81 条记录
+2025-04-11 07:58:43,591 - __main__ - WARNING - 股票 VTR 数据点不足: 1 < 20
+2025-04-11 07:58:43,730 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:43,783 - __main__ - INFO - 成功保存股票 VTR 的数据，总计 81 条记录
+2025-04-11 07:58:43,934 - __main__ - WARNING - 股票 VTRS 数据点不足: 1 < 20
+2025-04-11 07:58:44,254 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:44,307 - __main__ - INFO - 成功保存股票 VTRS 的数据，总计 81 条记录
+2025-04-11 07:58:44,478 - __main__ - WARNING - 股票 VZ 数据点不足: 1 < 20
+2025-04-11 07:58:44,643 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:44,700 - __main__ - INFO - 成功保存股票 VZ 的数据，总计 81 条记录
+2025-04-11 07:58:44,870 - __main__ - WARNING - 股票 WAB 数据点不足: 1 < 20
+2025-04-11 07:58:44,977 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:45,032 - __main__ - INFO - 成功保存股票 WAB 的数据，总计 81 条记录
+2025-04-11 07:58:45,364 - __main__ - WARNING - 股票 WAT 数据点不足: 1 < 20
+2025-04-11 07:58:45,463 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:45,515 - __main__ - INFO - 成功保存股票 WAT 的数据，总计 81 条记录
+2025-04-11 07:58:45,691 - __main__ - WARNING - 股票 WBA 数据点不足: 1 < 20
+2025-04-11 07:58:45,824 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:45,876 - __main__ - INFO - 成功保存股票 WBA 的数据，总计 81 条记录
+2025-04-11 07:58:45,969 - __main__ - WARNING - 股票 WBD 数据点不足: 1 < 20
+2025-04-11 07:58:46,049 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:46,104 - __main__ - INFO - 成功保存股票 WBD 的数据，总计 81 条记录
+2025-04-11 07:58:46,399 - __main__ - WARNING - 股票 WDAY 数据点不足: 1 < 20
+2025-04-11 07:58:46,481 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:46,537 - __main__ - INFO - 成功保存股票 WDAY 的数据，总计 81 条记录
+2025-04-11 07:58:46,634 - __main__ - WARNING - 股票 WDC 数据点不足: 1 < 20
+2025-04-11 07:58:46,871 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:46,921 - __main__ - INFO - 成功保存股票 WDC 的数据，总计 81 条记录
+2025-04-11 07:58:47,139 - __main__ - WARNING - 股票 WEC 数据点不足: 1 < 20
+2025-04-11 07:58:47,400 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:47,454 - __main__ - INFO - 成功保存股票 WEC 的数据，总计 81 条记录
+2025-04-11 07:58:47,592 - __main__ - WARNING - 股票 WELL 数据点不足: 1 < 20
+2025-04-11 07:58:47,786 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:47,838 - __main__ - INFO - 成功保存股票 WELL 的数据，总计 81 条记录
+2025-04-11 07:58:48,105 - __main__ - WARNING - 股票 WFC 数据点不足: 1 < 20
+2025-04-11 07:58:48,640 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:48,691 - __main__ - INFO - 成功保存股票 WFC 的数据，总计 81 条记录
+2025-04-11 07:58:49,038 - __main__ - WARNING - 股票 WM 数据点不足: 1 < 20
+2025-04-11 07:58:49,142 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:49,193 - __main__ - INFO - 成功保存股票 WM 的数据，总计 81 条记录
+2025-04-11 07:58:49,510 - __main__ - WARNING - 股票 WMB 数据点不足: 1 < 20
+2025-04-11 07:58:49,637 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:49,691 - __main__ - INFO - 成功保存股票 WMB 的数据，总计 81 条记录
+2025-04-11 07:58:49,894 - __main__ - WARNING - 股票 WMT 数据点不足: 1 < 20
+2025-04-11 07:58:50,045 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:50,097 - __main__ - INFO - 成功保存股票 WMT 的数据，总计 81 条记录
+2025-04-11 07:58:50,255 - __main__ - WARNING - 股票 WRB 数据点不足: 1 < 20
+2025-04-11 07:58:50,545 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:50,595 - __main__ - INFO - 成功保存股票 WRB 的数据，总计 81 条记录
+2025-04-11 07:58:50,811 - __main__ - WARNING - 股票 WST 数据点不足: 1 < 20
+2025-04-11 07:58:50,934 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:50,987 - __main__ - INFO - 成功保存股票 WST 的数据，总计 81 条记录
+2025-04-11 07:58:51,158 - __main__ - WARNING - 股票 WTW 数据点不足: 1 < 20
+2025-04-11 07:58:51,262 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:51,315 - __main__ - INFO - 成功保存股票 WTW 的数据，总计 81 条记录
+2025-04-11 07:58:51,590 - __main__ - WARNING - 股票 WY 数据点不足: 1 < 20
+2025-04-11 07:58:51,851 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:51,904 - __main__ - INFO - 成功保存股票 WY 的数据，总计 81 条记录
+2025-04-11 07:58:52,250 - __main__ - WARNING - 股票 WYNN 数据点不足: 1 < 20
+2025-04-11 07:58:52,644 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:52,696 - __main__ - INFO - 成功保存股票 WYNN 的数据，总计 81 条记录
+2025-04-11 07:58:52,902 - __main__ - WARNING - 股票 XEL 数据点不足: 1 < 20
+2025-04-11 07:58:53,164 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:53,217 - __main__ - INFO - 成功保存股票 XEL 的数据，总计 81 条记录
+2025-04-11 07:58:53,348 - __main__ - WARNING - 股票 XLB 数据点不足: 1 < 20
+2025-04-11 07:58:53,458 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:53,516 - __main__ - INFO - 成功保存股票 XLB 的数据，总计 81 条记录
+2025-04-11 07:58:53,775 - __main__ - WARNING - 股票 XLE 数据点不足: 1 < 20
+2025-04-11 07:58:53,871 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:53,924 - __main__ - INFO - 成功保存股票 XLE 的数据，总计 81 条记录
+2025-04-11 07:58:54,212 - __main__ - WARNING - 股票 XLF 数据点不足: 1 < 20
+2025-04-11 07:58:54,332 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:54,386 - __main__ - INFO - 成功保存股票 XLF 的数据，总计 81 条记录
+2025-04-11 07:58:54,736 - __main__ - WARNING - 股票 XLI 数据点不足: 1 < 20
+2025-04-11 07:58:54,854 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:54,910 - __main__ - INFO - 成功保存股票 XLI 的数据，总计 81 条记录
+2025-04-11 07:58:55,035 - __main__ - WARNING - 股票 XLK 数据点不足: 1 < 20
+2025-04-11 07:58:55,363 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:55,414 - __main__ - INFO - 成功保存股票 XLK 的数据，总计 81 条记录
+2025-04-11 07:58:55,789 - __main__ - WARNING - 股票 XLP 数据点不足: 1 < 20
+2025-04-11 07:58:55,904 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:55,963 - __main__ - INFO - 成功保存股票 XLP 的数据，总计 81 条记录
+2025-04-11 07:58:56,305 - __main__ - WARNING - 股票 XLU 数据点不足: 1 < 20
+2025-04-11 07:58:56,423 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:56,479 - __main__ - INFO - 成功保存股票 XLU 的数据，总计 81 条记录
+2025-04-11 07:58:56,606 - __main__ - WARNING - 股票 XLV 数据点不足: 1 < 20
+2025-04-11 07:58:56,919 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:56,973 - __main__ - INFO - 成功保存股票 XLV 的数据，总计 81 条记录
+2025-04-11 07:58:57,099 - __main__ - WARNING - 股票 XLY 数据点不足: 1 < 20
+2025-04-11 07:58:57,463 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:57,519 - __main__ - INFO - 成功保存股票 XLY 的数据，总计 81 条记录
+2025-04-11 07:58:57,882 - __main__ - WARNING - 股票 XOM 数据点不足: 1 < 20
+2025-04-11 07:58:58,057 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:58,109 - __main__ - INFO - 成功保存股票 XOM 的数据，总计 81 条记录
+2025-04-11 07:58:58,270 - __main__ - WARNING - 股票 XYL 数据点不足: 1 < 20
+2025-04-11 07:58:58,407 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:58,462 - __main__ - INFO - 成功保存股票 XYL 的数据，总计 81 条记录
+2025-04-11 07:58:58,566 - __main__ - WARNING - 股票 YANG 数据点不足: 1 < 20
+2025-04-11 07:58:58,652 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:58,707 - __main__ - INFO - 成功保存股票 YANG 的数据，总计 81 条记录
+2025-04-11 07:58:59,050 - __main__ - WARNING - 股票 YINN 数据点不足: 1 < 20
+2025-04-11 07:58:59,171 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:59,223 - __main__ - INFO - 成功保存股票 YINN 的数据，总计 81 条记录
+2025-04-11 07:58:59,449 - __main__ - WARNING - 股票 YUM 数据点不足: 1 < 20
+2025-04-11 07:58:59,552 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:58:59,605 - __main__ - INFO - 成功保存股票 YUM 的数据，总计 81 条记录
+2025-04-11 07:58:59,711 - __main__ - WARNING - 股票 ZBH 数据点不足: 1 < 20
+2025-04-11 07:58:59,980 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:00,033 - __main__ - INFO - 成功保存股票 ZBH 的数据，总计 81 条记录
+2025-04-11 07:59:00,128 - __main__ - WARNING - 股票 ZBRA 数据点不足: 1 < 20
+2025-04-11 07:59:00,288 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:00,341 - __main__ - INFO - 成功保存股票 ZBRA 的数据，总计 81 条记录
+2025-04-11 07:59:00,505 - __main__ - WARNING - 股票 ZTS 数据点不足: 1 < 20
+2025-04-11 07:59:00,632 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:00,685 - __main__ - INFO - 成功保存股票 ZTS 的数据，总计 81 条记录
+2025-04-11 07:59:01,025 - __main__ - WARNING - 股票 GDDY 数据点不足: 1 < 20
+2025-04-11 07:59:01,092 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:01,148 - __main__ - INFO - 成功保存股票 GDDY 的数据，总计 81 条记录
+2025-04-11 07:59:01,258 - __main__ - WARNING - 股票 CHAU 数据点不足: 1 < 20
+2025-04-11 07:59:01,432 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:01,488 - __main__ - INFO - 成功保存股票 CHAU 的数据，总计 81 条记录
+2025-04-11 07:59:01,628 - __main__ - WARNING - 股票 KHC 数据点不足: 1 < 20
+2025-04-11 07:59:01,712 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:01,766 - __main__ - INFO - 成功保存股票 KHC 的数据，总计 81 条记录
+2025-04-11 07:59:02,076 - __main__ - WARNING - 股票 PYPL 数据点不足: 1 < 20
+2025-04-11 07:59:02,144 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:02,201 - __main__ - INFO - 成功保存股票 PYPL 的数据，总计 81 条记录
+2025-04-11 07:59:02,374 - __main__ - WARNING - 股票 HPE 数据点不足: 1 < 20
+2025-04-11 07:59:02,600 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:02,653 - __main__ - INFO - 成功保存股票 HPE 的数据，总计 81 条记录
+2025-04-11 07:59:02,765 - __main__ - WARNING - 股票 TEAM 数据点不足: 1 < 20
+2025-04-11 07:59:02,847 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:02,899 - __main__ - INFO - 成功保存股票 TEAM 的数据，总计 81 条记录
+2025-04-11 07:59:03,179 - __main__ - WARNING - 股票 FTV 数据点不足: 1 < 20
+2025-04-11 07:59:03,285 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:03,338 - __main__ - INFO - 成功保存股票 FTV 的数据，总计 81 条记录
+2025-04-11 07:59:03,510 - __main__ - WARNING - 股票 DELL 数据点不足: 1 < 20
+2025-04-11 07:59:03,649 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:03,702 - __main__ - INFO - 成功保存股票 DELL 的数据，总计 81 条记录
+2025-04-11 07:59:03,800 - __main__ - WARNING - 股票 TTD 数据点不足: 1 < 20
+2025-04-11 07:59:03,882 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:03,935 - __main__ - INFO - 成功保存股票 TTD 的数据，总计 81 条记录
+2025-04-11 07:59:04,219 - __main__ - WARNING - 股票 ELF 数据点不足: 1 < 20
+2025-04-11 07:59:04,290 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:04,344 - __main__ - INFO - 成功保存股票 ELF 的数据，总计 81 条记录
+2025-04-11 07:59:04,468 - __main__ - WARNING - 股票 VST 数据点不足: 1 < 20
+2025-04-11 07:59:04,702 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:04,756 - __main__ - INFO - 成功保存股票 VST 的数据，总计 81 条记录
+2025-04-11 07:59:04,937 - __main__ - WARNING - 股票 HWM 数据点不足: 1 < 20
+2025-04-11 07:59:05,226 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:05,277 - __main__ - INFO - 成功保存股票 HWM 的数据，总计 81 条记录
+2025-04-11 07:59:05,395 - __main__ - WARNING - 股票 CWEB 数据点不足: 1 < 20
+2025-04-11 07:59:05,488 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:05,543 - __main__ - INFO - 成功保存股票 CWEB 的数据，总计 81 条记录
+2025-04-11 07:59:05,741 - __main__ - WARNING - 股票 LW 数据点不足: 1 < 20
+2025-04-11 07:59:05,845 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:05,899 - __main__ - INFO - 成功保存股票 LW 的数据，总计 81 条记录
+2025-04-11 07:59:06,023 - __main__ - WARNING - 股票 INVH 数据点不足: 1 < 20
+2025-04-11 07:59:06,465 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:06,523 - __main__ - INFO - 成功保存股票 INVH 的数据，总计 81 条记录
+2025-04-11 07:59:06,986 - __main__ - WARNING - 股票 IR 数据点不足: 1 < 20
+2025-04-11 07:59:07,083 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:07,135 - __main__ - INFO - 成功保存股票 IR 的数据，总计 81 条记录
+2025-04-11 07:59:07,370 - __main__ - WARNING - 股票 MDB 数据点不足: 1 < 20
+2025-04-11 07:59:07,444 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:07,498 - __main__ - INFO - 成功保存股票 MDB 的数据，总计 81 条记录
+2025-04-11 07:59:07,616 - __main__ - WARNING - 股票 VICI 数据点不足: 1 < 20
+2025-04-11 07:59:07,843 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:07,892 - __main__ - INFO - 成功保存股票 VICI 的数据，总计 81 条记录
+2025-04-11 07:59:07,983 - __main__ - WARNING - 股票 ZS 数据点不足: 1 < 20
+2025-04-11 07:59:08,057 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:08,111 - __main__ - INFO - 成功保存股票 ZS 的数据，总计 81 条记录
+2025-04-11 07:59:08,360 - __main__ - WARNING - 股票 DAY 数据点不足: 1 < 20
+2025-04-11 07:59:08,432 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:08,486 - __main__ - INFO - 成功保存股票 DAY 的数据，总计 81 条记录
+2025-04-11 07:59:08,582 - __main__ - WARNING - 股票 PDD 数据点不足: 1 < 20
+2025-04-11 07:59:08,661 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:08,716 - __main__ - INFO - 成功保存股票 PDD 的数据，总计 81 条记录
+2025-04-11 07:59:08,884 - __main__ - WARNING - 股票 MRNA 数据点不足: 1 < 20
+2025-04-11 07:59:08,985 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:09,037 - __main__ - INFO - 成功保存股票 MRNA 的数据，总计 81 条记录
+2025-04-11 07:59:09,178 - __main__ - WARNING - 股票 FOXA 数据点不足: 1 < 20
+2025-04-11 07:59:09,418 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:09,472 - __main__ - INFO - 成功保存股票 FOXA 的数据，总计 81 条记录
+2025-04-11 07:59:09,577 - __main__ - WARNING - 股票 FOX 数据点不足: 1 < 20
+2025-04-11 07:59:09,659 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:09,709 - __main__ - INFO - 成功保存股票 FOX 的数据，总计 81 条记录
+2025-04-11 07:59:09,935 - __main__ - WARNING - 股票 DOW 数据点不足: 1 < 20
+2025-04-11 07:59:10,073 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:10,128 - __main__ - INFO - 成功保存股票 DOW 的数据，总计 81 条记录
+2025-04-11 07:59:10,328 - __main__ - WARNING - 股票 TMDX 数据点不足: 1 < 20
+2025-04-11 07:59:10,460 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:10,512 - __main__ - INFO - 成功保存股票 TMDX 的数据，总计 81 条记录
+2025-04-11 07:59:10,602 - __main__ - WARNING - 股票 UBER 数据点不足: 1 < 20
+2025-04-11 07:59:10,669 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:10,724 - __main__ - INFO - 成功保存股票 UBER 的数据，总计 81 条记录
+2025-04-11 07:59:10,850 - __main__ - WARNING - 股票 CTVA 数据点不足: 1 < 20
+2025-04-11 07:59:10,990 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:11,042 - __main__ - INFO - 成功保存股票 CTVA 的数据，总计 81 条记录
+2025-04-11 07:59:11,129 - __main__ - WARNING - 股票 CRWD 数据点不足: 1 < 20
+2025-04-11 07:59:11,199 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:11,254 - __main__ - INFO - 成功保存股票 CRWD 的数据，总计 81 条记录
+2025-04-11 07:59:11,508 - __main__ - WARNING - 股票 DDOG 数据点不足: 1 < 20
+2025-04-11 07:59:11,580 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:11,634 - __main__ - INFO - 成功保存股票 DDOG 的数据，总计 81 条记录
+2025-04-11 07:59:11,731 - __main__ - WARNING - 股票 CARR 数据点不足: 1 < 20
+2025-04-11 07:59:11,805 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:11,861 - __main__ - INFO - 成功保存股票 CARR 的数据，总计 81 条记录
+2025-04-11 07:59:12,074 - __main__ - WARNING - 股票 OTIS 数据点不足: 1 < 20
+2025-04-11 07:59:12,147 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:12,199 - __main__ - INFO - 成功保存股票 OTIS 的数据，总计 81 条记录
+2025-04-11 07:59:12,299 - __main__ - WARNING - 股票 PLTR 数据点不足: 1 < 20
+2025-04-11 07:59:12,428 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:12,480 - __main__ - INFO - 成功保存股票 PLTR 的数据，总计 81 条记录
+2025-04-11 07:59:12,605 - __main__ - WARNING - 股票 ABNB 数据点不足: 1 < 20
+2025-04-11 07:59:12,685 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:12,737 - __main__ - INFO - 成功保存股票 ABNB 的数据，总计 81 条记录
+2025-04-11 07:59:12,840 - __main__ - WARNING - 股票 SOFI 数据点不足: 1 < 20
+2025-04-11 07:59:12,915 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:12,969 - __main__ - INFO - 成功保存股票 SOFI 的数据，总计 81 条记录
+2025-04-11 07:59:13,131 - __main__ - WARNING - 股票 HNST 数据点不足: 1 < 20
+2025-04-11 07:59:13,201 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:13,253 - __main__ - INFO - 成功保存股票 HNST 的数据，总计 81 条记录
+2025-04-11 07:59:13,342 - __main__ - WARNING - 股票 DASH 数据点不足: 1 < 20
+2025-04-11 07:59:13,480 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:13,532 - __main__ - INFO - 成功保存股票 DASH 的数据，总计 81 条记录
+2025-04-11 07:59:13,658 - __main__ - WARNING - 股票 GFS 数据点不足: 1 < 20
+2025-04-11 07:59:13,724 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:13,782 - __main__ - INFO - 成功保存股票 GFS 的数据，总计 81 条记录
+2025-04-11 07:59:13,873 - __main__ - WARNING - 股票 CEG 数据点不足: 1 < 20
+2025-04-11 07:59:13,958 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:14,011 - __main__ - INFO - 成功保存股票 CEG 的数据，总计 81 条记录
+2025-04-11 07:59:14,186 - __main__ - WARNING - 股票 CONL 数据点不足: 1 < 20
+2025-04-11 07:59:14,257 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:14,312 - __main__ - INFO - 成功保存股票 CONL 的数据，总计 81 条记录
+2025-04-11 07:59:14,406 - __main__ - WARNING - 股票 TSLY 数据点不足: 1 < 20
+2025-04-11 07:59:14,531 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:14,589 - __main__ - INFO - 成功保存股票 TSLY 的数据，总计 81 条记录
+2025-04-11 07:59:14,717 - __main__ - WARNING - 股票 NVDL 数据点不足: 1 < 20
+2025-04-11 07:59:14,784 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:14,838 - __main__ - INFO - 成功保存股票 NVDL 的数据，总计 81 条记录
+2025-04-11 07:59:14,941 - __main__ - WARNING - 股票 GEHC 数据点不足: 1 < 20
+2025-04-11 07:59:15,015 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:15,076 - __main__ - INFO - 成功保存股票 GEHC 的数据，总计 81 条记录
+2025-04-11 07:59:15,234 - __main__ - WARNING - 股票 KVUE 数据点不足: 1 < 20
+2025-04-11 07:59:15,366 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:15,429 - __main__ - INFO - 成功保存股票 KVUE 的数据，总计 81 条记录
+2025-04-11 07:59:15,573 - __main__ - WARNING - 股票 NVDY 数据点不足: 1 < 20
+2025-04-11 07:59:15,876 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:16,028 - __main__ - INFO - 成功保存股票 NVDY 的数据，总计 81 条记录
+2025-04-11 07:59:16,134 - __main__ - WARNING - 股票 NVDD 数据点不足: 1 < 20
+2025-04-11 07:59:16,287 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:16,362 - __main__ - INFO - 成功保存股票 NVDD 的数据，总计 81 条记录
+2025-04-11 07:59:16,465 - __main__ - WARNING - 股票 ARM 数据点不足: 1 < 20
+2025-04-11 07:59:16,536 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:16,595 - __main__ - INFO - 成功保存股票 ARM 的数据，总计 81 条记录
+2025-04-11 07:59:16,755 - __main__ - WARNING - 股票 VLTO 数据点不足: 1 < 20
+2025-04-11 07:59:16,834 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:16,910 - __main__ - INFO - 成功保存股票 VLTO 的数据，总计 81 条记录
+2025-04-11 07:59:17,025 - __main__ - WARNING - 股票 IWMY 数据点不足: 1 < 20
+2025-04-11 07:59:17,284 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:17,399 - __main__ - INFO - 成功保存股票 IWMY 的数据，总计 81 条记录
+2025-04-11 07:59:17,508 - __main__ - WARNING - 股票 YMAX 数据点不足: 1 < 20
+2025-04-11 07:59:17,585 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:17,657 - __main__ - INFO - 成功保存股票 YMAX 的数据，总计 81 条记录
+2025-04-11 07:59:17,803 - __main__ - WARNING - 股票 YMAG 数据点不足: 1 < 20
+2025-04-11 07:59:17,882 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:17,944 - __main__ - INFO - 成功保存股票 YMAG 的数据，总计 81 条记录
+2025-04-11 07:59:18,044 - __main__ - WARNING - 股票 ULTY 数据点不足: 1 < 20
+2025-04-11 07:59:18,129 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:18,190 - __main__ - INFO - 成功保存股票 ULTY 的数据，总计 81 条记录
+2025-04-11 07:59:18,374 - __main__ - WARNING - 股票 GEV 数据点不足: 1 < 20
+2025-04-11 07:59:18,445 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:18,501 - __main__ - INFO - 成功保存股票 GEV 的数据，总计 81 条记录
+2025-04-11 07:59:18,612 - __main__ - WARNING - 股票 SOLV 数据点不足: 1 < 20
+2025-04-11 07:59:18,905 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:18,962 - __main__ - INFO - 成功保存股票 SOLV 的数据，总计 81 条记录
+2025-04-11 07:59:19,065 - __main__ - WARNING - 股票 SW 数据点不足: 1 < 20
+2025-04-11 07:59:19,129 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:19,187 - __main__ - INFO - 成功保存股票 SW 的数据，总计 81 条记录
+2025-04-11 07:59:19,374 - __main__ - WARNING - 股票 AMTM 数据点不足: 1 < 20
+2025-04-11 07:59:19,445 - __main__ - INFO - 成功获取更多历史数据，现在有 81 个数据点
+2025-04-11 07:59:19,501 - __main__ - INFO - 成功保存股票 AMTM 的数据，总计 81 条记录
+2025-04-11 07:59:19,502 - __main__ - INFO - 股票数据处理完成 - 两个表已同步更新
+2025-04-13 23:44:07,827 - backtest.backtest_engine - WARNING - 没有完成的交易
+2025-04-13 23:44:08,251 - backtest.backtest_engine - WARNING - 没有完成的交易
+2025-04-13 23:44:08,252 - __main__ - INFO - 
+=== 组合策略分析结果 ===
+2025-04-13 23:44:08,252 - __main__ - INFO - 
+1. 组合性能指标:
+2025-04-13 23:44:08,252 - __main__ - INFO - 总收益率: 1.94%
+2025-04-13 23:44:08,252 - __main__ - INFO - 年化收益率: 9.94%
+2025-04-13 23:44:08,252 - __main__ - INFO - 夏普比率: 0.47
+2025-04-13 23:44:08,252 - __main__ - INFO - 最大回撤: 5.15%
+2025-04-13 23:44:08,252 - __main__ - INFO - 总交易次数: 0
+2025-04-13 23:44:08,252 - __main__ - INFO - 
+2. 各策略表现:
+2025-04-13 23:44:08,252 - __main__ - INFO - 
+策略 1:
+2025-04-13 23:44:08,252 - __main__ - INFO - 权重: 60.00%
+2025-04-13 23:44:08,252 - __main__ - INFO - 总收益率: 1.94%
+2025-04-13 23:44:08,252 - __main__ - INFO - 夏普比率: 0.47
+2025-04-13 23:44:08,252 - __main__ - INFO - 最大回撤: 5.15%
+2025-04-13 23:44:08,253 - __main__ - INFO - 交易次数: 0
+2025-04-13 23:44:08,253 - __main__ - INFO - 
+策略 2:
+2025-04-13 23:44:08,253 - __main__ - INFO - 权重: 40.00%
+2025-04-13 23:44:08,253 - __main__ - INFO - 总收益率: 1.94%
+2025-04-13 23:44:08,253 - __main__ - INFO - 夏普比率: 0.47
+2025-04-13 23:44:08,253 - __main__ - INFO - 最大回撤: 5.15%
+2025-04-13 23:44:08,253 - __main__ - INFO - 交易次数: 0
+2025-04-13 23:44:08,950 - __main__ - INFO - 组合策略结果图表已保存至 portfolio_results.html
+2025-04-14 10:40:16,944 - monitor.market_monitor - INFO - 正在从 /Users/gangtao.zhou/py_project/qute/mose/monitor/config/market_monitor_config.json 加载配置
+2025-04-14 10:40:16,945 - monitor.market_monitor - WARNING - 配置文件 /Users/gangtao.zhou/py_project/qute/mose/monitor/config/market_monitor_config.json 不存在,使用默认配置
+2025-04-14 10:40:16,947 - monitor.market_monitor - ERROR - Redis连接失败: Error 61 connecting to localhost:6379. Connection refused.
+2025-04-14 10:40:16,947 - monitor.market_monitor - INFO - 市场监控器初始化完成
+2025-04-14 10:40:16,947 - __main__ - INFO - 开始回测: 2024-01-01 到 2025-04-13

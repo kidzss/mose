@@ -1,0 +1,87 @@
+{
+    "positions": {
+        "GOOG": {
+            "cost_basis": 170.478,
+            "weight": 0.4719,
+            "shares": 59,
+            "stop_loss": 0.12
+        },
+        "TSLA": {
+            "cost_basis": 289.434,
+            "weight": 0.3473,
+            "shares": 28,
+            "stop_loss": 0.15
+        },
+        "AMD": {
+            "cost_basis": 123.737,
+            "weight": 0.2563,
+            "shares": 58,
+            "stop_loss": 0.08
+        },
+        "NVDA": {
+            "cost_basis": 138.843,
+            "weight": 0.2134,
+            "shares": 40,
+            "stop_loss": 0.08
+        },
+        "PFE": {
+            "cost_basis": 25.899,
+            "weight": 0.0941,
+            "shares": 80,
+            "stop_loss": 0.10
+        },
+        "MSFT": {
+            "cost_basis": 370.95,
+            "weight": 0.0579,
+            "shares": 3,
+            "stop_loss": 0.12
+        },
+        "TMDX": {
+            "cost_basis": 101.75,
+            "weight": 0.0476,
+            "shares": 13,
+            "stop_loss": 0.15
+        }
+    },
+    "monitor_config": {
+        "price_alert_threshold": 0.05,
+        "loss_alert_threshold": 0.05,
+        "profit_target": 0.25,
+        "stop_loss": 0.15,
+        "check_interval": 60,
+        "email_notifications": true,
+        "update_interval": 60,
+        "risk_thresholds": {
+            "volatility": 0.02,
+            "concentration": 0.3,
+            "var": 0.1
+        },
+        "notification_settings": {
+            "email": true,
+            "slack": false,
+            "telegram": false
+        },
+        "sector_specific_settings": {
+            "semiconductor": {
+                "stop_loss": 0.08,
+                "price_alert_threshold": 0.03,
+                "volatility_threshold": 0.03
+            },
+            "tech": {
+                "stop_loss": 0.12,
+                "price_alert_threshold": 0.04,
+                "volatility_threshold": 0.025
+            },
+            "healthcare": {
+                "stop_loss": 0.10,
+                "price_alert_threshold": 0.04,
+                "volatility_threshold": 0.02
+            },
+            "automotive": {
+                "stop_loss": 0.15,
+                "price_alert_threshold": 0.05,
+                "volatility_threshold": 0.03
+            }
+        }
+    }
+} 

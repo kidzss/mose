@@ -1,0 +1,28 @@
+{
+    "backtest_params": {
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "initial_capital": 1000000,
+        "transaction_cost": 0.001,
+        "slippage": 0.001,
+        "stock_pool": ["GOOG", "TSLA", "AMD", "NVDA", "PFE", "MSFT", "TMDX"],
+        "position_limits": {
+            "max_position_size": 0.2,
+            "max_sector_exposure": 0.4,
+            "max_single_stock_exposure": 0.15
+        },
+        "risk_parameters": {
+            "max_drawdown": 0.15,
+            "volatility_threshold": 0.02,
+            "var_threshold": 0.1
+        },
+        "strategy_weights": {
+            "trend": 0.25,
+            "momentum": 0.20,
+            "sentiment": 0.15,
+            "liquidity": 0.15,
+            "breadth": 0.15,
+            "risk": 0.10
+        }
+    }
+} 

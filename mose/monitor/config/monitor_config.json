@@ -1,0 +1,31 @@
+{
+    "strategy_weights": {
+        "NiuniuV3": 1.0
+    },
+    "risk_params": {
+        "stop_loss": 0.05,
+        "take_profit": 0.1,
+        "position_size_limit": 0.2
+    },
+    "monitor_config": {
+        "alert_thresholds": {
+            "rsi_overbought": 70,
+            "rsi_oversold": 30,
+            "price_change": 0.02,
+            "volume_change": 0.5
+        },
+        "market_hours": {
+            "start": "09:30",
+            "end": "16:00",
+            "timezone": "America/New_York"
+        }
+    },
+    "data_fetcher": {
+        "api_key": "",
+        "cache_duration": 300
+    },
+    "report_generator": {
+        "template_path": "templates",
+        "output_path": "reports"
+    }
+} 

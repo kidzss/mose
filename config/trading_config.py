@@ -12,10 +12,11 @@ class EmailConfig:
 
 @dataclass
 class DatabaseConfig:
+    """数据库配置"""
     host: str = "localhost"
     port: int = 3306
     user: str = "root"
-    password: str = ""  # MySQL没有密码
+    password: str = ""  # 根据实际情况设置密码
     database: str = "mose"
 
 @dataclass

@@ -1,4 +1,6 @@
+advisor
+backtest
+data
 monitor
 strategy
-strategy_optimizer
 utils
