@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
 import logging
-from datetime import datetime
-from pathlib import Path
+from typing import Dict, List, Tuple, Optional, Any
+import matplotlib.pyplot as plt
+import seaborn as sns
+from monitor.market_monitor import MarketMonitor
+from strategy.combined_strategy import CombinedStrategy
 
 class BacktestEngine:
     """回测引擎类"""
@@ -49,6 +52,26 @@ class BacktestEngine:
         
         self._initialize_backtest()
         
+    def _process_signals(self, signals):
+        """处理策略生成的信号"""
+        try:
+            if isinstance(signals, pd.DataFrame):
+                # 如果是DataFrame,尝试获取signal列或最后一列的值
+                if 'signal' in signals.columns:
+                    signal = float(signals['signal'].iloc[-1])
+                else:
+                    # 如果没有signal列,使用最后一列
+                    signal = float(signals.iloc[-1, -1])
+            elif isinstance(signals, pd.Series):
+                signal = float(signals.iloc[-1])
+            else:
+                signal = float(signals)
+            
+            return signal
+        except Exception as e:
+            self.logger.error(f"处理信号时出错: {str(e)}")
+            return 0.0  # 出错时返回空仓信号
+
     def run_backtest(self, 
                     data: pd.DataFrame,
                     strategy: Any,
@@ -58,84 +81,89 @@ class BacktestEngine:
         运行回测
         
         参数:
-            data: 回测数据
+            data: 市场数据
             strategy: 策略实例
-            start_date: 开始日期
-            end_date: 结束日期
+            start_date: 回测开始日期
+            end_date: 回测结束日期
             
         返回:
             回测结果字典
         """
         try:
-            # 数据预处理
-            df = self._prepare_data(data, start_date, end_date)
-            if df.empty:
-                raise ValueError("回测数据为空")
-                
-            # 初始化回测状态
-            self._initialize_backtest()
+            # 初始化回测结果
+            self.positions = pd.Series(index=data.index, data=0.0)
+            self.returns = pd.Series(index=data.index, data=0.0)
+            self.equity = pd.Series(index=data.index, data=self.initial_capital)
+            self.drawdown = pd.Series(index=data.index, data=0.0)
             
-            # 记录每日资金和持仓
-            self.daily_capital = []
-            self.daily_positions = []
-            
-            # 逐日回测
-            for i in range(1, len(df)):
-                # 更新市场数据
-                self.current_data = df.iloc[:i+1]
-                current_date = df.index[i]
-                
-                # 生成交易信号
-                signals = strategy.generate_signals(self.current_data)
-                
-                # 获取当前价格
-                current_price = float(df['close'].iloc[i])
-                
-                # 执行交易
-                if isinstance(signals, pd.DataFrame) and 'signal' in signals.columns:
-                    signal = signals['signal'].iloc[-1]
-                else:
-                    signal = signals.iloc[-1] if isinstance(signals, pd.Series) else signals
-                    
-                if signal != 0:
-                    self._execute_trades({'stock': signal}, current_price)
-                
-                # 更新每日资金和持仓
-                total_value = self.current_capital
-                for symbol, quantity in self.positions.items():
-                    total_value += quantity * current_price
-                    
-                self.daily_capital.append({
-                    'date': current_date,
-                    'capital': total_value
-                })
-                
-                self.daily_positions.append({
-                    'date': current_date,
-                    'positions': self.positions.copy()
-                })
-            
-            # 计算回测结果
-            results = self._calculate_results()
-            
-            return results
-            
-        except Exception as e:
-            self.logger.error(f"回测执行出错: {str(e)}")
-            raise
-            
-    def _prepare_data(self, df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
-        """准备回测数据"""
-        try:
-            # 转换日期字符串为时间戳，不设置时区
-            if start_date and end_date:
-                start_ts = pd.Timestamp(start_date)
-                end_ts = pd.Timestamp(end_date)
+            # 记录交易
+            self.trades = []
+            self.current_position = 0.0
+            self.entry_price = 0.0
+            self.entry_date = None
             
             # 过滤日期范围
-            df = df[df.index >= start_ts]
-            df = df[df.index <= end_ts]
+            if start_date:
+                data = data[data.index >= pd.Timestamp(start_date)]
+            if end_date:
+                data = data[data.index <= pd.Timestamp(end_date)]
+            
+            # 计算技术指标
+            df = strategy.calculate_indicators(data)
+            
+            # 生成交易信号
+            signals = strategy.generate_signals(df)
+            
+            # 模拟交易
+            for i in range(1, len(df)):
+                current_price = float(df['close'].iloc[i])
+                current_date = df.index[i]
+                
+                # 获取当前信号
+                if isinstance(signals, pd.DataFrame):
+                    current_signals = signals.iloc[i:i+1]
+                else:
+                    current_signals = signals[i]
+                
+                signal = self._process_signals(current_signals)
+                
+                # 更新持仓
+                if signal == 1 and self.current_position <= 0:
+                    # 开多仓
+                    self._open_long_position(current_price, current_date)
+                elif signal == -1 and self.current_position >= 0:
+                    # 开空仓
+                    self._open_short_position(current_price, current_date)
+                elif signal == 0 and self.current_position != 0:
+                    # 平仓
+                    self._close_position(current_price, current_date)
+                
+                # 更新收益和回撤
+                self._update_returns(current_price)
+                self._update_drawdown()
+                
+                # 记录持仓
+                self.positions.iloc[i] = self.current_position
+            
+            # 计算回测指标
+            metrics = self._calculate_metrics()
+            
+            return {
+                'positions': self.positions,
+                'returns': self.returns,
+                'equity': self.equity,
+                'drawdown': self.drawdown,
+                'trades': self.trades,
+                'metrics': metrics
+            }
+            
+        except Exception as e:
+            self.logger.error(f"运行回测时出错: {str(e)}")
+            raise
         
+    def _prepare_data(self, df: pd.DataFrame, start_date: Optional[str] = None, end_date: Optional[str] = None) -> pd.DataFrame:
+        """准备回测数据"""
+        try:
             # 确保数据按时间排序
             df = df.sort_index()
             
@@ -170,6 +198,13 @@ class BacktestEngine:
             
             # 只保留需要的列
             df = df[required_columns]
+            
+            # 如果提供了日期范围，则进行过滤
+            if start_date and end_date:
+                start_ts = pd.Timestamp(start_date)
+                end_ts = pd.Timestamp(end_date)
+                df = df[df.index >= start_ts]
+                df = df[df.index <= end_ts]
             
             return df
             
@@ -375,3 +410,143 @@ class BacktestEngine:
         except Exception as e:
             self.logger.error(f"计算回测结果时出错: {str(e)}")
             raise 
+
+    def _open_long_position(self, price, date):
+        """开多仓"""
+        # 计算可用资金
+        available_capital = self.equity.iloc[-1] * self.position_size
+        
+        # 计算可买入数量
+        quantity = available_capital / price
+        quantity = min(quantity, self.max_position)
+        
+        # 计算手续费
+        commission = price * quantity * self.commission_rate
+        
+        # 更新持仓
+        self.current_position = quantity
+        self.entry_price = price
+        self.entry_date = date
+        
+        # 记录交易
+        self.trades.append({
+            'date': date,
+            'type': 'LONG',
+            'price': price,
+            'quantity': quantity,
+            'commission': commission
+        })
+
+    def _open_short_position(self, price, date):
+        """开空仓"""
+        # 计算可用资金
+        available_capital = self.equity.iloc[-1] * self.position_size
+        
+        # 计算可卖出数量
+        quantity = available_capital / price
+        quantity = min(quantity, self.max_position)
+        
+        # 计算手续费
+        commission = price * quantity * self.commission_rate
+        
+        # 更新持仓
+        self.current_position = -quantity
+        self.entry_price = price
+        self.entry_date = date
+        
+        # 记录交易
+        self.trades.append({
+            'date': date,
+            'type': 'SHORT',
+            'price': price,
+            'quantity': quantity,
+            'commission': commission
+        })
+
+    def _close_position(self, price, date):
+        """平仓"""
+        if self.current_position == 0:
+            return
+        
+        # 计算手续费
+        commission = abs(self.current_position) * price * self.commission_rate
+        
+        # 计算收益
+        if self.current_position > 0:
+            profit = (price - self.entry_price) * self.current_position
+        else:
+            profit = (self.entry_price - price) * abs(self.current_position)
+        
+        # 记录交易
+        self.trades.append({
+            'date': date,
+            'type': 'CLOSE',
+            'price': price,
+            'quantity': abs(self.current_position),
+            'commission': commission,
+            'profit': profit
+        })
+        
+        # 更新持仓
+        self.current_position = 0.0
+        self.entry_price = 0.0
+        self.entry_date = None
+
+    def _update_returns(self, price):
+        """更新收益"""
+        if self.current_position == 0:
+            return
+        
+        # 计算当日收益
+        if self.current_position > 0:
+            daily_return = (price - self.entry_price) / self.entry_price
+        else:
+            daily_return = (self.entry_price - price) / self.entry_price
+        
+        # 更新收益序列
+        self.returns.iloc[-1] = daily_return
+        
+        # 更新权益
+        self.equity.iloc[-1] = self.equity.iloc[-2] * (1 + daily_return)
+
+    def _update_drawdown(self):
+        """更新回撤"""
+        # 计算当前权益相对于历史最高点的回撤
+        rolling_max = self.equity.expanding().max()
+        self.drawdown = (rolling_max - self.equity) / rolling_max
+
+    def _calculate_metrics(self):
+        """计算回测指标"""
+        try:
+            # 计算年化收益率
+            total_days = (self.equity.index[-1] - self.equity.index[0]).days
+            total_return = (self.equity.iloc[-1] / self.equity.iloc[0]) - 1
+            annual_return = (1 + total_return) ** (365 / total_days) - 1
+            
+            # 计算夏普比率
+            daily_returns = self.returns[self.returns != 0]
+            if len(daily_returns) > 0:
+                sharpe_ratio = np.sqrt(252) * daily_returns.mean() / daily_returns.std()
+            else:
+                sharpe_ratio = 0
+            
+            # 计算最大回撤
+            max_drawdown = self.drawdown.max()
+            
+            # 计算胜率
+            profitable_trades = len([t for t in self.trades if t.get('profit', 0) > 0])
+            total_trades = len(self.trades)
+            win_rate = profitable_trades / total_trades if total_trades > 0 else 0
+            
+            return {
+                'total_return': total_return,
+                'annual_return': annual_return,
+                'sharpe_ratio': sharpe_ratio,
+                'max_drawdown': max_drawdown,
+                'win_rate': win_rate,
+                'total_trades': total_trades
+            }
+            
+        except Exception as e:
+            self.logger.error(f"计算回测指标时出错: {str(e)}")
+            return {} 

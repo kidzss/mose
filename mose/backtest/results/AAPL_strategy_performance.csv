@@ -1,7 +1,0 @@
-,strategy,state,sharpe,mean_return,std_return,n_trades
-0,BollingerBandsStrategy,ranging,0.0,-0.0008550261556170677,0.0001728252194204306,93380
-1,BollingerBandsStrategy,breakout,0.0,-0.002189690016770693,0.001771186919135777,214136
-2,TDIStrategy,ranging,0.0,0.0,0.0,93380
-3,TDIStrategy,breakout,0.0,0.0,0.0,214136
-4,MomentumStrategy,ranging,0.0,0.0004112433534444926,0.0004375558146385613,93380
-5,MomentumStrategy,breakout,0.0,0.002096345165799908,0.004751986501302973,214136

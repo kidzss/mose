@@ -1,0 +1,20 @@
+{
+    "log_level": "INFO",
+    "log_file": "market_monitor.log",
+    "check_interval": 60,
+    "update_interval": 60,
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 0,
+        "password": null
+    },
+    "backtest": {
+        "initial_capital": 100000,
+        "commission": 0.001,
+        "slippage": 0.001,
+        "symbols": ["GOOG", "TSLA", "AMD", "NVDA"],
+        "start_date": "2023-04-14",
+        "end_date": "2024-04-14"
+    }
+} 

@@ -35,162 +35,182 @@ class Strategy(ABC):
     5. 市场环境分析与调整
     """
 
-    def __init__(self, name: str, parameters: Optional[Dict[str, Any]] = None):
+    def __init__(self, name: str, parameters: Dict[str, Any]):
         """
         初始化策略
         
-        参数:
+        Args:
             name: 策略名称
-            parameters: 策略参数字典
+            parameters: 策略参数
         """
         self.name = name
-        self.parameters = parameters or {}
-        self.version = '1.0.0'
-        
-        # 设置日志记录器
+        self.parameters = parameters
         self.logger = logging.getLogger(f"strategy.{name}")
-        if not self.logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
-    
-    @abstractmethod
-    def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        计算策略所需的技术指标
         
-        参数:
-            data: 原始OHLCV数据
+    @abstractmethod
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """计算技术指标"""
+        pass
+        
+    @abstractmethod
+    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
+        """生成交易信号"""
+        pass
+        
+    def get_stop_loss(self, price: float, position: int, market_regime: str) -> float:
+        """
+        计算止损价格
+        
+        Args:
+            price: 当前价格
+            position: 持仓方向 (1: 多头, -1: 空头)
+            market_regime: 市场环境
             
-        返回:
-            添加了技术指标的DataFrame
+        Returns:
+            float: 止损价格
         """
-        pass
-    
-    @abstractmethod
-    def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        生成交易信号
-        
-        参数:
-            data: 包含OHLCV数据的DataFrame
+        if market_regime == 'bullish':
+            stop_loss_pct = 0.02  # 牛市止损更宽松
+        elif market_regime == 'bearish':
+            stop_loss_pct = 0.01  # 熊市止损更严格
+        else:
+            stop_loss_pct = 0.015  # 中性市场
             
-        返回:
-            添加了'signal'列的DataFrame，其中:
-            1 = 买入信号
-            0 = 持有/无信号
-            -1 = 卖出信号
-        """
-        pass
-    
-    @abstractmethod
-    def extract_signal_components(self, data: pd.DataFrame) -> Dict[str, pd.Series]:
-        """
-        提取并标准化策略的核心信号组件
-        
-        参数:
-            data: 包含OHLCV和技术指标的DataFrame
+        if position == 1:  # 多头
+            return price * (1 - stop_loss_pct)
+        else:  # 空头
+            return price * (1 + stop_loss_pct)
             
-        返回:
-            字典，包含标准化后的信号组件
+    def get_take_profit(self, price: float, position: int, market_regime: str) -> float:
         """
-        pass
-    
-    @abstractmethod
-    def get_signal_metadata(self) -> Dict[str, Dict[str, Any]]:
-        """
-        获取信号组件的元数据
+        计算止盈价格
         
-        返回:
-            字典，包含每个信号组件的元数据
+        Args:
+            price: 当前价格
+            position: 持仓方向 (1: 多头, -1: 空头)
+            market_regime: 市场环境
+            
+        Returns:
+            float: 止盈价格
         """
-        pass
-    
-    def update_parameters(self, new_parameters: Dict[str, Any]) -> None:
+        if market_regime == 'bullish':
+            take_profit_pct = 0.04  # 牛市止盈更高
+        elif market_regime == 'bearish':
+            take_profit_pct = 0.02  # 熊市止盈更低
+        else:
+            take_profit_pct = 0.03  # 中性市场
+            
+        if position == 1:  # 多头
+            return price * (1 + take_profit_pct)
+        else:  # 空头
+            return price * (1 - take_profit_pct)
+            
+    def analyze_market_regime(self, df: pd.DataFrame) -> str:
         """
-        更新策略参数
+        分析市场环境
         
-        参数:
-            new_parameters: 新的参数字典
+        Args:
+            df: 包含技术指标的数据框
+            
+        Returns:
+            str: 市场环境 ('bullish', 'bearish', 'neutral')
         """
-        self.parameters.update(new_parameters)
-        self.logger.info(f"更新策略参数: {new_parameters}")
-    
-    def optimize_parameters(self, data: pd.DataFrame, param_grid: Dict[str, List[Any]], 
-                           metric: str = 'sharpe_ratio') -> Dict[str, Any]:
+        # 计算趋势指标
+        ma_20 = df['close'].rolling(window=20).mean()
+        ma_50 = df['close'].rolling(window=50).mean()
+        
+        # 计算波动率
+        volatility = df['close'].pct_change().rolling(window=20).std()
+        
+        # 判断市场环境
+        if ma_20.iloc[-1] > ma_50.iloc[-1] and volatility.iloc[-1] < volatility.quantile(0.7):
+            return 'bullish'
+        elif ma_20.iloc[-1] < ma_50.iloc[-1] and volatility.iloc[-1] > volatility.quantile(0.3):
+            return 'bearish'
+        else:
+            return 'neutral'
+            
+    def optimize_parameters(self, 
+                          df: pd.DataFrame,
+                          param_grid: Dict[str, List[Any]],
+                          metric: str = 'sharpe_ratio',
+                          n_iter: int = 10) -> Dict[str, Any]:
         """
         优化策略参数
         
-        参数:
-            data: 历史价格数据
-            param_grid: 参数网格，包含要测试的参数值列表
-            metric: 优化目标指标，默认为夏普比率
+        Args:
+            df: 历史数据
+            param_grid: 参数网格
+            metric: 优化指标
+            n_iter: 迭代次数
             
-        返回:
-            优化后的参数字典
+        Returns:
+            Dict[str, Any]: 优化后的参数
         """
-        self.logger.info(f"开始参数优化，优化指标: {metric}")
+        best_params = {}
+        best_score = float('-inf')
         
-        # 导入必要的库
-        from itertools import product
-        
-        # 生成参数组合
-        param_names = list(param_grid.keys())
-        param_values = list(param_grid.values())
-        combinations = list(product(*param_values))
-        
-        best_score = -float('inf')
-        best_params = None
-        
-        # 遍历所有参数组合
-        for combo in combinations:
-            # 创建参数字典
-            params = {name: value for name, value in zip(param_names, combo)}
+        for _ in range(n_iter):
+            # 随机选择参数组合
+            params = {k: np.random.choice(v) for k, v in param_grid.items()}
             
             # 更新策略参数
             self.update_parameters(params)
             
-            # 生成信号
-            result = self.generate_signals(data)
+            # 计算策略表现
+            df = self.calculate_indicators(df)
+            df = self.generate_signals(df)
             
-            # 计算绩效（简化版，实际应实现完整的回测）
+            # 计算收益率
+            df['position'] = df['signal'].shift(1).fillna(0)  # 使用前一天的信号作为今天的持仓
+            df['returns'] = df['position'] * df['close'].pct_change()
+            
+            # 计算优化指标
             if metric == 'sharpe_ratio':
-                # 计算每日收益率（假设简单的买入持有策略）
-                result['returns'] = result['close'].pct_change() * result['signal'].shift(1)
-                
-                # 计算夏普比率
-                annual_factor = 252  # 假设交易日为252天
-                mean_return = result['returns'].mean()
-                std_return = result['returns'].std()
-                if std_return > 0:
-                    score = np.sqrt(annual_factor) * mean_return / std_return
+                returns = df['returns'].mean()
+                volatility = df['returns'].std()
+                if volatility > 0:
+                    score = returns / volatility * np.sqrt(252)  # 年化夏普比率
                 else:
-                    score = 0
+                    score = float('-inf')
+            elif metric == 'max_drawdown':
+                cum_returns = (1 + df['returns']).cumprod()
+                rolling_max = cum_returns.expanding().max()
+                drawdown = (cum_returns - rolling_max) / rolling_max
+                score = -drawdown.min()  # 负号因为我们要最小化最大回撤
             else:
-                # 如果实现了其他指标，可以在此处添加
-                score = 0
+                raise ValueError(f"Unsupported metric: {metric}")
                 
             # 更新最佳参数
             if score > best_score:
                 best_score = score
-                best_params = params
+                best_params = params.copy()
                 
-            self.logger.debug(f"参数: {params}, 得分: {score}")
-        
-        # 设置为最佳参数
-        if best_params:
-            self.update_parameters(best_params)
-            self.logger.info(f"优化完成，最佳参数: {best_params}, 得分: {best_score}")
-        else:
-            self.logger.warning("优化未能找到更好的参数")
-            
+        self.logger.info(f"Best parameters found: {best_params} with score: {best_score}")
         return best_params
-    
-    def __str__(self) -> str:
-        """返回策略的字符串表示"""
-        return f"{self.name} (v{self.version}) - 参数: {self.parameters}"
+        
+    def update_parameters(self, params: Dict[str, Any]):
+        """
+        更新策略参数
+        
+        Args:
+            params: 新的参数值
+        """
+        self.parameters.update(params)
+        self.logger.info(f"Updated parameters: {params}")
+        
+    def get_strategy_info(self) -> Dict[str, Any]:
+        """
+        获取策略信息
+        
+        Returns:
+            Dict[str, Any]: 策略信息
+        """
+        return {
+            'name': self.name,
+            'parameters': self.parameters,
+            'description': self.__doc__
+        }
 
     def get_market_regime(self, data: pd.DataFrame) -> MarketRegime:
         """
@@ -343,76 +363,6 @@ class Strategy(ABC):
         # 默认返回基础仓位
         return base_position
 
-    def get_stop_loss(self, data: pd.DataFrame, entry_price: float, position: int) -> float:
-        """
-        计算止损价格
-        
-        参数:
-            data: 市场数据
-            entry_price: 入场价格
-            position: 仓位方向(1=多, -1=空)
-            
-        返回:
-            止损价格
-        """
-        # 获取市场环境
-        regime = self.get_market_regime(data)
-        
-        # 基础止损比例
-        base_stop_pct = 0.05  # 5%止损
-        
-        # 根据市场环境调整止损比例
-        if regime == MarketRegime.VOLATILE:
-            # 高波动环境，扩大止损范围
-            stop_pct = base_stop_pct * 1.5
-        elif regime == MarketRegime.LOW_VOLATILITY:
-            # 低波动环境，缩小止损范围
-            stop_pct = base_stop_pct * 0.8
-        else:
-            stop_pct = base_stop_pct
-        
-        # 计算止损价格
-        if position > 0:  # 多头
-            return entry_price * (1 - stop_pct)
-        elif position < 0:  # 空头
-            return entry_price * (1 + stop_pct)
-        return 0.0
-
-    def get_take_profit(self, data: pd.DataFrame, entry_price: float, position: int) -> float:
-        """
-        计算止盈价格
-        
-        参数:
-            data: 市场数据
-            entry_price: 入场价格
-            position: 仓位方向(1=多, -1=空)
-            
-        返回:
-            止盈价格
-        """
-        # 获取市场环境
-        regime = self.get_market_regime(data)
-        
-        # 基础止盈比例
-        base_tp_pct = 0.10  # 10%止盈
-        
-        # 根据市场环境调整止盈比例
-        if regime == MarketRegime.BULLISH and position > 0:
-            # 牛市多头，扩大止盈目标
-            tp_pct = base_tp_pct * 1.5
-        elif regime == MarketRegime.BEARISH and position < 0:
-            # 熊市空头，扩大止盈目标
-            tp_pct = base_tp_pct * 1.5
-        else:
-            tp_pct = base_tp_pct
-        
-        # 计算止盈价格
-        if position > 0:  # 多头
-            return entry_price * (1 + tp_pct)
-        elif position < 0:  # 空头
-            return entry_price * (1 - tp_pct)
-        return 0.0
-
     def should_adjust_stop_loss(self, data: pd.DataFrame, current_price: float,
                                 stop_loss: float, position: int) -> float:
         """
@@ -429,20 +379,6 @@ class Strategy(ABC):
         """
         # 默认实现 - 不调整止损
         return stop_loss
-
-    def get_strategy_info(self) -> Dict[str, Any]:
-        """
-        获取策略信息
-        
-        返回:
-            包含策略信息的字典
-        """
-        return {
-            'name': self.name,
-            'parameters': self.parameters,
-            'description': self.__doc__ or "无描述",
-            'version': getattr(self, 'version', '1.0.0')
-        }
 
     def analyze(self, data: Union[pd.DataFrame, pd.Series], market_state: Dict[str, Any] = None) -> Dict[str, Any]:
         """

@@ -8,126 +8,141 @@ import json
 import os
 import time
 import random
+import pickle
 
 logger = logging.getLogger(__name__)
 
 class MarketSentimentData:
-    def __init__(self, cache_dir: str = 'data/cache'):
-        self.vix_data = None
-        self.put_call_ratio_data = None
-        self.last_update = None
-        self.cache_dir = cache_dir
-        self.historical_data = {}
-        self.retry_delay = 5  # seconds
-        self.max_retries = 3
+    """市场情绪数据类"""
+    
+    def __init__(self):
+        """初始化市场情绪数据类"""
+        self.cache_file = 'data/market_sentiment_cache.pkl'
+        self._ensure_cache_dir()
+        self._load_or_generate_data()
         
-        # 创建缓存目录
-        os.makedirs(cache_dir, exist_ok=True)
+    def _ensure_cache_dir(self):
+        """确保缓存目录存在"""
+        os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
         
-        # 加载历史数据
-        self._load_historical_data()
-        
-    def _load_historical_data(self):
-        """加载历史数据"""
+    def _load_or_generate_data(self):
+        """加载或生成数据"""
         try:
-            vix_file = os.path.join(self.cache_dir, 'vix_history.json')
-            pcr_file = os.path.join(self.cache_dir, 'pcr_history.json')
-            
-            if os.path.exists(vix_file):
-                with open(vix_file, 'r') as f:
-                    self.historical_data['vix'] = json.load(f)
-                    
-            if os.path.exists(pcr_file):
-                with open(pcr_file, 'r') as f:
-                    self.historical_data['pcr'] = json.load(f)
-                    
+            if os.path.exists(self.cache_file):
+                with open(self.cache_file, 'rb') as f:
+                    self.data = pickle.load(f)
+            else:
+                self.data = self._generate_simulated_data()
+                self._save_data()
         except Exception as e:
-            logger.error(f"Error loading historical data: {str(e)}")
+            logger.error(f"加载/生成数据失败: {str(e)}")
+            self.data = self._generate_simulated_data()
             
-    def _save_historical_data(self):
-        """保存历史数据"""
+    def _save_data(self):
+        """保存数据到缓存文件"""
         try:
-            vix_file = os.path.join(self.cache_dir, 'vix_history.json')
-            pcr_file = os.path.join(self.cache_dir, 'pcr_history.json')
-            
-            if 'vix' in self.historical_data:
-                with open(vix_file, 'w') as f:
-                    json.dump(self.historical_data['vix'], f)
-                    
-            if 'pcr' in self.historical_data:
-                with open(pcr_file, 'w') as f:
-                    json.dump(self.historical_data['pcr'], f)
-                    
+            with open(self.cache_file, 'wb') as f:
+                pickle.dump(self.data, f)
         except Exception as e:
-            logger.error(f"Error saving historical data: {str(e)}")
+            logger.error(f"保存数据失败: {str(e)}")
             
-    def _fetch_with_retry(self, url: str) -> dict:
-        """Fetch data with retry logic and rate limiting"""
-        for attempt in range(self.max_retries):
-            try:
-                response = requests.get(url)
-                if response.status_code == 200:
-                    return response.json()
-                elif response.status_code == 429:  # Too Many Requests
-                    wait_time = self.retry_delay * (2 ** attempt)  # Exponential backoff
-                    logger.warning(f"Rate limited. Waiting {wait_time} seconds before retry...")
-                    time.sleep(wait_time)
-                else:
-                    logger.warning(f"Failed to fetch data: {response.status_code}")
-                    return None
-            except Exception as e:
-                logger.warning(f"Error fetching data: {str(e)}")
-                if attempt < self.max_retries - 1:
-                    time.sleep(self.retry_delay)
-                else:
-                    return None
-        return None
+    def _generate_simulated_data(self, start_date='2024-01-01', end_date='2024-12-31'):
+        """生成模拟的市场情绪数据"""
+        dates = pd.date_range(start=start_date, end=end_date, freq='D')
+        np.random.seed(42)  # 固定随机种子以确保可重复性
         
-    def update_data(self):
-        """Update market sentiment data"""
+        # 生成VIX数据（基于日期生成，确保每天的值是固定的）
+        vix_values = []
+        for date in dates:
+            np.random.seed(date.toordinal())  # 使用日期作为随机种子
+            vix = np.random.normal(20, 5)  # 均值20，标准差5
+            vix = max(10, min(40, vix))  # 限制在10-40之间
+            vix_values.append(vix)
+            
+        # 生成PCR数据（基于日期生成，确保每天的值是固定的）
+        pcr_values = []
+        for date in dates:
+            np.random.seed(date.toordinal() + 1000)  # 使用不同的种子
+            pcr = np.random.normal(1.0, 0.2)  # 均值1.0，标准差0.2
+            pcr = max(0.5, min(1.5, pcr))  # 限制在0.5-1.5之间
+            pcr_values.append(pcr)
+            
+        # 创建DataFrame
+        df = pd.DataFrame({
+            'date': dates,
+            'vix': vix_values,
+            'pcr': pcr_values
+        })
+        
+        # 计算市场情绪
+        df['sentiment'] = 'neutral'
+        df.loc[(df['vix'] < 15) & (df['pcr'] < 0.8), 'sentiment'] = 'bullish'
+        df.loc[(df['vix'] > 25) & (df['pcr'] > 1.2), 'sentiment'] = 'bearish'
+        
+        return df
+        
+    def get_historical_sentiment(self, start_date, end_date):
+        """获取历史市场情绪数据"""
         try:
-            # Fetch VIX data
-            vix_url = "https://cdn.cboe.com/api/global/delayed_quotes/indices/VIX.json"
-            vix_response = self._fetch_with_retry(vix_url)
-            if vix_response:
-                self.vix_data = vix_response.get('data', {}).get('last', 0)
-                
-            # Fetch Put/Call Ratio data
-            pcr_url = "https://cdn.cboe.com/api/global/delayed_quotes/indices/PCR.json"
-            pcr_response = self._fetch_with_retry(pcr_url)
-            if pcr_response:
-                self.put_call_ratio_data = pcr_response.get('data', {}).get('last', 0)
-                
-            self.last_update = datetime.now()
-            self._save_historical_data()
-            logger.info("Market sentiment data updated successfully")
-            
+            mask = (self.data['date'] >= pd.Timestamp(start_date)) & \
+                   (self.data['date'] <= pd.Timestamp(end_date))
+            return self.data[mask].copy()
         except Exception as e:
-            logger.error(f"Error updating market sentiment data: {str(e)}")
+            logger.error(f"获取历史情绪数据失败: {str(e)}")
+            return pd.DataFrame()
             
+    def get_current_sentiment(self):
+        """获取当前市场情绪数据"""
+        try:
+            # 获取今天的日期
+            today = pd.Timestamp.now().normalize()
+            
+            # 如果今天的数据不存在，生成新的数据
+            if today not in self.data['date'].values:
+                new_data = self._generate_simulated_data(
+                    start_date=today.strftime('%Y-%m-%d'),
+                    end_date=today.strftime('%Y-%m-%d')
+                )
+                self.data = pd.concat([self.data, new_data], ignore_index=True)
+                self._save_data()
+            
+            # 返回今天的数据
+            return self.data[self.data['date'] == today].iloc[0].to_dict()
+        except Exception as e:
+            logger.error(f"获取当前情绪数据失败: {str(e)}")
+            return None
+
     def get_vix(self, date: str) -> float:
         """获取指定日期的VIX值"""
         # 检查历史数据
-        if 'vix' in self.historical_data and date in self.historical_data['vix']:
-            return self.historical_data['vix'][date]
+        if 'vix' in self.data and date in self.data['date'].dt.strftime('%Y-%m-%d').values:
+            return self.data[self.data['date'].dt.strftime('%Y-%m-%d') == date]['vix'].values[0]
             
-        # 检查是否需要更新数据
-        if not self.vix_data or (datetime.now() - self.last_update).days > 0:
-            self.update_data()
-            
-        return self.vix_data if self.vix_data else 20.0  # 默认值
+        # 生成模拟数据
+        vix, _ = self._generate_simulated_data(date)
+        
+        # 更新历史数据
+        if 'vix' not in self.data:
+            self.data['vix'] = []
+        self.data['vix'].append(vix)
+        
+        return vix
         
     def get_put_call_ratio(self, date: str) -> float:
         """获取指定日期的Put/Call Ratio值"""
         # 检查历史数据
-        if 'pcr' in self.historical_data and date in self.historical_data['pcr']:
-            return self.historical_data['pcr'][date]
+        if 'pcr' in self.data and date in self.data['date'].dt.strftime('%Y-%m-%d').values:
+            return self.data[self.data['date'].dt.strftime('%Y-%m-%d') == date]['pcr'].values[0]
             
-        # 检查是否需要更新数据
-        if not self.put_call_ratio_data or (datetime.now() - self.last_update).days > 0:
-            self.update_data()
-            
-        return self.put_call_ratio_data if self.put_call_ratio_data else 1.0  # 默认值
+        # 生成模拟数据
+        _, pcr = self._generate_simulated_data(date)
+        
+        # 更新历史数据
+        if 'pcr' not in self.data:
+            self.data['pcr'] = []
+        self.data['pcr'].append(pcr)
+        
+        return pcr
         
     def get_sentiment(self, date: str) -> str:
         """获取市场情绪"""
