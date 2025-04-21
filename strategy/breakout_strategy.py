@@ -13,7 +13,13 @@ class BreakoutStrategy(Strategy):
                  breakout_threshold=0.02, # 突破阈值
                  volume_threshold=1.5,   # 成交量阈值
                  confirmation_period=3): # 确认周期
-        super().__init__(name="Breakout")
+        parameters = {
+            'lookback_period': lookback_period,
+            'breakout_threshold': breakout_threshold,
+            'volume_threshold': volume_threshold,
+            'confirmation_period': confirmation_period
+        }
+        super().__init__("Breakout", parameters)
         self.lookback_period = lookback_period
         self.breakout_threshold = breakout_threshold
         self.volume_threshold = volume_threshold

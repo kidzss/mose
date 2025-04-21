@@ -10,8 +10,6 @@ class TrendFollowingStrategy(Strategy):
     """
     
     def __init__(self, params: Dict[str, Any] = None):
-        super().__init__(params)
-        
         # 默认参数
         self.default_params = {
             # 趋势确认参数
@@ -39,6 +37,9 @@ class TrendFollowingStrategy(Strategy):
         if params:
             self.default_params.update(params)
             
+        # 调用父类构造函数
+        super().__init__("TrendFollowing", self.default_params)
+        
         # 初始化状态变量
         self.current_position = 0
         self.current_losing_streak = 0

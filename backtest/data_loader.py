@@ -24,7 +24,7 @@ class DataLoader:
         symbol: str,
         start_date: datetime,
         end_date: datetime = None,
-        adjust: bool = True
+        adjust: bool = False
     ) -> pd.DataFrame:
         """
         加载股票数据
@@ -33,27 +33,27 @@ class DataLoader:
             symbol: 股票代码
             start_date: 开始日期
             end_date: 结束日期（默认为当前日期）
-            adjust: 是否使用复权价格
+            adjust: 是否使用复权价格（默认为False，因为AdjClose数据可能不可用）
         """
         try:
             # 构建查询
             query = f"""
             SELECT 
-                Date, Open, High, Low, 
-                {'AdjClose' if adjust else 'Close'} as Close,
-                Volume 
-            FROM stock_time_code 
-            WHERE Code = '{symbol}'
-                AND Date >= '{start_date.strftime('%Y-%m-%d')}'
+                date, open, high, low, 
+                {'adjclose' if adjust else 'close'} as close,
+                volume 
+            FROM stock_code_time 
+            WHERE code = '{symbol}'
+                AND date >= '{start_date.strftime('%Y-%m-%d')}'
             """
             
             if end_date:
-                query += f" AND Date <= '{end_date.strftime('%Y-%m-%d')}'"
+                query += f" AND date <= '{end_date.strftime('%Y-%m-%d')}'"
                 
-            query += " ORDER BY Date"
+            query += " ORDER BY date"
             
             # 读取数据
-            df = pd.read_sql(query, self.engine, index_col='Date', parse_dates=['Date'])
+            df = pd.read_sql(query, self.engine, index_col='date', parse_dates=['date'])
             
             if df.empty:
                 self.logger.warning(f"未找到股票 {symbol} 的数据")
@@ -86,22 +86,22 @@ class DataLoader:
             # 构建查询
             query = f"""
             SELECT 
-                Date, Open, High, Low, 
-                AdjClose as Close,
-                Volume 
-            FROM stock_time_code 
-            WHERE Code = '{benchmark_symbol}'
+                date, open, high, low, 
+                close,  # 使用普通收盘价
+                volume 
+            FROM stock_code_time 
+            WHERE code = '{benchmark_symbol}'
             """
             
             if start_date:
-                query += f" AND Date >= '{start_date.strftime('%Y-%m-%d')}'"
+                query += f" AND date >= '{start_date.strftime('%Y-%m-%d')}'"
             if end_date:
-                query += f" AND Date <= '{end_date.strftime('%Y-%m-%d')}'"
+                query += f" AND date <= '{end_date.strftime('%Y-%m-%d')}'"
                 
-            query += " ORDER BY Date"
+            query += " ORDER BY date"
             
             # 读取数据
-            df = pd.read_sql(query, self.engine, index_col='Date', parse_dates=['Date'])
+            df = pd.read_sql(query, self.engine, index_col='date', parse_dates=['date'])
             
             if df.empty:
                 self.logger.warning(f"未找到基准 {benchmark_symbol} 的数据")

@@ -53,7 +53,7 @@ class CPGWStrategy(Strategy):
         df = df.copy()
         
         # Calculate RSI
-        delta = df['close'].diff()
+        delta = df['Close'].diff()
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
         
@@ -64,17 +64,17 @@ class CPGWStrategy(Strategy):
         df['rsi'] = 100 - (100 / (1 + rs))
         
         # Calculate moving averages
-        df['fast_ma'] = df['close'].rolling(window=self.fast_ma).mean()
-        df['slow_ma'] = df['close'].rolling(window=self.slow_ma).mean()
+        df['fast_ma'] = df['Close'].rolling(window=self.fast_ma).mean()
+        df['slow_ma'] = df['Close'].rolling(window=self.slow_ma).mean()
         
         # Calculate MA crossover
         df['ma_cross'] = np.where(df['fast_ma'] > df['slow_ma'], 1, -1)
         
         # Calculate price momentum
-        df['momentum'] = df['close'].pct_change(periods=5)
+        df['momentum'] = df['Close'].pct_change(periods=5)
         
         # Calculate volatility
-        df['volatility'] = df['close'].pct_change().rolling(window=20).std()
+        df['volatility'] = df['Close'].pct_change().rolling(window=20).std()
         
         return df
     
@@ -86,15 +86,11 @@ class CPGWStrategy(Strategy):
         # Initialize signal column
         df['signal'] = 0
         
-        # 获取市场环境
-        market_regime = self.get_market_regime(df)
-        volatility_regime = self.get_volatility_regime(df)
-        
-        # Generate signals based on RSI, MA crossover, and momentum
+        # Generate base signals
         for i in range(1, len(df)):
             # 趋势判断
-            trend_up = df['close'].iloc[i-1] > df['fast_ma'].iloc[i-1] > df['slow_ma'].iloc[i-1]
-            trend_down = df['close'].iloc[i-1] < df['fast_ma'].iloc[i-1] < df['slow_ma'].iloc[i-1]
+            trend_up = df['Close'].iloc[i-1] > df['fast_ma'].iloc[i-1] > df['slow_ma'].iloc[i-1]
+            trend_down = df['Close'].iloc[i-1] < df['fast_ma'].iloc[i-1] < df['slow_ma'].iloc[i-1]
             
             # Buy signal conditions
             buy_condition1 = df['rsi'].iloc[i-1] < self.oversold  # RSI oversold
@@ -106,106 +102,57 @@ class CPGWStrategy(Strategy):
             sell_condition2 = df['ma_cross'].iloc[i-1] == -1  # MA crossover bearish
             sell_condition3 = df['momentum'].iloc[i-1] < 0  # Negative momentum
             
-            # 根据市场环境调整信号强度
-            signal_strength = 1.0
-            if market_regime == MarketRegime.BULLISH:
-                signal_strength *= 1.5
-            elif market_regime == MarketRegime.BEARISH:
-                signal_strength *= 0.5
-                
-            if volatility_regime.iloc[i] == 'high':
-                signal_strength *= 0.7
-            elif volatility_regime.iloc[i] == 'low':
-                signal_strength *= 1.3
-            
             # Generate signals
             if trend_up and ((buy_condition1 and buy_condition2) or (buy_condition1 and buy_condition3) or (buy_condition2 and buy_condition3)):
-                df.loc[df.index[i], 'signal'] = signal_strength  # Buy signal
+                df.loc[df.index[i], 'signal'] = 1  # Buy signal
             elif trend_down and ((sell_condition1 and sell_condition2) or (sell_condition1 and sell_condition3) or (sell_condition2 and sell_condition3)):
-                df.loc[df.index[i], 'signal'] = -signal_strength  # Sell signal
+                df.loc[df.index[i], 'signal'] = -1  # Sell signal
+        
+        # 使用基类的市场环境调整方法
+        if self.use_market_regime:
+            df = self.adjust_for_market_regime(df, df)
         
         return df
     
     def get_position_size(self, df: pd.DataFrame, current_price: float) -> float:
         """根据市场环境和信号强度动态调整仓位大小"""
-        # 获取当前市场环境
-        market_regime = self.get_market_regime(df)
-        volatility_regime = self.get_volatility_regime(df).iloc[-1]
-        
-        # 基础仓位大小
-        base_position = 0.1
-        
-        # 根据市场环境调整仓位
-        if market_regime == MarketRegime.BULLISH:
-            base_position *= 1.5
-        elif market_regime == MarketRegime.BEARISH:
-            base_position *= 0.5
-            
-        # 根据波动率调整仓位
-        if volatility_regime == 'high':
-            base_position *= 0.7
-        elif volatility_regime == 'low':
-            base_position *= 1.3
-            
-        return base_position
+        # 使用基类的position_size方法
+        signal = df['signal'].iloc[-1] if 'signal' in df.columns else 0
+        return super().get_position_size(df, signal)
     
     def get_stop_loss(self, df: pd.DataFrame, entry_price: float, position: str) -> float:
         """根据市场环境动态调整止损价格"""
-        # 获取当前市场环境
+        # 使用基类的stop_loss方法
+        pos = 1 if position == 'long' else -1
         market_regime = self.get_market_regime(df)
-        volatility_regime = self.get_volatility_regime(df).iloc[-1]
-        
-        # 基础止损比例
-        base_stop_loss = 0.03
-        
-        # 根据市场环境调整止损
-        if market_regime == MarketRegime.BULLISH:
-            base_stop_loss *= 1.2
-        elif market_regime == MarketRegime.BEARISH:
-            base_stop_loss *= 0.8
-            
-        # 根据波动率调整止损
-        if volatility_regime == 'high':
-            base_stop_loss *= 1.2
-        elif volatility_regime == 'low':
-            base_stop_loss *= 0.8
-            
-        # 计算止损价格
-        if position == 'long':
-            stop_loss_price = entry_price * (1 - base_stop_loss)
-        else:
-            stop_loss_price = entry_price * (1 + base_stop_loss)
-            
-        return stop_loss_price
+        return super().get_stop_loss(entry_price, pos, market_regime.value)
     
     def get_take_profit(self, df: pd.DataFrame, entry_price: float, position: str) -> float:
         """根据市场环境动态调整止盈价格"""
-        # 获取当前市场环境
+        # 使用基类的take_profit方法
+        pos = 1 if position == 'long' else -1
         market_regime = self.get_market_regime(df)
-        volatility_regime = self.get_volatility_regime(df).iloc[-1]
+        return super().get_take_profit(entry_price, pos, market_regime.value)
+    
+    def analyze(self, data: pd.DataFrame, market_state: Dict[str, Any] = None) -> Dict[str, Any]:
+        """分析市场状态并提供建议"""
+        # 使用基类的analyze方法
+        analysis_result = super().analyze(data, market_state)
         
-        # 基础止盈比例
-        base_take_profit = 0.1
+        # 添加策略特定的分析
+        signal_components = self.extract_signal_components(data)
+        score = self._calculate_score(signal_components)
+        market_regime = self.get_market_regime(data)
         
-        # 根据市场环境调整止盈
-        if market_regime == MarketRegime.BULLISH:
-            base_take_profit *= 1.2
-        elif market_regime == MarketRegime.BEARISH:
-            base_take_profit *= 0.8
-            
-        # 根据波动率调整止盈
-        if volatility_regime == 'high':
-            base_take_profit *= 1.2
-        elif volatility_regime == 'low':
-            base_take_profit *= 0.8
-            
-        # 计算止盈价格
-        if position == 'long':
-            take_profit_price = entry_price * (1 + base_take_profit)
-        else:
-            take_profit_price = entry_price * (1 - base_take_profit)
-            
-        return take_profit_price
+        analysis_result.update({
+            'rsi_state': 'oversold' if signal_components['rsi'].iloc[-1] < self.oversold else 'overbought' if signal_components['rsi'].iloc[-1] > self.overbought else 'neutral',
+            'ma_trend': 'bullish' if signal_components['ma_cross'].iloc[-1] > 0 else 'bearish',
+            'momentum_state': 'positive' if signal_components['momentum'].iloc[-1] > 0 else 'negative',
+            'strategy_score': score,
+            'market_regime': market_regime.value
+        })
+        
+        return analysis_result
     
     def extract_signal_components(self, df: pd.DataFrame) -> Dict[str, pd.Series]:
         """Extract individual components that make up the signal"""
@@ -248,35 +195,24 @@ class CPGWStrategy(Strategy):
                 "description": "5-period price momentum",
                 "weight": 0.2,
                 "normalization": "percentile",
-                "interpretation": "Positive values indicate upward momentum, negative values indicate downward momentum"
+                "interpretation": "Positive momentum supports trend continuation"
             }
         }
     
-    def update_trade_stats(self, trade_result):
-        """Update strategy's trade statistics"""
-        # Implement if needed
-        pass 
-    
     def get_volatility_regime(self, df: pd.DataFrame) -> pd.Series:
-        """
-        判断波动率环境
-        
-        Args:
-            df: 市场数据
+        """判断波动率状态"""
+        if 'volatility' not in df.columns:
+            df = self.calculate_indicators(df)
             
-        Returns:
-            pd.Series: 波动率环境 ('high', 'low', 'normal')
-        """
-        # 计算波动率
-        volatility = df['close'].pct_change().rolling(window=20).std() * np.sqrt(252)  # 年化波动率
-        
         # 计算波动率分位数
-        high_threshold = volatility.quantile(0.7)
-        low_threshold = volatility.quantile(0.3)
+        vol_percentile = df['volatility'].rolling(window=60).apply(
+            lambda x: pd.Series(x).rank(pct=True).iloc[-1]
+        )
         
-        # 判断波动率环境
-        volatility_regime = pd.Series(index=df.index, data='normal')
-        volatility_regime[volatility > high_threshold] = 'high'
-        volatility_regime[volatility < low_threshold] = 'low'
+        # 根据分位数判断波动率状态
+        volatility_regime = pd.Series(index=df.index, dtype=str)
+        volatility_regime[vol_percentile >= 0.7] = 'high'
+        volatility_regime[vol_percentile <= 0.3] = 'low'
+        volatility_regime[(vol_percentile > 0.3) & (vol_percentile < 0.7)] = 'normal'
         
         return volatility_regime 

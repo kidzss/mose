@@ -14,7 +14,14 @@ class IntradayMomentumStrategy(Strategy):
                  momentum_window=6,  # 动量计算窗口
                  volume_window=12,   # 成交量计算窗口
                  threshold=0.001):   # 动量阈值
-        super().__init__(name="IntradayMomentum")
+        parameters = {
+            'short_window': short_window,
+            'long_window': long_window,
+            'momentum_window': momentum_window,
+            'volume_window': volume_window,
+            'threshold': threshold
+        }
+        super().__init__(name="IntradayMomentum", parameters=parameters)
         self.short_window = short_window
         self.long_window = long_window
         self.momentum_window = momentum_window

@@ -1,16 +1,22 @@
+"""
+简单的组合策略回测测试
+"""
+import sys
+import os
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import logging
 import matplotlib.pyplot as plt
 from typing import Dict, Any
-import sys
-import os
 
-# 添加项目根目录到路径，确保能导入项目模块
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from strategy.combined_strategy import CombinedStrategy
+from backtest_engine import BacktestEngine
+from data_loader import DataLoader
+from utils.logger import setup_logger
 
 # 配置日志
 logging.basicConfig(
@@ -269,40 +275,50 @@ def plot_results(results: Dict[str, Any], save_path: str = None):
         logger.error(f"绘制结果时出错: {str(e)}")
         raise
 
-def main():
-    """
-    主函数
-    """
+def run_simple_test():
+    """运行简单的组合策略测试"""
     try:
-        # 生成测试数据
-        logger.info("生成测试数据...")
-        data = generate_test_data(days=365)  # 生成一年的测试数据
-        logger.info(f"测试数据生成完成，共 {len(data)} 条记录")
+        # 初始化数据加载器
+        data_loader = DataLoader()
         
-        # 创建策略实例
+        # 获取测试数据
+        test_data = data_loader.get_test_data()
+        if test_data.empty:
+            logger.error("No test data available")
+            return None
+            
+        # 创建组合策略实例
         strategy = CombinedStrategy()
         
+        # 创建回测引擎
+        engine = BacktestEngine(
+            initial_capital=1_000_000,
+            commission_rate=0.001,
+            slippage_rate=0.001
+        )
+        
         # 运行回测
-        logger.info("开始回测...")
-        results = run_backtest(data, strategy)
+        results = engine.run_backtest(
+            data=test_data,
+            strategy=strategy,
+            start_date='2024-01-01',
+            end_date='2024-12-31'
+        )
         
-        # 输出回测结果
-        logger.info("\n=== 回测结果 ===")
-        logger.info(f"初始资金: ${results['initial_capital']:,.2f}")
-        logger.info(f"最终资金: ${results['final_capital']:,.2f}")
-        logger.info(f"总收益率: {results['total_return']*100:.2f}%")
-        logger.info(f"年化收益率: {results['annual_return']*100:.2f}%")
-        logger.info(f"夏普比率: {results['sharpe_ratio']:.2f}")
-        logger.info(f"最大回撤: {results['max_drawdown']*100:.2f}%")
-        logger.info(f"总交易次数: {results['total_trades']}")
-        
-        # 绘制结果
-        plot_results(results, 'combined_strategy_results.png')
-        logger.info("结果已保存到 combined_strategy_results.png")
+        return results
         
     except Exception as e:
-        logger.error(f"主程序执行出错: {str(e)}")
-        raise
+        logger.error(f"Error in simple test: {str(e)}")
+        return None
 
-if __name__ == '__main__':
-    main() 
+if __name__ == "__main__":
+    results = run_simple_test()
+    if results:
+        print("\n回测结果:")
+        print(f"总收益率: {results['total_return']:.2%}")
+        print(f"年化收益率: {results['annualized_return']:.2%}")
+        print(f"最大回撤: {results['max_drawdown']:.2%}")
+        print(f"夏普比率: {results['sharpe_ratio']:.2f}")
+        print(f"胜率: {results['win_rate']:.2%}")
+    else:
+        print("回测失败") 

@@ -76,6 +76,6 @@ default_config = TradingConfig(
         sender_password="wlkp dbbz xpgk rkhy"  # 替换为从Google生成的应用专用密码
     ),
     database=DatabaseConfig(
-        password=""
+        password="123456"  # 设置正确的数据库密码
     )
 ) 

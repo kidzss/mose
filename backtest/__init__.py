@@ -1,4 +1,4 @@
-from .strategy import CombinedStrategy
+from strategy.combined_strategy import CombinedStrategy
 from .risk_manager import RiskManager
 from .volatility_manager import VolatilityManager
 from .strategy_factory import StrategyFactory

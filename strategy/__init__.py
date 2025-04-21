@@ -1,21 +1,23 @@
+"""
+Strategy package initialization
+"""
+
 from .strategy_base import Strategy
 from .cpgw_strategy import CPGWStrategy
+from .uss_gold_triangle_risk import USSGoldTriangleRisk
+from .momentum_strategy import MomentumStrategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
-from .trend_following_strategy import TrendFollowingStrategy
-from .mean_reversion_strategy import MeanReversionStrategy
-from .breakout_strategy import BreakoutStrategy
-from .combined_strategy import CombinedStrategy
-from .market_sentiment_strategy import MarketSentimentStrategy
-from .market_analysis import MarketAnalysis
+from .tdi_strategy import TDIStrategy
+from .uss_market_forecast import USSMarketForecast
+from .bollinger_bands_strategy import BollingerBandsStrategy
 
 __all__ = [
     'Strategy',
     'CPGWStrategy',
+    'USSGoldTriangleRisk',
+    'MomentumStrategy',
     'NiuniuStrategyV3',
-    'TrendFollowingStrategy',
-    'MeanReversionStrategy',
-    'BreakoutStrategy',
-    'CombinedStrategy',
-    'MarketSentimentStrategy',
-    'MarketAnalysis'
+    'TDIStrategy',
+    'USSMarketForecast',
+    'BollingerBandsStrategy'
 ] 

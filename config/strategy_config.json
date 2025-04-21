@@ -1,0 +1,47 @@
+{
+    "combined_strategy": {
+        "weight_tdi": 0.4,
+        "weight_niuniu": 0.3,
+        "weight_gold_triangle": 0.3,
+        "cooldown_period": 10,
+        "risk_params": {
+            "max_drawdown": 0.25,
+            "volatility_limit": 0.35,
+            "position_limit": 0.9
+        },
+        "weight_adjust_params": {
+            "market_regime_factor": 1.15,
+            "volatility_factor": 1.1,
+            "sentiment_factor": 1.05,
+            "min_adjust_interval": 5
+        }
+    },
+    "tdi_strategy": {
+        "ma_short": 20,
+        "ma_long": 50,
+        "rsi_period": 14,
+        "atr_period": 14,
+        "stop_loss_atr": 2.0,
+        "take_profit_atr": 3.0,
+        "base_position_size": 0.1,
+        "max_position_size": 0.3,
+        "volatility_threshold": 25,
+        "max_daily_loss": 0.02,
+        "max_total_loss": 0.1
+    },
+    "monitor_settings": {
+        "short_term": {
+            "price_change_threshold": 0.02,
+            "volume_ratio_threshold": 2.0,
+            "rsi_overbought": 70,
+            "rsi_oversold": 30,
+            "check_interval": "1min"
+        },
+        "long_term": {
+            "trend_ma_periods": [20, 50, 200],
+            "momentum_period": 14,
+            "volatility_period": 20,
+            "check_interval": "1day"
+        }
+    }
+} 

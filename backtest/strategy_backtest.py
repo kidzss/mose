@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
-from typing import List, Dict, Optional, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple, Any
 import logging
 from pathlib import Path
 import json
@@ -17,6 +17,7 @@ from strategy.uss_tdi_strategy import TDIStrategy
 from strategy.uss_market_forecast_strategy import MarketForecastStrategy
 from strategy.uss_cpgw_strategy import CPGWStrategy
 from strategy.uss_volume_strategy import VolumeStrategy
+from strategy.strategy_base import Strategy
 
 # 配置日志
 logging.basicConfig(
@@ -189,210 +190,165 @@ class PriceBreakoutStrategy(MonitorStrategy):
             return data
 
 
-class StrategyBacktest:
-    """策略回测类"""
-
-    def __init__(
-            self,
-            data_manager,  # 使用新的数据管理器
-            stock_manager,
-            strategies=None
-    ):
-        """
-        初始化回测系统
+class StrategyBacktest(Strategy):
+    """
+    策略回测类，用于回测交易策略
+    
+    Args:
+        data: 历史数据
+        config: 回测配置
+    """
+    
+    def __init__(self, data: pd.DataFrame, config: Dict):
+        super().__init__("StrategyBacktest", config)
+        self.data = data
+        self.config = config
+        self.strategies = []
+        self.returns = pd.Series()
         
-        参数:
-            data_manager: 数据管理器
-            stock_manager: 股票管理器
-            strategies: 策略列表
+    def add_strategy(self, strategy: Strategy) -> None:
         """
-        self.data_manager = data_manager
-        self.stock_manager = stock_manager
+        添加策略
         
-        # 如果没有提供策略列表，使用所有内置策略
-        self.strategies = strategies or [
-            GoldTriangleStrategy(),
-            MomentumStrategy(),
-            NiuniuStrategy(),
-            TDIStrategy(),
-            MarketForecastStrategy(),
-            CPGWStrategy(),
-            VolumeStrategy()
-        ]
-
-        # 回测结果
-        self.results = {}
-
-        logger.info(f"StrategyBacktest初始化完成，加载了 {len(self.strategies)} 个策略")
-
-    def run_backtest(self) -> Dict:
-        """运行回测"""
-        try:
-            # 获取监控的股票列表
-            stocks = self.stock_manager.get_monitored_stocks()
-            if stocks.empty:
-                logger.warning("没有可回测的股票")
-                return {}
-
-            logger.info(f"开始回测，股票数量: {len(stocks)}, 策略数量: {len(self.strategies)}")
-
-            # 对每个股票进行回测
-            for _, stock in stocks.iterrows():
-                symbol = stock['symbol']
-                try:
-                    # 获取最新数据（包含历史数据和实时数据）
-                    data = self.data_manager.get_latest_data(symbol)
-
-                    if data is None or data.empty:
-                        logger.warning(f"无法获取股票 {symbol} 的数据")
-                        continue
-
-                    # 运行每个策略
-                    stock_results = {}
-                    strategy_weights = {}
-                    total_weight = 0
-                    composite_signal = 0
-
-                    for strategy in self.strategies:
-                        try:
-                            # 生成信号
-                            signals = strategy.generate_signals(data.copy())
-
-                            # 评估策略
-                            evaluation = self._evaluate_strategy(signals, strategy.name)
-                            stock_results[strategy.name] = evaluation
-
-                            # 计算策略权重
-                            weight = self._calculate_strategy_weight(evaluation)
-                            strategy_weights[strategy.name] = weight
-                            total_weight += weight
-
-                            # 累加加权信号
-                            if 'signal' in signals.columns:
-                                last_signal = signals['signal'].iloc[-1]
-                                composite_signal += last_signal * weight
-
-                        except Exception as e:
-                            logger.error(f"运行策略 {strategy.name} 于股票 {symbol} 时出错: {e}")
-
-                    # 归一化策略权重
-                    if total_weight > 0:
-                        for strategy_name in strategy_weights:
-                            strategy_weights[strategy_name] /= total_weight
-                        composite_signal /= total_weight
-
-                    # 保存结果
-                    self.results[symbol] = {
-                        'strategy_results': stock_results,
-                        'strategy_weights': strategy_weights,
-                        'composite_signal': composite_signal
-                    }
-
-                    # 记录信号
-                    if abs(composite_signal) > 0.7:
-                        signal_type = "强" + ("买入" if composite_signal > 0 else "卖出")
-                        logger.info(f"{symbol} 产生{signal_type}信号: {composite_signal:.2f}")
-                    elif abs(composite_signal) > 0.3:
-                        signal_type = "中等" + ("买入" if composite_signal > 0 else "卖出")
-                        logger.info(f"{symbol} 产生{signal_type}信号: {composite_signal:.2f}")
-
-                except Exception as e:
-                    logger.error(f"回测股票 {symbol} 时出错: {e}")
-
-            logger.info("回测完成")
-            return self.results
-
-        except Exception as e:
-            logger.error(f"运行回测时出错: {e}")
-            return {}
-
-    def _evaluate_strategy(self, data: pd.DataFrame, strategy_name: str) -> Dict:
-        """评估策略表现"""
-        try:
-            # 确保数据中有必要的列
-            required_columns = ['close', 'signal']
-            if not all(col in data.columns for col in required_columns):
-                raise ValueError("数据缺少必要的列")
-
-            # 计算策略收益
-            data['strategy_returns'] = data['signal'].shift(1) * data['close'].pct_change()
-
-            # 计算累积收益
-            data['cumulative_returns'] = (1 + data['strategy_returns']).cumprod()
-
-            # 计算评估指标
-            total_return = data['cumulative_returns'].iloc[-1] - 1
-            annual_return = (1 + total_return) ** (252 / len(data)) - 1
-
-            # 计算夏普比率
-            risk_free_rate = 0.02  # 假设无风险利率为2%
-            excess_returns = data['strategy_returns'] - risk_free_rate / 252
-            epsilon = 1e-8
-            sharpe_ratio = np.sqrt(252) * excess_returns.mean() / excess_returns.std() + epsilon
-
-            # 计算最大回撤
-            rolling_max = data['cumulative_returns'].expanding().max()
-            drawdowns = data['cumulative_returns'] / rolling_max - 1
-            max_drawdown = drawdowns.min()
-
-            # 计算信号统计
-            total_signals = len(data[data['signal'] != 0])
-            long_signals = len(data[data['signal'] == 1])
-            short_signals = len(data[data['signal'] == -1])
-
-            return {
-                "strategy_name": strategy_name,
-                "total_return": total_return,
-                "annual_return": annual_return,
-                "sharpe_ratio": sharpe_ratio,
-                "max_drawdown": max_drawdown,
-                "total_signals": total_signals,
-                "long_signals": long_signals,
-                "short_signals": short_signals,
-                "win_rate": self._calculate_win_rate(data)
-            }
-
-        except Exception as e:
-            logger.error(f"评估策略 {strategy_name} 时出错: {e}")
-            return {}
-
-    def _calculate_win_rate(self, data: pd.DataFrame) -> float:
-        """计算胜率"""
-        try:
-            # 获取有信号的交易
-            trades = data[data['signal'] != 0]
-            if len(trades) == 0:
-                return 0.0
-
-            # 计算每笔交易的收益
-            winning_trades = len(trades[trades['strategy_returns'] > 0])
-            return winning_trades / len(trades)
-
-        except Exception as e:
-            logger.error(f"计算胜率时出错: {e}")
-            return 0.0
-
-    def _calculate_strategy_weight(self, evaluation: Dict) -> float:
+        Args:
+            strategy: 交易策略
         """
-        计算策略权重
+        if strategy not in self.strategies:
+            self.strategies.append(strategy)
+            logger.info(f"Added strategy: {strategy.name}")
+            
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        计算技术指标
         
-        基于以下指标计算权重：
-        1. Sharpe比率 (40%)
-        2. 胜率 (30%)
-        3. 最大回撤 (20%)
-        4. 年化收益率 (10%)
+        Args:
+            df: 历史数据
+            
+        Returns:
+            pd.DataFrame: 包含技术指标的数据
         """
-        try:
-            sharpe_weight = 0.4 * max(0, min(1, evaluation.get('sharpe_ratio', 0) / 2))
-            win_rate_weight = 0.3 * evaluation.get('win_rate', 0)
-            drawdown_weight = 0.2 * (1 + min(0, evaluation.get('max_drawdown', 0)))
-            return_weight = 0.1 * max(0, min(1, evaluation.get('annual_return', 0)))
-
-            return sharpe_weight + win_rate_weight + drawdown_weight + return_weight
-
-        except Exception as e:
-            logger.error(f"计算策略权重时出错: {e}")
-            return 0.0
+        # 计算移动平均线
+        df['ma_5'] = df['close'].rolling(window=5).mean()
+        df['ma_10'] = df['close'].rolling(window=10).mean()
+        df['ma_20'] = df['close'].rolling(window=20).mean()
+        
+        # 计算相对强弱指标
+        delta = df['close'].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        rs = avg_gain / avg_loss
+        df['rsi'] = 100 - (100 / (1 + rs))
+        
+        # 计算布林带
+        df['ma_20'] = df['close'].rolling(window=20).mean()
+        df['std_20'] = df['close'].rolling(window=20).std()
+        df['upper_band'] = df['ma_20'] + 2 * df['std_20']
+        df['lower_band'] = df['ma_20'] - 2 * df['std_20']
+        
+        return df
+        
+    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        生成交易信号
+        
+        Args:
+            df: 包含技术指标的数据
+            
+        Returns:
+            pd.DataFrame: 包含交易信号的数据
+        """
+        # 初始化信号列
+        df['signal'] = 0
+        
+        # 生成移动平均线交叉信号
+        df.loc[df['ma_5'] > df['ma_20'], 'signal'] = 1
+        df.loc[df['ma_5'] < df['ma_20'], 'signal'] = -1
+        
+        # RSI 超买超卖信号
+        df.loc[df['rsi'] > 70, 'signal'] = -1
+        df.loc[df['rsi'] < 30, 'signal'] = 1
+        
+        # 布林带突破信号
+        df.loc[df['close'] > df['upper_band'], 'signal'] = -1
+        df.loc[df['close'] < df['lower_band'], 'signal'] = 1
+        
+        return df
+        
+    def run_backtest(self) -> Dict[str, Any]:
+        """
+        运行回测
+        
+        Returns:
+            Dict[str, Any]: 回测结果
+        """
+        results = {}
+        
+        # 计算技术指标
+        self.data = self.calculate_indicators(self.data)
+        
+        # 生成交易信号
+        self.data = self.generate_signals(self.data)
+        
+        # 计算收益率
+        self.data['position'] = self.data['signal'].shift(1).fillna(0)
+        self.data['returns'] = self.data['position'] * self.data['close'].pct_change()
+        self.returns = self.data['returns']
+        
+        # 计算回测指标
+        results['total_return'] = self.calculate_total_return()
+        results['annual_return'] = self.calculate_annual_return()
+        results['sharpe_ratio'] = self.calculate_sharpe_ratio()
+        results['max_drawdown'] = self.calculate_max_drawdown()
+        
+        return results
+        
+    def calculate_total_return(self) -> float:
+        """
+        计算总收益率
+        
+        Returns:
+            float: 总收益率
+        """
+        return (1 + self.returns).prod() - 1
+        
+    def calculate_annual_return(self) -> float:
+        """
+        计算年化收益率
+        
+        Returns:
+            float: 年化收益率
+        """
+        days = (self.data.index[-1] - self.data.index[0]).days
+        return (1 + self.calculate_total_return()) ** (365 / days) - 1
+        
+    def calculate_sharpe_ratio(self, risk_free_rate: float = 0.02) -> float:
+        """
+        计算夏普比率
+        
+        Args:
+            risk_free_rate: 无风险利率
+            
+        Returns:
+            float: 夏普比率
+        """
+        excess_returns = self.returns - risk_free_rate / 252
+        if self.returns.std() > 0:
+            return np.sqrt(252) * excess_returns.mean() / self.returns.std()
+        return 0
+        
+    def calculate_max_drawdown(self) -> float:
+        """
+        计算最大回撤
+        
+        Returns:
+            float: 最大回撤
+        """
+        cum_returns = (1 + self.returns).cumprod()
+        rolling_max = cum_returns.expanding().max()
+        drawdown = (cum_returns - rolling_max) / rolling_max
+        return drawdown.min()
 
     def generate_report(self) -> str:
         """生成回测报告"""
@@ -583,37 +539,3 @@ class StrategyBacktest:
         except Exception as e:
             logger.error(f"识别机会板块时出错: {e}")
             return []
-
-
-class StockMonitor:
-    def __init__(self, stock_list):
-        self.stocks = stock_list
-        self.volatility_strategy = VolatilityBreakoutStrategy()
-        self.price_strategy = PriceBreakoutStrategy()
-
-    def monitor_individual_stocks(self):
-        for stock in self.stocks:
-            # 分析个股异常
-            volatility_signal = self.volatility_strategy.generate_signals(stock)
-            price_signal = self.price_strategy.generate_signals(stock)
-
-            if self.is_significant_event(volatility_signal, price_signal):
-                self.generate_alert(stock)
-
-
-class MarketMonitor:
-    def __init__(self):
-        self.market_indices = ['SPY', 'QQQ', 'IWM']  # 主要市场指数
-        self.sector_etfs = ['XLF', 'XLK', 'XLE']  # 主要行业ETF
-
-    def analyze_market_condition(self):
-        # 分析市场整体状况
-        market_volatility = self.calculate_market_volatility()
-        sector_rotation = self.analyze_sector_rotation()
-        market_breadth = self.calculate_market_breadth()
-
-        return {
-            'market_condition': 'bull/bear/neutral',
-            'risk_level': 'high/medium/low',
-            'opportunity_sectors': ['tech', 'finance']
-        }

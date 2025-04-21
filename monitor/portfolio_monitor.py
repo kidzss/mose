@@ -4,6 +4,12 @@ import datetime as dt
 import logging
 from typing import List, Dict, Optional, Union, Tuple
 from dataclasses import dataclass
+import sys
+import os
+
+# 添加项目根目录到 Python 路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from .market_monitor import MarketMonitor, Alert
 from .notification_manager import NotificationManager
 from data.data_interface import YahooFinanceRealTimeSource

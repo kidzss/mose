@@ -17,12 +17,12 @@ import talib
 import traceback
 import redis
 from sqlalchemy import text
+import sys
+
+# 添加项目根目录到 Python 路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from .data_fetcher import DataFetcher
-from backtest.risk_manager import RiskManager
-from backtest.volatility_manager import VolatilityManager
-from backtest.strategy_factory import StrategyFactory
-from backtest.strategy import CombinedStrategy
 from utils.data_loader import DataLoader
 
 class Alert:

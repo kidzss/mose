@@ -4,6 +4,12 @@ import logging
 from typing import Dict, List, Optional, Union, Any, Tuple
 from dataclasses import dataclass
 from datetime import datetime
+import sys
+import os
+
+# 添加项目根目录到 Python 路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from .volatility_manager import VolatilityManager, VolatilityMetrics
 import itertools
 

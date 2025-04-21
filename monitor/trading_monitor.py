@@ -10,13 +10,35 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from sqlalchemy import create_engine
-from backtest.strategy_evaluator import StrategyEvaluator
-from backtest.parameter_optimizer import ParameterOptimizer
-from backtest.market_analyzer import MarketAnalyzer
-from backtest.risk_manager import RiskManager
 
+# 添加项目根目录到 Python 路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from config.trading_config import TradingConfig, default_config
+
+class AlertSystem:
+    def __init__(self, config: TradingConfig):
+        self.config = config
+        self.logger = logging.getLogger(__name__)
+
+    def send_email(self, subject: str, body: str):
+        """发送邮件通知"""
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = self.config.email.sender
+            msg['To'] = self.config.email.recipient
+            msg['Subject'] = subject
+            
+            msg.attach(MIMEText(body, 'html'))
+            
+            with smtplib.SMTP_SSL(self.config.email.smtp_server, self.config.email.smtp_port) as server:
+                server.login(self.config.email.sender, self.config.email.password)
+                server.send_message(msg)
+                
+            self.logger.info(f"邮件发送成功: {subject}")
+            
+        except Exception as e:
+            self.logger.error(f"发送邮件时出错: {str(e)}")
 
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate technical indicators for trading signals"""
@@ -198,137 +220,60 @@ class SignalGenerator:
             self.logger.error(f"生成信号时出错: {str(e)}")
             return None
 
-class AlertSystem:
-    def __init__(self, config: TradingConfig):
-        self.config = config
-        self.logger = logging.getLogger(__name__)
-        self.last_alert_time = {}  # 记录每个股票的最后提醒时间
-
-    def _can_send_alert(self, stock: str) -> bool:
-        """检查是否可以发送提醒"""
-        now = datetime.now()
-        if stock in self.last_alert_time:
-            time_diff = (now - self.last_alert_time[stock]).total_seconds()
-            return time_diff >= self.config.monitoring.alert_cooldown
-        return True
-
-    def send_email(self, subject: str, body: str):
-        """发送邮件"""
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = self.config.email.sender_email
-            msg['To'] = ', '.join(self.config.email.receiver_emails)
-            msg['Subject'] = subject
-
-            msg.attach(MIMEText(body, 'html'))
-
-            with smtplib.SMTP(self.config.email.smtp_server, self.config.email.smtp_port) as server:
-                server.starttls()
-                server.login(
-                    self.config.email.sender_email,
-                    self.config.email.sender_password
-                )
-                server.send_message(msg)
-
-            self.logger.info(f"成功发送邮件: {subject}")
-        except Exception as e:
-            self.logger.error(f"发送邮件时出错: {str(e)}")
-
-    def format_signal_message(self, stock: str, signal_data: Dict) -> str:
-        """格式化信号消息"""
-        return f"""
-        <h2>股票交易信号提醒</h2>
-        <p>股票代码: {stock}</p>
-        <p>信号时间: {signal_data['date']}</p>
-        <p>当前价格: {signal_data['close']:.2f}</p>
-        <p>信号类型: {signal_data['signal']}</p>
-        <h3>指标数据:</h3>
-        <ul>
-            <li>长庄线: {signal_data['indicators']['Long Line']:.2f}</li>
-            <li>游资线: {signal_data['indicators']['Hot Money Line']:.2f}</li>
-            <li>主力线: {signal_data['indicators']['Main Force Line']:.2f}</li>
-        </ul>
-        """
-
-    def process_signal(self, stock: str, signal_data: Dict):
-        """处理交易信号"""
-        if not signal_data or 'signal' not in signal_data:
-            return
-
-        if not self._can_send_alert(stock):
-            return
-
-        signal = signal_data['signal']
-        if "Buy signal" in signal or "Sell signal" in signal:
-            subject = f"交易信号提醒 - {stock}"
-            body = self.format_signal_message(stock, signal_data)
-            self.send_email(subject, body)
-            self.last_alert_time[stock] = datetime.now()
-
 class TradingMonitor:
     def __init__(self, config: TradingConfig = None):
         self.config = config or default_config
-        self.setup_logging()
-        
         self.data_fetcher = DataFetcher(self.config)
         self.signal_generator = SignalGenerator(self.config)
         self.alert_system = AlertSystem(self.config)
-        
         self.logger = logging.getLogger(__name__)
+        self.setup_logging()
 
     def setup_logging(self):
         """设置日志"""
-        logging.basicConfig(
-            level=getattr(logging, self.config.log_level),
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(self.config.log_file),
-                logging.StreamHandler()
-            ]
+        log_file = 'trading_monitor.log'
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(
+            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         )
+        self.logger.addHandler(file_handler)
+        self.logger.setLevel(logging.INFO)
 
     def monitor_stock(self, stock: str):
         """监控单个股票"""
         try:
             # 获取数据
-            df = self.data_fetcher.get_stock_data(stock)
-            if df is None:
+            data = self.data_fetcher.get_stock_data(stock)
+            if data is None:
                 return
-
+                
             # 生成信号
-            signal_data = self.signal_generator.generate_signals(df)
+            signal_data = self.signal_generator.generate_signals(data)
             if signal_data is None:
                 return
-
+                
             # 处理信号
-            self.alert_system.process_signal(stock, signal_data)
-
+            self.process_signal(stock, signal_data)
+            
         except Exception as e:
             self.logger.error(f"监控股票 {stock} 时出错: {str(e)}")
 
     def run(self):
-        """运行监控系统"""
-        self.logger.info("启动交易监控系统...")
-        
-        while True:
-            try:
-                # 获取股票列表
-                stocks = self.data_fetcher.get_stock_list()
-                if not stocks:
-                    self.logger.error("无法获取股票列表")
-                    time.sleep(self.config.monitoring.retry_delay)
-                    continue
-
-                # 监控每个股票
-                for stock in stocks:
-                    self.monitor_stock(stock)
-
-                # 等待下一次检查
-                time.sleep(self.config.monitoring.check_interval)
-
-            except Exception as e:
-                self.logger.error(f"监控系统运行出错: {str(e)}")
-                time.sleep(self.config.monitoring.retry_delay)
+        """运行监控"""
+        try:
+            # 获取股票列表
+            stocks = self.data_fetcher.get_stock_list()
+            if not stocks:
+                self.logger.error("无法获取股票列表")
+                return
+                
+            # 监控每个股票
+            for stock in stocks:
+                self.monitor_stock(stock)
+                time.sleep(1)  # 避免请求过于频繁
+                
+        except Exception as e:
+            self.logger.error(f"运行监控时出错: {str(e)}")
 
 def main():
     """主函数"""
