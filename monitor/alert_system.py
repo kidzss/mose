@@ -3,6 +3,9 @@ import numpy as np
 from typing import Dict, List, Tuple
 import yfinance as yf
 from datetime import datetime, timedelta
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 class AlertSystem:
     """高级预警系统"""
@@ -33,28 +36,28 @@ class AlertSystem:
             # 计算移动平均线
             for name, period in self.technical_indicators.items():
                 if 'SMA' in name:
-                    indicators[name] = data['Close'].rolling(window=period).mean().iloc[-1]
+                    indicators[name] = data['close'].rolling(window=period).mean().iloc[-1]
             
             # 计算RSI
-            delta = data['Close'].diff()
+            delta = data['close'].diff()
             gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
             loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
             rs = gain / loss
             indicators['RSI'] = 100 - (100 / (1 + rs.iloc[-1]))
             
             # 计算MACD
-            exp1 = data['Close'].ewm(span=12, adjust=False).mean()
-            exp2 = data['Close'].ewm(span=26, adjust=False).mean()
+            exp1 = data['close'].ewm(span=12, adjust=False).mean()
+            exp2 = data['close'].ewm(span=26, adjust=False).mean()
             macd = exp1 - exp2
             signal = macd.ewm(span=9, adjust=False).mean()
             indicators['MACD'] = macd.iloc[-1]
             indicators['MACD_Signal'] = signal.iloc[-1]
             
             # 计算波动率
-            indicators['Volatility'] = data['Close'].pct_change().std() * np.sqrt(252)
+            indicators['Volatility'] = data['close'].pct_change().std() * np.sqrt(252)
             
             # 计算成交量相对值
-            indicators['Volume_Ratio'] = data['Volume'].iloc[-1] / data['Volume'].rolling(window=20).mean().iloc[-1]
+            indicators['Volume_Ratio'] = data['volume'].iloc[-1] / data['volume'].rolling(window=20).mean().iloc[-1]
             
             return indicators
         except Exception as e:
@@ -66,7 +69,7 @@ class AlertSystem:
         try:
             alerts = []
             indicators = self.calculate_technical_indicators(symbol, current_data)
-            current_price = current_data['Close'].iloc[-1]
+            current_price = current_data['close'].iloc[-1]
             cost_basis = position['cost_basis']
             
             # 技术指标预警
@@ -211,4 +214,86 @@ class AlertSystem:
                 'action': 'hold',
                 'confidence': 0.0,
                 'reasons': ['数据异常，建议观望']
-            } 
+            }
+
+    def send_alert(self, stock: str, alert_type: str, message: str, price: float, indicators: Dict):
+        """发送警报"""
+        try:
+            # 构建完整的消息
+            full_message = f"""
+股票代码: {stock}
+警报类型: {alert_type}
+
+价格信息:
+- 当前价格: {price:.2f}
+- 成本价格: {indicators.get('cost_basis', 0):.2f}
+- 价格变化: {indicators.get('price_change', 0):.2%}
+
+技术指标分析:
+- RSI: {self._get_rsi_explanation(indicators.get('RSI', 0))}
+- MACD: {self._get_macd_explanation(indicators.get('MACD', 0), indicators.get('MACD_Signal', 0))}
+- 成交量: {self._get_volume_explanation(indicators.get('volume', 0), indicators.get('volume_ma20', 0))}
+
+风险控制:
+- 止损价格: {price * (1 - indicators.get('stop_loss', 0.15)):.2f} ({indicators.get('stop_loss', 0.15):.1%})
+- 仓位权重: {indicators.get('weight', 0):.2%}
+"""
+            
+            # 发送邮件通知
+            if hasattr(self.config, 'email'):
+                subject = f"交易警报 - {stock} - {alert_type}"
+                self.send_email(subject, full_message)
+            
+            print(f"警报已发送: {stock} - {alert_type}")
+        
+        except Exception as e:
+            print(f"发送警报失败: {str(e)}")
+
+    def send_email(self, subject: str, body: str):
+        """发送邮件通知"""
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = self.config.email.sender_email
+            msg['To'] = ', '.join(self.config.email.receiver_emails)
+            msg['Subject'] = subject
+            
+            msg.attach(MIMEText(body, 'plain'))
+            
+            with smtplib.SMTP(self.config.email.smtp_server, self.config.email.smtp_port) as server:
+                server.starttls()
+                server.login(self.config.email.sender_email, self.config.email.sender_password)
+                server.send_message(msg)
+            
+            print(f"邮件发送成功: {subject}")
+        
+        except Exception as e:
+            print(f"发送邮件时出错: {str(e)}")
+
+    def _get_rsi_explanation(self, rsi: float) -> str:
+        """获取RSI指标的解释"""
+        if rsi > 70:
+            return f"超买区域 ({rsi:.2f})，可能面临回调风险"
+        elif rsi < 30:
+            return f"超卖区域 ({rsi:.2f})，可能存在反弹机会"
+        else:
+            return f"中性区域 ({rsi:.2f})，市场相对平衡"
+
+    def _get_macd_explanation(self, macd: float, signal: float) -> str:
+        """获取MACD指标的解释"""
+        if macd > signal:
+            return f"金叉形态，上涨动能增强"
+        elif macd < signal:
+            return f"死叉形态，下跌动能增强"
+        else:
+            return f"趋势不明朗，等待方向确认"
+
+    def _get_volume_explanation(self, volume: float, volume_ma20: float) -> str:
+        """获取成交量指标的解释"""
+        if volume > volume_ma20 * 2:
+            return f"成交量显著放大，可能有重要信息"
+        elif volume > volume_ma20 * 1.5:
+            return f"成交量温和放大，需要关注"
+        elif volume < volume_ma20 * 0.5:
+            return f"成交量显著萎缩，交投清淡"
+        else:
+            return f"成交量正常，市场交投平稳" 

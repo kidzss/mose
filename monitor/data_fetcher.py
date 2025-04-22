@@ -44,6 +44,7 @@ class DataFetcher:
         self.data_cache = {}
         self.cache_timestamps = {}
         self.cache_expiry = 3600  # 缓存过期时间（秒）
+        self.api_delay = 1.0  # API调用延迟时间（秒）
         
     def get_historical_data(
         self,

@@ -15,6 +15,38 @@ from monitor.notification_manager import NotificationManager
 
 logger = logging.getLogger(__name__)
 
+default_config = {
+    'combined_strategy': {
+        'macd_fast': 12,
+        'macd_slow': 26,
+        'macd_signal': 9,
+        'adx_length': 14,
+        'adx_threshold': 25,
+        'volume_ma_length': 20,
+        'volume_threshold': 1.5,
+        'roc_length': 10,
+        'roc_ma_length': 5
+    },
+    'tdi_strategy': {
+        'rsi_length': 14,
+        'stoch_length': 14,
+        'stoch_smooth': 3,
+        'volume_ma_length': 20,
+        'rsi_oversold': 30,
+        'rsi_overbought': 70,
+        'stoch_oversold': 20,
+        'stoch_overbought': 80,
+        'volume_threshold': 1.5
+    },
+    'monitored_stocks': ['GOOG', 'TSLA', 'AMD', 'NVDA', 'PFE', 'MSFT', 'TMDX'],
+    'notification_threshold': {
+        'price_change': 0.05,
+        'volume_change': 2.0,
+        'market_volatility': 0.02,
+        'risk_level': 'high'
+    }
+}
+
 class StrategyMonitor:
     """策略监控器，整合短期和长期策略"""
     
@@ -26,7 +58,7 @@ class StrategyMonitor:
             config_path: 策略配置文件路径
             portfolio_path: 持仓和观察股票配置文件路径
         """
-        self.config = self._load_config(config_path)
+        self.config = self._load_config(config_path) or default_config
         self.portfolio_config = self._load_portfolio_config(portfolio_path)
         
         # 初始化策略
@@ -391,4 +423,25 @@ class StrategyMonitor:
             
         except Exception as e:
             logger.error(f"获取观察股票状态时出错: {str(e)}")
-            return {} 
+            return {}
+
+    async def monitor_strategies(self, data: Dict[str, pd.DataFrame]) -> None:
+        """监控策略"""
+        try:
+            for symbol, stock_data in data.items():
+                # 运行组合策略
+                signals = self.combined_strategy.generate_signals(stock_data)
+                
+                # 检查是否有交易信号
+                if signals['signal'].iloc[-1] != 0:
+                    self._process_long_term_signal(symbol, stock_data, signals)
+                
+                # 运行TDI策略
+                signals = self.tdi_strategy.generate_signals(stock_data)
+                
+                # 检查是否有交易信号
+                if signals['signal'].iloc[-1] != 0:
+                    self._process_short_term_signal(symbol, stock_data, signals)
+                
+        except Exception as e:
+            logger.error(f"监控策略时出错: {str(e)}") 

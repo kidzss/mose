@@ -26,7 +26,7 @@ class NotificationManager:
         """初始化通知管理器"""
         self.config = config or default_config
         self.alert_system = AlertSystem(self.config)
-        self.thresholds = self.config.notification_threshold
+        self.thresholds = self.config['notification_threshold']
         self.notification_history = {}
         self.cooldown_periods = {
             'trade_signal': timedelta(minutes=5),  # 缩短信号冷却时间

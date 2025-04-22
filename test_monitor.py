@@ -6,9 +6,11 @@ import pandas as pd
 import numpy as np
 import json
 from typing import Dict
+import yfinance as yf
+import traceback
 
 from monitor.trading_monitor import TradingMonitor, AlertSystem
-from monitor.strategy_monitor import StrategyMonitor
+from monitor.strategy_monitor import StrategyMonitor, default_config
 from config.trading_config import TradingConfig, EmailConfig, DatabaseConfig
 from data.data_interface import YahooFinanceRealTimeSource, DataInterface
 from strategy.combined_strategy import CombinedStrategy
@@ -16,76 +18,56 @@ from strategy.momentum_strategy import MomentumStrategy
 from strategy.mean_reversion_strategy import MeanReversionStrategy
 from strategy.bollinger_bands_strategy import BollingerBandsStrategy
 from strategy.breakout_strategy import BreakoutStrategy
+from monitor.portfolio_monitor import PortfolioMonitor
+from monitor.market_monitor import MarketMonitor
+from monitor.data_fetcher import DataFetcher
+from monitor.technical_analysis import TechnicalAnalysis
+from monitor.alert_system import AlertSystem
+from monitor.report_generator import ReportGenerator
+from monitor.notification_system import NotificationSystem
 
-# 创建默认配置
-default_config = TradingConfig(
-    notification_settings={
-        'email': True,
-        'slack': False,
-        'telegram': False
-    },
-    price_alert_threshold=0.05,
-    loss_alert_threshold=0.05,
-    profit_target=0.25,
-    stop_loss=0.15,
-    check_interval=60,
-    update_interval=60,
-    email_notifications=True,
-    risk_thresholds={
-        'volatility': 0.02,
-        'concentration': 0.3,
-        'var': 0.1
-    },
-    sector_specific_settings={
-        'semiconductor': {
-            'stop_loss': 0.08,
-            'price_alert_threshold': 0.03,
-            'volatility_threshold': 0.03
-        },
-        'tech': {
-            'stop_loss': 0.12,
-            'price_alert_threshold': 0.04,
-            'volatility_threshold': 0.025
-        },
-        'healthcare': {
-            'stop_loss': 0.10,
-            'price_alert_threshold': 0.04,
-            'volatility_threshold': 0.02
-        },
-        'automotive': {
-            'stop_loss': 0.15,
-            'price_alert_threshold': 0.05,
-            'volatility_threshold': 0.03
-        }
-    },
-    email=EmailConfig(
-        sender_password="wlkp dbbz xpgk rkhy",
-        smtp_server="smtp.gmail.com",
-        smtp_port=587,
-        sender_email="kidzss@gmail.com",
-        receiver_emails=["kidzss@gmail.com"]
-    ),
-    database=DatabaseConfig(
-        host="localhost",
-        port=3306,
-        user="root",
-        password="",
-        database="mose"
-    )
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-
-# 设置日志
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+async def get_test_data(symbol: str = None):
+    """获取测试数据"""
+    # 创建数据源
+    data_source = YahooFinanceRealTimeSource()
+    
+    if symbol:
+        # 获取单个股票的实时数据
+        data = await data_source.get_realtime_data([symbol])
+        if symbol in data:
+            return data[symbol].iloc[-1]
+        return None
+    else:
+        # 获取所有测试股票的数据
+        test_stocks = ['GOOG', 'TSLA', 'AMD', 'NVDA', 'PFE', 'MSFT', 'TMDX']
+        return await data_source.get_realtime_data(test_stocks)
+
+# 初始化配置
+trading_config = {
+    'smtp_server': 'smtp.gmail.com',
+    'smtp_port': 587,
+    'sender_email': 'kidzss@gmail.com',
+    'sender_password': 'wlkp dbbz xpgk rkhy',
+    'recipient_email': 'kidzss@gmail.com',
+    'notification_threshold': {
+        'price_change': 0.05,
+        'volume_change': 2.0,
+        'market_volatility': 0.02,
+        'risk_level': 'high'
+    }
+}
 
 def load_portfolio_config():
     """加载持仓配置"""
-    try:
-        with open('monitor/configs/portfolio_config.json', 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"加载持仓配置失败: {str(e)}")
-        return {"positions": {}, "monitor_config": {}}
+    with open('monitor/configs/portfolio_config.json', 'r') as f:
+        return json.load(f)
 
 def get_strategy_signals(data: pd.DataFrame) -> Dict:
     """获取各个策略的信号"""
@@ -125,189 +107,178 @@ def get_strategy_signals(data: pd.DataFrame) -> Dict:
             'combined': empty_signal
         }
 
-async def test_trading_monitor():
-    """测试交易监控器"""
-    try:
-        logger.info("开始测试交易监控器...")
-        
-        # 加载持仓配置
-        portfolio_config = load_portfolio_config()
-        monitor_config = portfolio_config.get('monitor_config', {})
-        
-        # 获取需要监控的股票
-        stocks_to_monitor = set(portfolio_config.get('positions', {}).keys())
-        
-        logger.info(f"需要监控的股票: {list(stocks_to_monitor)}")
-        logger.info(f"监控配置: {monitor_config}")
-        
-        # 创建监控器实例
-        monitor = TradingMonitor()
-        
-        # 创建实时数据源
-        data_source = YahooFinanceRealTimeSource()
-        
-        # 获取实时数据
-        real_time_data = await data_source.get_realtime_data(list(stocks_to_monitor))
-        
-        # 测试单个股票监控
-        for stock in stocks_to_monitor:
-            if stock in real_time_data:
-                stock_data = real_time_data[stock]
-                logger.info(f"股票 {stock} 实时数据: {stock_data.iloc[-1].to_dict()}")
-            monitor.monitor_stock(stock)
-            logger.info(f"完成股票 {stock} 的监控测试")
-        
-        logger.info("持仓股票监控测试完成")
-        
-    except Exception as e:
-        logger.error(f"交易监控器测试失败: {str(e)}")
+async def test_monitor_system(trading_config):
+    """测试监控系统"""
+    print("开始监控系统测试...")
+    
+    # 初始化监控系统
+    monitor = TradingMonitor()
+    monitor.config = trading_config
+    
+    # 获取测试数据
+    test_stocks = ['GOOG', 'TSLA', 'AMD', 'NVDA', 'PFE', 'MSFT', 'TMDX']
+    for symbol in test_stocks:
+        # 只传递股票代码
+        monitor.monitor_stock(symbol)
+    
+    print("监控系统测试完成")
 
-async def test_strategy_monitor():
+def get_default_config():
+    """获取默认配置"""
+    return {
+        'price_alert_threshold': 0.05,
+        'loss_alert_threshold': 0.05,
+        'profit_target': 0.25,
+        'stop_loss': 0.15,
+        'check_interval': 60,
+        'email_notifications': True,
+        'update_interval': 60,
+        'notification_threshold': 0.05,  # Added notification threshold
+        'risk_thresholds': {
+            'volatility': 0.02,
+            'concentration': 0.3,
+            'var': 0.1
+        },
+        'notification_settings': {
+            'email': True,
+            'slack': False,
+            'telegram': False
+        },
+        'sector_specific_settings': {
+            'semiconductor': {
+                'stop_loss': 0.08,
+                'price_alert_threshold': 0.03,
+                'volatility_threshold': 0.03
+            },
+            'tech': {
+                'stop_loss': 0.12,
+                'price_alert_threshold': 0.04,
+                'volatility_threshold': 0.025
+            },
+            'healthcare': {
+                'stop_loss': 0.1,
+                'price_alert_threshold': 0.04,
+                'volatility_threshold': 0.02
+            },
+            'automotive': {
+                'stop_loss': 0.15,
+                'price_alert_threshold': 0.05,
+                'volatility_threshold': 0.03
+            }
+        }
+    }
+
+async def test_strategy_monitor(trading_config):
     """测试策略监控器"""
+    print("开始策略监控测试...")
     try:
-        logger.info("开始测试策略监控器...")
+        # 初始化策略监控器
+        strategy_monitor = StrategyMonitor()
         
-        # 创建策略监控器实例，使用默认配置
-        strategy_monitor = StrategyMonitor(config_path="config/strategy_config.json")
+        # 设置配置
+        config = {
+            'notification_threshold': {
+                'price_change': 0.05,
+                'volume_change': 2.0,
+                'market_volatility': 0.02,
+                'risk_level': 'high'
+            }
+        }
+        config.update(trading_config)
+        strategy_monitor.config = config
         
-        # 测试监控功能
-        strategy_monitor.start_monitoring()
-        await asyncio.sleep(5)  # 运行5秒
-        strategy_monitor.stop_monitoring()
+        # 获取测试数据
+        test_data = await get_test_data()
         
-        logger.info("策略监控器测试完成")
-        
+        # 运行策略监控
+        await strategy_monitor.monitor_strategies(test_data)
+        print("策略监控测试完成")
+        return True
     except Exception as e:
-        logger.error(f"策略监控器测试失败: {str(e)}")
+        print(f"测试过程中出现错误: {str(e)}")
+        traceback.print_exc()
+        return False
 
-async def test_notification_system():
+async def test_notification_system(trading_config):
     """测试通知系统"""
-    try:
-        logger.info("开始测试通知系统...")
-        
-        # 加载持仓配置
-        portfolio_config = load_portfolio_config()
-        
-        # 创建警报系统实例
-        alert_system = AlertSystem(default_config)
-        
-        # 创建数据接口
-        data_interface = DataInterface()
-        
-        # 创建实时数据源
-        data_source = YahooFinanceRealTimeSource()
-        
-        # 测试交易信号通知
-        for stock, position in portfolio_config.get('positions', {}).items():
-            try:
-                # 获取实时数据
-                real_time_data = await data_source.get_realtime_data([stock])
-                if stock not in real_time_data:
-                    logger.warning(f"无法获取 {stock} 的实时数据")
-                    continue
-                    
-                # 获取最新的实时数据
-                latest_data = real_time_data[stock].iloc[-1]
-                current_price = latest_data['close']
-                cost_basis = position.get('cost_basis', 0)
-                
-                # 计算价格变化百分比
-                price_change = (current_price - cost_basis) / cost_basis if cost_basis > 0 else 0
-                
-                # 获取止损价格
-                stop_loss = position.get('stop_loss', 0)
-                if isinstance(stop_loss, float) and stop_loss < 1.0:  # 如果是百分比形式
-                    stop_loss_price = cost_basis * (1 - stop_loss)
-                else:  # 如果是具体价格
-                    stop_loss_price = stop_loss
-                
-                # 获取历史数据用于计算技术指标
-                end_date = datetime.now()
-                start_date = end_date - timedelta(days=60)
-                hist_data = data_interface.get_historical_data(stock, start_date, end_date)
-                
-                if hist_data is None or hist_data.empty:
-                    logger.warning(f"无法获取 {stock} 的历史数据")
-                    continue
-                
-                # 获取各个策略的信号
-                strategy_signals = get_strategy_signals(hist_data)
-                
-                # 生成消息
-                message = f"""
-实时价格: {current_price:.2f}
-成本价: {cost_basis:.2f}
-变化: {price_change:.2%}
-止损价格: {stop_loss_price:.2f}
-
-策略信号:
-- 动量策略: {alert_system._get_signal_explanation(strategy_signals['momentum'].iloc[-1]['signal'])}
-- 均值回归: {alert_system._get_signal_explanation(strategy_signals['mean_reversion'].iloc[-1]['signal'])}
-- 布林带策略: {alert_system._get_signal_explanation(strategy_signals['bollinger'].iloc[-1]['signal'])}
-- 突破策略: {alert_system._get_signal_explanation(strategy_signals['breakout'].iloc[-1]['signal'])}
-- 组合策略: {alert_system._get_signal_explanation(strategy_signals['combined'].iloc[-1]['signal'])}
-
-技术指标分析:
-- RSI: {alert_system._get_rsi_explanation(latest_data.get('RSI', 0))}
-- MACD: {alert_system._get_macd_explanation(latest_data.get('MACD', 0), latest_data.get('Signal', 0))}
-- 布林带: {alert_system._get_bollinger_explanation(current_price, latest_data.get('BB_upper', 0), latest_data.get('BB_lower', 0))}
-- 20日均线: {alert_system._get_ma_explanation(current_price, latest_data.get('MA20', 0))}
-- 成交量: {alert_system._get_volume_explanation(latest_data.get('volume', 0), latest_data.get('volume_ma20', 0))}
-"""
-                
-                alert_system.send_alert(
-                    stock=stock,
-                    alert_type="strategy_update",
-                    message=message,
-                    price=current_price,
-                    indicators={
-                        # 基本指标
-                        "cost_basis": cost_basis,
-                        "price_change": price_change,
-                        "stop_loss": stop_loss_price,
-                        "weight": position.get('weight', 0),
-                        
-                        # 技术指标
-                        "RSI": latest_data.get('RSI', 0),
-                        "MACD": latest_data.get('MACD', 0),
-                        "Signal": latest_data.get('Signal', 0),
-                        "BB_upper": latest_data.get('BB_upper', 0),
-                        "BB_lower": latest_data.get('BB_lower', 0),
-                        "MA20": latest_data.get('MA20', 0),
-                        "volume_ma20": latest_data.get('Volume_MA20', 0),
-                        
-                        # 策略信号
-                        "momentum_signal": float(strategy_signals['momentum'].iloc[-1]['signal']),
-                        "mean_reversion_signal": float(strategy_signals['mean_reversion'].iloc[-1]['signal']),
-                        "bollinger_signal": float(strategy_signals['bollinger'].iloc[-1]['signal']),
-                        "breakout_signal": float(strategy_signals['breakout'].iloc[-1]['signal']),
-                        "combined_signal": float(strategy_signals['combined'].iloc[-1]['signal'])
-                    }
-                )
-                logger.info(f"完成股票 {stock} 的通知测试")
-            except Exception as e:
-                logger.error(f"处理股票 {stock} 时出错: {str(e)}")
+    print("开始通知系统测试...")
+    
+    # 初始化通知系统
+    alert_system = AlertSystem()
+    alert_system.config = trading_config
+    
+    # 获取测试数据
+    test_stocks = ['GOOG', 'TSLA', 'AMD', 'NVDA', 'PFE', 'MSFT', 'TMDX']
+    for symbol in test_stocks:
+        data = await get_test_data(symbol)
+        if data is not None:
+            # 将数据转换为DataFrame格式
+            df = pd.DataFrame({
+                'close': [data.get('close', 0)],
+                'volume': [data.get('volume', 0)],
+                'open': [data.get('open', 0)],
+                'high': [data.get('high', 0)],
+                'low': [data.get('low', 0)]
+            })
             
-            await asyncio.sleep(1)  # 避免请求过于频繁
-        
-        logger.info("交易信号通知测试完成")
-        
-    except Exception as e:
-        logger.error(f"通知系统测试失败: {str(e)}")
+            # 使用 generate_alerts 方法
+            position = {
+                'cost_basis': data.get('close', 0),
+                'weight': 0.1
+            }
+            alerts = alert_system.generate_alerts(symbol, position, df)
+            if alerts:
+                for alert in alerts:
+                    alert_system.send_alert(
+                        stock=symbol,
+                        alert_type=alert['type'],
+                        message=alert['message'],
+                        price=data.get('close', 0),
+                        indicators={
+                            'cost_basis': position['cost_basis'],
+                            'weight': position['weight'],
+                            'RSI': data.get('RSI', 0),
+                            'MACD': data.get('MACD', 0),
+                            'MACD_Signal': data.get('MACD_Signal', 0),
+                            'volume': data.get('volume', 0),
+                            'volume_ma20': data.get('volume_ma20', 0)
+                        }
+                    )
+    
+    print("通知系统测试完成")
 
 async def main():
     """主函数"""
-    logger.info("开始监控系统测试...")
+    # 加载配置
+    portfolio_config = load_portfolio_config()
     
-    # 运行各个测试
-    await test_trading_monitor()
-    await test_strategy_monitor()
-    await test_notification_system()
+    # 合并配置
+    trading_config = {
+        'smtp_server': 'smtp.gmail.com',
+        'smtp_port': 587,
+        'sender_email': 'kidzss@gmail.com',
+        'sender_password': 'wlkp dbbz xpgk rkhy',
+        'recipient_email': 'kidzss@gmail.com',
+        'notification_threshold': {
+            'price_change': 0.05,
+            'volume_change': 2.0,
+            'market_volatility': 0.02,
+            'risk_level': 'high'
+        }
+    }
     
-    logger.info("所有测试完成")
+    # 合并持仓配置
+    trading_config.update(portfolio_config)
+    
+    # 运行测试
+    await test_monitor_system(trading_config)
+    await test_notification_system(trading_config)
+    await test_strategy_monitor(trading_config)
+    
+    print("所有测试完成")
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
 
 def _get_signal_explanation(self, signal: float) -> str:
     """获取策略信号的解释"""

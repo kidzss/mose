@@ -1,0 +1,25 @@
+{
+    "combined_strategy": {
+        "macd_fast": 12,
+        "macd_slow": 26,
+        "macd_signal": 9,
+        "adx_length": 14,
+        "adx_threshold": 25,
+        "volume_ma_length": 20,
+        "volume_threshold": 1.5,
+        "roc_length": 10,
+        "roc_ma_length": 5
+    },
+    "tdi_strategy": {
+        "rsi_length": 14,
+        "stoch_length": 14,
+        "stoch_smooth": 3,
+        "volume_ma_length": 20,
+        "rsi_oversold": 30,
+        "rsi_overbought": 70,
+        "stoch_oversold": 20,
+        "stoch_overbought": 80,
+        "volume_threshold": 1.5
+    },
+    "monitored_stocks": ["GOOG", "TSLA", "AMD", "NVDA", "PFE", "MSFT", "TMDX"]
+} 
