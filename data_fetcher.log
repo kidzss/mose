@@ -7215,3 +7215,6 @@
 2025-04-21 22:06:42,783 - StockManager - ERROR - 获取股票 MSFT 数据失败: 'MSFT'
 2025-04-21 22:06:42,783 - monitor.data_fetcher - ERROR - 获取最新数据时出错: 'DataFetcher' object has no attribute 'max_workers'
 2025-04-21 22:06:42,784 - StockManager - ERROR - 获取股票 TMDX 数据失败: 'TMDX'
+2025-04-21 22:07:01,788 - monitor.stock_monitor - INFO - 警报已清除
+2025-04-21 22:07:01,788 - monitor.stock_monitor - INFO - 警报已清除
+2025-04-21 22:07:15,301 - monitor.stock_monitor - INFO - 警报已清除

@@ -622,7 +622,8 @@
 2025-04-21 22:05:01,776 - monitor.stock_monitor - INFO - 警报已清除
 2025-04-21 22:06:01,781 - monitor.stock_monitor - INFO - 警报已清除
 2025-04-21 22:06:41,177 - monitor.stock_monitor - ERROR - 执行监控失败: 'MarketMonitor' object has no attribute 'monitor_market'
- monitor.data_fetcher - ERROR - 获取最新数据时出错: 'DataFetcher' object has no attribute 'api_delay'
+2025-04-21 22:07:01,788 - monitor.stock_monitor - INFO - 警报已清除
+' object has no attribute 'api_delay'
 2025-04-21 16:35:59,757 - StockManager - ERROR - 获取股票 TMDX 数据失败: 'TMDX'
 2025-04-21 16:36:00,029 - monitor.stock_monitor - INFO - 警报已清除
 2025-04-21 16:36:59,894 - monitor.stock_monitor - INFO - 警报已清除
@@ -2148,7 +2149,8 @@
 2025-04-21 22:06:42,783 - StockManager - ERROR - 获取股票 MSFT 数据失败: 'MSFT'
 2025-04-21 22:06:42,783 - monitor.data_fetcher - ERROR - 获取最新数据时出错: 'DataFetcher' object has no attribute 'max_workers'
 2025-04-21 22:06:42,784 - StockManager - ERROR - 获取股票 TMDX 数据失败: 'TMDX'
-25-04-21 21:11:32,093 - StockManager - ERROR - 获取股票 NVDA 数据失败: 'NVDA'
+2025-04-21 22:07:15,301 - monitor.stock_monitor - INFO - 警报已清除
+�败: 'NVDA'
 [*********************100%***********************]  1 of 1 completed
 2025-04-21 21:11:32,111 - monitor.data_fetcher - ERROR - 获取最新数据时出错: 'DataFetcher' object has no attribute 'api_delay'
 2025-04-21 21:11:32,112 - StockManager - ERROR - 获取股票 PFE 数据失败: 'PFE'
@@ -2488,3 +2490,4 @@
 [*********************100%***********************]  1 of 1 completed
 2025-04-21 22:06:39,745 - monitor.data_fetcher - ERROR - 获取最新数据时出错: 'DataFetcher' object has no attribute 'api_delay'
 2025-04-21 22:06:39,745 - StockManager - ERROR - 获取股票 TMDX 数据失败: 'TMDX'
+2025-04-21 22:07:01,788 - monitor.stock_monitor - INFO - 警报已清除
