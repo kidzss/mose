@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# 设置Python环境
+source venv/bin/activate
+
+# 设置日志文件
+LOG_FILE="trading_monitor.log"
+
+# 启动监控系统
+echo "启动交易监控系统..."
+python -u run_monitor.py >> $LOG_FILE 2>&1 &
+
+# 保存进程ID
+echo $! > monitor.pid
+
+echo "监控系统已启动，进程ID: $(cat monitor.pid)"
+echo "日志文件: $LOG_FILE"
+
 # 定义日志文件路径
 MONITOR_LOG="monitor.log"
 MARKET_BOTTOM_LOG="market_bottom.log"

@@ -38,6 +38,12 @@ class DataFetcher:
     def __init__(self):
         """初始化数据获取器"""
         self.logger = logging.getLogger(__name__)
+        self.max_workers = 5  # 默认最大工作线程数
+        self.engine = None
+        self.cache_data = True
+        self.data_cache = {}
+        self.cache_timestamps = {}
+        self.cache_expiry = 3600  # 缓存过期时间（秒）
         
     def get_historical_data(
         self,

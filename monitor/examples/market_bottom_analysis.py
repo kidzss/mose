@@ -7,6 +7,11 @@ from monitor.stock_monitor import StockMonitor
 from monitor.semiconductor_trading_strategy import SemiconductorTradingStrategy
 from monitor.notification_system import NotificationSystem
 from data.data_loader import DataLoader
+from monitor.data_fetcher import DataFetcher
+from monitor.strategy_manager import StrategyManager
+from monitor.report_generator import ReportGenerator
+from monitor.market_monitor import MarketMonitor
+from monitor.stock_manager import StockManager
 
 # 配置日志
 logging.basicConfig(
@@ -17,7 +22,22 @@ logger = logging.getLogger(__name__)
 
 class MarketBottomAnalyzer:
     def __init__(self):
-        self.stock_monitor = StockMonitor()
+        # 创建必要的组件
+        data_fetcher = DataFetcher()
+        strategy_manager = StrategyManager()
+        report_generator = ReportGenerator()
+        market_monitor = MarketMonitor()
+        stock_manager = StockManager(data_fetcher=data_fetcher)
+        
+        # 初始化StockMonitor
+        self.stock_monitor = StockMonitor(
+            data_fetcher=data_fetcher,
+            strategy_manager=strategy_manager,
+            report_generator=report_generator,
+            market_monitor=market_monitor,
+            stock_manager=stock_manager
+        )
+        
         self.semiconductor_strategy = SemiconductorTradingStrategy()
         self.data_loader = DataLoader()
         self.notification_system = NotificationSystem()

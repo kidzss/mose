@@ -55,14 +55,24 @@ class NotificationThreshold:
 
 @dataclass
 class TradingConfig:
+    # 必需参数
+    price_alert_threshold: float
+    loss_alert_threshold: float
+    profit_target: float
+    stop_loss: float
+    check_interval: int
+    email_notifications: bool
+    update_interval: int
+    risk_thresholds: Dict
+    notification_settings: Dict
+    sector_specific_settings: Dict
     email: EmailConfig
     database: DatabaseConfig
-    strategy: StrategyConfig = field(default_factory=StrategyConfig)
-    monitoring: MonitoringConfig = field(default_factory=MonitoringConfig)
-    notification_threshold: NotificationThreshold = field(default_factory=NotificationThreshold)
-    stock_pool: Optional[List[str]] = None  # 可选的股票池
+    
+    # 可选参数
     log_level: str = "INFO"
     log_file: str = "trading_monitor.log"
+    stock_pool: Optional[List[str]] = None  # 可选的股票池
     
     def __post_init__(self):
         if self.stock_pool is None:
@@ -72,10 +82,49 @@ class TradingConfig:
 
 # 默认配置
 default_config = TradingConfig(
+    price_alert_threshold=0.05,
+    loss_alert_threshold=0.05,
+    profit_target=0.25,
+    stop_loss=0.15,
+    check_interval=60,
+    email_notifications=True,
+    update_interval=60,
+    risk_thresholds={
+        'volatility': 0.02,
+        'concentration': 0.3,
+        'var': 0.1
+    },
+    notification_settings={
+        'email': True,
+        'slack': False,
+        'telegram': False
+    },
+    sector_specific_settings={
+        'semiconductor': {
+            'stop_loss': 0.08,
+            'price_alert_threshold': 0.03,
+            'volatility_threshold': 0.03
+        },
+        'tech': {
+            'stop_loss': 0.12,
+            'price_alert_threshold': 0.04,
+            'volatility_threshold': 0.025
+        },
+        'healthcare': {
+            'stop_loss': 0.1,
+            'price_alert_threshold': 0.04,
+            'volatility_threshold': 0.02
+        },
+        'automotive': {
+            'stop_loss': 0.15,
+            'price_alert_threshold': 0.05,
+            'volatility_threshold': 0.03
+        }
+    },
     email=EmailConfig(
         sender_password="wlkp dbbz xpgk rkhy"  # 替换为从Google生成的应用专用密码
     ),
     database=DatabaseConfig(
-        password="123456"  # 设置正确的数据库密码
+        password=""  # 设置正确的数据库密码
     )
 ) 

@@ -1,8 +1,9 @@
-from typing import Dict, Any, Optional
+from .strategy_base import Strategy
+from .market_analysis import MarketAnalysis
+from data.market_sentiment import MarketSentimentData
 import pandas as pd
 import numpy as np
-from strategy_base import Strategy
-from data.market_sentiment import MarketSentimentData
+from typing import Dict, List, Any, Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,11 +13,12 @@ class MarketSentimentStrategy(Strategy):
     市场情绪策略，结合VIX指数、Put/Call Ratio和市场宽度指标
     """
     
-    def __init__(self, parameters: Optional[Dict[str, Any]] = None):
+    def __init__(self, name: str = "Market Sentiment Strategy", parameters: Dict[str, Any] = None):
         """
         初始化市场情绪策略
         
         参数:
+            name: 策略名称
             parameters: 策略参数
         """
         # 默认参数
@@ -47,10 +49,13 @@ class MarketSentimentStrategy(Strategy):
             default_params.update(parameters)
             
         # 调用父类初始化
-        super().__init__(name="MarketSentimentStrategy", parameters=default_params)
+        super().__init__(name, default_params)
+        
+        # 初始化市场分析器
+        self.market_analyzer = MarketAnalysis()
         
         # 初始化市场情绪数据
-        self.market_sentiment = MarketSentimentData()
+        self.sentiment_data = MarketSentimentData()
         
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """
@@ -68,7 +73,7 @@ class MarketSentimentStrategy(Strategy):
         # 获取VIX数据
         vix_data = []
         for date in df.index:
-            vix = self.market_sentiment.get_vix(date.strftime('%Y-%m-%d'))
+            vix = self.sentiment_data.get_vix(date.strftime('%Y-%m-%d'))
             vix_data.append(vix)
         df['vix'] = vix_data
         
@@ -76,13 +81,13 @@ class MarketSentimentStrategy(Strategy):
         df['vix_change'] = df['vix'].pct_change()
         
         # 计算平滑后的VIX
-        df['vix_smooth'] = df['vix'].rolling(window=self.params['vix_smoothing']).mean()
+        df['vix_smooth'] = df['vix'].rolling(window=self.parameters['vix_smoothing']).mean()
         
         # 2. Put/Call Ratio指标
         # 获取PCR数据
         pcr_data = []
         for date in df.index:
-            pcr = self.market_sentiment.get_put_call_ratio(date.strftime('%Y-%m-%d'))
+            pcr = self.sentiment_data.get_put_call_ratio(date.strftime('%Y-%m-%d'))
             pcr_data.append(pcr)
         df['pcr'] = pcr_data
         
@@ -90,19 +95,19 @@ class MarketSentimentStrategy(Strategy):
         df['pcr_change'] = df['pcr'].pct_change()
         
         # 计算平滑后的PCR
-        df['pcr_smooth'] = df['pcr'].rolling(window=self.params['pcr_smoothing']).mean()
+        df['pcr_smooth'] = df['pcr'].rolling(window=self.parameters['pcr_smoothing']).mean()
         
         # 3. 市场宽度指标
         # 计算上涨股票比例
-        df['advance_ratio'] = df['close'].rolling(window=self.params['breadth_period']).apply(
+        df['advance_ratio'] = df['close'].rolling(window=self.parameters['breadth_period']).apply(
             lambda x: len(x[x > x.shift(1)]) / len(x)
         )
         
         # 计算新高新低比例
-        df['new_high_ratio'] = df['high'].rolling(window=self.params['breadth_period']).apply(
+        df['new_high_ratio'] = df['high'].rolling(window=self.parameters['breadth_period']).apply(
             lambda x: len(x[x == x.max()]) / len(x)
         )
-        df['new_low_ratio'] = df['low'].rolling(window=self.params['breadth_period']).apply(
+        df['new_low_ratio'] = df['low'].rolling(window=self.parameters['breadth_period']).apply(
             lambda x: len(x[x == x.min()]) / len(x)
         )
         
@@ -116,45 +121,45 @@ class MarketSentimentStrategy(Strategy):
         # 4. 计算综合情绪得分
         # VIX得分 (0-1)
         df['vix_score'] = np.where(
-            df['vix'] > self.params['vix_threshold_high'],
+            df['vix'] > self.parameters['vix_threshold_high'],
             0,
             np.where(
-                df['vix'] < self.params['vix_threshold_low'],
+                df['vix'] < self.parameters['vix_threshold_low'],
                 1,
-                (self.params['vix_threshold_high'] - df['vix']) /
-                (self.params['vix_threshold_high'] - self.params['vix_threshold_low'])
+                (self.parameters['vix_threshold_high'] - df['vix']) /
+                (self.parameters['vix_threshold_high'] - self.parameters['vix_threshold_low'])
             )
         )
         
         # PCR得分 (0-1)
         df['pcr_score'] = np.where(
-            df['pcr'] > self.params['pcr_threshold_high'],
+            df['pcr'] > self.parameters['pcr_threshold_high'],
             0,
             np.where(
-                df['pcr'] < self.params['pcr_threshold_low'],
+                df['pcr'] < self.parameters['pcr_threshold_low'],
                 1,
-                (self.params['pcr_threshold_high'] - df['pcr']) /
-                (self.params['pcr_threshold_high'] - self.params['pcr_threshold_low'])
+                (self.parameters['pcr_threshold_high'] - df['pcr']) /
+                (self.parameters['pcr_threshold_high'] - self.parameters['pcr_threshold_low'])
             )
         )
         
         # 市场宽度得分 (0-1)
         df['breadth_score'] = np.where(
-            df['market_breadth'] > self.params['breadth_threshold_high'],
+            df['market_breadth'] > self.parameters['breadth_threshold_high'],
             1,
             np.where(
-                df['market_breadth'] < self.params['breadth_threshold_low'],
+                df['market_breadth'] < self.parameters['breadth_threshold_low'],
                 0,
-                (df['market_breadth'] - self.params['breadth_threshold_low']) /
-                (self.params['breadth_threshold_high'] - self.params['breadth_threshold_low'])
+                (df['market_breadth'] - self.parameters['breadth_threshold_low']) /
+                (self.parameters['breadth_threshold_high'] - self.parameters['breadth_threshold_low'])
             )
         )
         
         # 计算综合情绪得分
         df['sentiment_score'] = (
-            df['vix_score'] * self.params['sentiment_weight'] +
-            df['pcr_score'] * self.params['sentiment_weight'] +
-            df['breadth_score'] * self.params['sentiment_weight']
+            df['vix_score'] * self.parameters['sentiment_weight'] +
+            df['pcr_score'] * self.parameters['sentiment_weight'] +
+            df['breadth_score'] * self.parameters['sentiment_weight']
         )
         
         return df
@@ -169,40 +174,19 @@ class MarketSentimentStrategy(Strategy):
         返回:
             添加了信号的DataFrame
         """
-        df = data.copy()
+        df = self.calculate_indicators(data)
         
-        # 初始化信号列
-        df['signal'] = 0
+        # 获取市场情绪数据
+        sentiment = self.sentiment_data.get_sentiment(data.index[-1].strftime('%Y-%m-%d'))
         
         # 生成信号
-        for i in range(1, len(df)):
-            current_data = df.iloc[i]
-            
-            # 1. 情绪指标
-            sentiment_bullish = current_data['sentiment_score'] > 0.7
-            sentiment_bearish = current_data['sentiment_score'] < 0.3
-            
-            # 2. 趋势指标
-            trend_up = (
-                current_data['market_breadth'] > self.params['breadth_threshold_high'] and
-                current_data['vix'] < self.params['vix_threshold_low']
-            )
-            trend_down = (
-                current_data['market_breadth'] < self.params['breadth_threshold_low'] and
-                current_data['vix'] > self.params['vix_threshold_high']
-            )
-            
-            # 3. 波动率指标
-            volatility_high = current_data['vix'] > self.params['vix_threshold_high']
-            volatility_low = current_data['vix'] < self.params['vix_threshold_low']
-            
-            # 生成买入信号
-            if sentiment_bullish and trend_up and volatility_low:
-                df.loc[df.index[i], 'signal'] = 1
-                
-            # 生成卖出信号
-            elif sentiment_bearish and trend_down and volatility_high:
-                df.loc[df.index[i], 'signal'] = -1
+        df['signal'] = 0.0
+        
+        # 检查综合情绪得分
+        if sentiment > self.parameters['sentiment_threshold']:
+            df['signal'].iloc[-1] = 1.0  # 买入信号
+        elif sentiment < -self.parameters['sentiment_threshold']:
+            df['signal'].iloc[-1] = -1.0  # 卖出信号
                 
         return df
         
@@ -232,7 +216,7 @@ class MarketSentimentStrategy(Strategy):
             return 'bullish'
         elif sentiment_score < 0.3 and trend_score < 0.3 and volatility_score < 0.3:
             return 'bearish'
-        elif current_data['vix'] > self.params['vix_threshold_high']:
+        elif current_data['vix'] > self.parameters['vix_threshold_high']:
             return 'volatile'
         else:
             return 'ranging'

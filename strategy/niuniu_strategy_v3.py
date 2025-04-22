@@ -255,7 +255,7 @@ class NiuniuStrategyV3(Strategy):
             df['ATR'] = talib.ATR(df['high'].values, df['low'].values, df['close'].values, timeperiod=14)
             
             # 填充NaN值
-            df = df.fillna(method='ffill')
+            df = df.ffill()
             
             return df
             

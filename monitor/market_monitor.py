@@ -303,3 +303,55 @@ class MarketMonitor:
         except Exception as e:
             self.logger.error(f"分析风险水平时出错: {str(e)}")
             return 0.5
+
+    def monitor_market(self, market_data: Dict) -> List[Alert]:
+        """
+        监控市场状态并生成警报
+        
+        参数:
+            market_data: 市场数据字典
+            
+        返回:
+            List[Alert]: 警报列表
+        """
+        try:
+            alerts = []
+            
+            # 分析市场状态
+            market_state = self._analyze_market_state(market_data)
+            
+            # 根据市场状态生成警报
+            if market_state['market_state'] == 'bullish':
+                alerts.append(Alert(
+                    alert_type='market',
+                    message='市场进入牛市状态',
+                    level='info'
+                ))
+            elif market_state['market_state'] == 'bearish':
+                alerts.append(Alert(
+                    alert_type='market',
+                    message='市场进入熊市状态',
+                    level='warning'
+                ))
+                
+            # 检查风险水平
+            if market_state['risk'] > 0.7:
+                alerts.append(Alert(
+                    alert_type='risk',
+                    message='市场风险水平较高',
+                    level='warning'
+                ))
+                
+            # 检查趋势变化
+            if market_state['trend'] < 0.3:
+                alerts.append(Alert(
+                    alert_type='trend',
+                    message='市场趋势转弱',
+                    level='warning'
+                ))
+                
+            return alerts
+            
+        except Exception as e:
+            self.logger.error(f"监控市场时出错: {str(e)}")
+            return []

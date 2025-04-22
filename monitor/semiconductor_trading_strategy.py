@@ -3,7 +3,6 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
-from monitor.stock_monitor import StockMonitor
 from data.data_loader import DataLoader
 
 # 配置日志
@@ -17,7 +16,6 @@ class SemiconductorTradingStrategy:
     """半导体板块交易策略"""
     
     def __init__(self):
-        self.stock_monitor = StockMonitor()
         self.semiconductor_stocks = ['AMD', 'NVDA', 'INTC', 'QCOM', 'AVGO']
         # 调整止损位，考虑利好因素
         self.stop_loss_levels = {
@@ -81,7 +79,7 @@ class SemiconductorTradingStrategy:
             # 分析每只股票
             for symbol, name in semiconductor_stocks.items():
                 try:
-                    analysis = await self.stock_monitor.get_stock_analysis(symbol)
+                    analysis = await self.data_loader.get_stock_analysis(symbol)
                     if analysis and 'error' not in analysis:
                         sector_analysis['stocks'][symbol] = {
                             'name': name,

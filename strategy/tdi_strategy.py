@@ -48,8 +48,9 @@ class TDIStrategy(Strategy):
         df = data.copy()
         
         # 计算移动平均线
-        df['MA20'] = df['close'].rolling(window=20).mean()
-        df['MA50'] = df['close'].rolling(window=50).mean()
+        df['MA5'] = df['close'].rolling(window=5).mean()    # 短期
+        df['MA20'] = df['close'].rolling(window=20).mean()  # 中期
+        df['MA50'] = df['close'].rolling(window=50).mean()  # 长期
         
         # 计算RSI
         delta = df['close'].diff()
@@ -71,37 +72,162 @@ class TDIStrategy(Strategy):
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         生成交易信号
+        
+        参数:
+            data: 包含OHLCV数据的DataFrame
+            
+        返回:
+            添加了信号列的DataFrame
         """
-        # 首先计算指标
-        df = self.calculate_indicators(data)
+        # 计算技术指标
+        data = self.calculate_indicators(data)
         
-        # 生成信号
-        df['signal'] = 0.0
+        # 初始化信号列
+        data['signal'] = 0
+        data['signal_type'] = ''  # 新增信号类型列
         
-        for i in range(1, len(df)):
-            current_data = df.iloc[i]
-            df.loc[df.index[i], 'signal'] = self.generate_signal(current_data)
+        # 短期信号 (5日均线)
+        short_term_buy = (
+            (data['close'] > data['MA5']) &
+            (data['RSI'] < 30)
+        )
+        short_term_sell = (
+            (data['close'] < data['MA5']) &
+            (data['RSI'] > 70)
+        )
         
-        return df
+        # 中期信号 (20日均线)
+        medium_term_buy = (
+            (data['close'] > data['MA20']) &
+            (data['MA20'] > data['MA50']) &
+            (data['RSI'] < 35)
+        )
+        medium_term_sell = (
+            (data['close'] < data['MA20']) &
+            (data['MA20'] < data['MA50']) &
+            (data['RSI'] > 65)
+        )
         
-    def generate_signal(self, current_data: pd.Series) -> float:
+        # 长期信号 (50日均线)
+        long_term_buy = (
+            (data['close'] > data['MA50']) &
+            (data['MA50'].diff() > 0) &
+            (data['RSI'] < 40)
+        )
+        long_term_sell = (
+            (data['close'] < data['MA50']) &
+            (data['MA50'].diff() < 0) &
+            (data['RSI'] > 60)
+        )
+        
+        # 设置信号和信号类型
+        data.loc[short_term_buy, 'signal'] = 1
+        data.loc[short_term_buy, 'signal_type'] = 'short_term_buy'
+        data.loc[short_term_sell, 'signal'] = -1
+        data.loc[short_term_sell, 'signal_type'] = 'short_term_sell'
+        
+        data.loc[medium_term_buy, 'signal'] = 1
+        data.loc[medium_term_buy, 'signal_type'] = 'medium_term_buy'
+        data.loc[medium_term_sell, 'signal'] = -1
+        data.loc[medium_term_sell, 'signal_type'] = 'medium_term_sell'
+        
+        data.loc[long_term_buy, 'signal'] = 1
+        data.loc[long_term_buy, 'signal_type'] = 'long_term_buy'
+        data.loc[long_term_sell, 'signal'] = -1
+        data.loc[long_term_sell, 'signal_type'] = 'long_term_sell'
+        
+        # 发送交易信号通知
+        if hasattr(self, 'notification_manager'):
+            latest_data = data.iloc[-1]
+            if latest_data['signal'] != 0:
+                signal_type = latest_data['signal_type']
+                time_frame = signal_type.split('_')[0]  # 获取时间周期
+                action = signal_type.split('_')[1]      # 获取买卖动作
+                
+                indicators = {
+                    'MA5': latest_data['MA5'],
+                    'MA20': latest_data['MA20'],
+                    'MA50': latest_data['MA50'],
+                    'RSI': latest_data['RSI'],
+                    'ATR': latest_data['ATR']
+                }
+                
+                confidence = self._calculate_signal_confidence(latest_data)
+                self.notification_manager.send_trading_signal(
+                    stock=self.symbol,
+                    signal_type=action,
+                    price=latest_data['close'],
+                    indicators=indicators,
+                    confidence=confidence,
+                    time_frame=time_frame
+                )
+        
+        return data
+        
+    def _calculate_signal_confidence(self, data: pd.Series) -> float:
         """
-        根据当前数据生成信号
+        计算信号置信度
+        
+        参数:
+            data: 包含技术指标的Series
+            
+        返回:
+            信号置信度 (0-1之间)
         """
-        # 趋势判断
-        trend_up = current_data['MA20'] > current_data['MA50']
+        # 基于多个指标计算综合置信度
+        confidence = 0.0
         
-        # RSI超买超卖
-        rsi_overbought = current_data['RSI'] > 70
-        rsi_oversold = current_data['RSI'] < 30
+        # 根据时间周期调整权重
+        time_frame = data['signal_type'].split('_')[0]
+        if time_frame == 'short':
+            rsi_weight = 0.4
+            ma_weight = 0.4
+            atr_weight = 0.2
+        elif time_frame == 'medium':
+            rsi_weight = 0.3
+            ma_weight = 0.5
+            atr_weight = 0.2
+        else:  # long
+            rsi_weight = 0.2
+            ma_weight = 0.6
+            atr_weight = 0.2
         
-        # 生成信号
-        if trend_up and rsi_oversold:
-            return 1.0  # 买入信号
-        elif not trend_up and rsi_overbought:
-            return -1.0  # 卖出信号
-        else:
-            return 0.0  # 无信号
+        # RSI权重
+        if data['signal'] > 0:  # 买入信号
+            rsi_confidence = (30 - data['RSI']) / 30
+        else:  # 卖出信号
+            rsi_confidence = (data['RSI'] - 70) / 30
+        confidence += rsi_confidence * rsi_weight
+        
+        # 均线权重
+        if time_frame == 'short':
+            if data['signal'] > 0:  # 买入信号
+                ma_confidence = (data['close'] - data['MA5']) / data['MA5']
+            else:  # 卖出信号
+                ma_confidence = (data['MA5'] - data['close']) / data['close']
+        elif time_frame == 'medium':
+            if data['signal'] > 0:  # 买入信号
+                ma_confidence = (
+                    (data['close'] - data['MA20']) / data['MA20'] +
+                    (data['MA20'] - data['MA50']) / data['MA50']
+                ) / 2
+            else:  # 卖出信号
+                ma_confidence = (
+                    (data['MA20'] - data['close']) / data['close'] +
+                    (data['MA50'] - data['MA20']) / data['MA20']
+                ) / 2
+        else:  # long
+            if data['signal'] > 0:  # 买入信号
+                ma_confidence = (data['close'] - data['MA50']) / data['MA50']
+            else:  # 卖出信号
+                ma_confidence = (data['MA50'] - data['close']) / data['close']
+        confidence += ma_confidence * ma_weight
+        
+        # ATR权重
+        atr_confidence = min(data['ATR'] / data['close'], 1.0)
+        confidence += atr_confidence * atr_weight
+        
+        return min(max(confidence, 0.0), 1.0)
         
     def calculate_position_size(self, data: pd.DataFrame, volatility_high: bool) -> float:
         """计算仓位大小"""

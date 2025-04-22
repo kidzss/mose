@@ -9,11 +9,11 @@ from config.trading_config import DatabaseConfig
 @dataclass
 class MySQLConfig:
     """MySQL数据库配置"""
-    host: str = DatabaseConfig.host
-    port: int = DatabaseConfig.port
-    user: str = DatabaseConfig.user
-    password: str = DatabaseConfig.password
-    database: str = DatabaseConfig.database
+    host: str = "localhost"
+    port: int = 3306
+    user: str = "root"
+    password: str = ""
+    database: str = "mose"
 
 
 @dataclass

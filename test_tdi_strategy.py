@@ -10,9 +10,16 @@ from typing import Dict, Any
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from backtest.backtest_engine import BacktestEngine
+from monitor.notification_manager import NotificationManager
+from monitor.strategy_monitor import StrategyMonitor
+from data.data_interface import YahooFinanceRealTimeSource
+import time
 
-# 设置日志
-logging.basicConfig(level=logging.INFO)
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 def load_data_from_mysql(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
@@ -341,6 +348,185 @@ def analyze_backtest_results(engine: BacktestEngine, symbol: str) -> Dict[str, A
         logger.error(f"分析回测结果时出错: {str(e)}")
         return {}
 
+def generate_test_data(days=100):
+    """生成测试数据"""
+    dates = pd.date_range(end=datetime.now(), periods=days)
+    base_price = 150.0
+    volatility = 2.0
+    
+    # 生成随机价格数据
+    np.random.seed(42)
+    returns = np.random.normal(0, volatility/100, days)
+    prices = base_price * (1 + returns).cumprod()
+    
+    # 添加一些趋势
+    trend = np.linspace(0, 0.1, days)
+    prices = prices * (1 + trend)
+    
+    # 创建DataFrame
+    df = pd.DataFrame({
+        'date': dates,
+        'open': prices,
+        'high': prices * (1 + np.random.uniform(0, 0.01, days)),
+        'low': prices * (1 - np.random.uniform(0, 0.01, days)),
+        'close': prices,
+        'volume': np.random.randint(1000000, 5000000, days)
+    })
+    
+    return df
+
+def test_tdi_strategy():
+    """测试TDI策略"""
+    # 初始化策略和通知管理器
+    strategy = TDIStrategy()
+    notification_manager = NotificationManager()
+    
+    # 将通知管理器添加到策略中
+    strategy.notification_manager = notification_manager
+    
+    # 生成测试数据
+    test_data = generate_test_data()
+    
+    # 设置股票代码
+    strategy.symbol = "AAPL"
+    
+    # 生成信号
+    signals = strategy.generate_signals(test_data)
+    
+    # 打印信号统计
+    signal_counts = signals['signal_type'].value_counts()
+    logger.info("信号统计:")
+    logger.info(signal_counts)
+    
+    # 打印最后10个信号
+    last_signals = signals[signals['signal'] != 0].tail(10)
+    logger.info("最近10个信号:")
+    for _, row in last_signals.iterrows():
+        logger.info(f"日期: {row['date']}, 信号类型: {row['signal_type']}, 价格: {row['close']:.2f}")
+
+def test_monitoring_and_notification():
+    """测试监控和通知功能"""
+    try:
+        # 初始化策略监控器
+        monitor = StrategyMonitor()
+        
+        # 启动监控
+        monitor.start_monitoring()
+        logger.info("监控已启动")
+        
+        # 测试运行一段时间
+        test_duration = 300  # 5分钟
+        start_time = time.time()
+        
+        while time.time() - start_time < test_duration:
+            try:
+                # 获取持仓状态
+                portfolio_status = monitor.get_portfolio_status()
+                if portfolio_status:
+                    logger.info("\n当前持仓状态:")
+                    for holding in portfolio_status['holdings']:
+                        logger.info(
+                            f"{holding['symbol']}: "
+                            f"持仓 {holding['shares']} 股, "
+                            f"成本 {holding['avg_cost']:.2f}, "
+                            f"现价 {holding['current_price']:.2f}, "
+                            f"盈亏 {holding['pnl']:.2f} ({holding['pnl_percent']:.2f}%)"
+                        )
+                    logger.info(
+                        f"总市值: {portfolio_status['total_value']:.2f}, "
+                        f"总成本: {portfolio_status['total_cost']:.2f}, "
+                        f"总盈亏: {portfolio_status['total_pnl']:.2f}"
+                    )
+                
+                # 获取观察股票状态
+                watchlist_status = monitor.get_watchlist_status()
+                if watchlist_status:
+                    logger.info("\n观察股票状态:")
+                    for stock in watchlist_status['watchlist']:
+                        signal_text = "买入" if stock['signal'] > 0 else "卖出" if stock['signal'] < 0 else "观望"
+                        logger.info(
+                            f"{stock['symbol']}: "
+                            f"现价 {stock['current_price']:.2f}, "
+                            f"信号: {signal_text}, "
+                            f"时间周期: {stock.get('time_frame', 'N/A')}"
+                        )
+                
+                # 等待下一次更新
+                time.sleep(60)  # 每分钟更新一次
+                
+            except KeyboardInterrupt:
+                logger.info("收到停止信号，正在停止监控...")
+                break
+            except Exception as e:
+                logger.error(f"监控过程中出错: {str(e)}")
+                time.sleep(60)  # 出错后等待一分钟再继续
+                
+    finally:
+        # 停止监控
+        monitor.stop_monitoring()
+        logger.info("监控已停止")
+
+def test_notification_system():
+    """测试通知系统"""
+    try:
+        # 初始化通知管理器
+        notification_manager = NotificationManager()
+        
+        # 测试不同时间周期的信号通知
+        test_cases = [
+            {
+                'stock': 'AAPL',
+                'signal_type': 'buy',
+                'price': 150.0,
+                'indicators': {
+                    'MA5': 149.5,
+                    'MA20': 148.0,
+                    'MA50': 145.0,
+                    'RSI': 28,
+                    'ATR': 2.5
+                },
+                'confidence': 0.85,
+                'time_frame': 'short'
+            },
+            {
+                'stock': 'AAPL',
+                'signal_type': 'sell',
+                'price': 155.0,
+                'indicators': {
+                    'MA5': 156.0,
+                    'MA20': 157.0,
+                    'MA50': 158.0,
+                    'RSI': 72,
+                    'ATR': 2.8
+                },
+                'confidence': 0.75,
+                'time_frame': 'medium'
+            },
+            {
+                'stock': 'AAPL',
+                'signal_type': 'buy',
+                'price': 140.0,
+                'indicators': {
+                    'MA5': 139.0,
+                    'MA20': 138.0,
+                    'MA50': 137.0,
+                    'RSI': 35,
+                    'ATR': 2.0
+                },
+                'confidence': 0.90,
+                'time_frame': 'long'
+            }
+        ]
+        
+        # 发送测试通知
+        for case in test_cases:
+            notification_manager.send_trading_signal(**case)
+            logger.info(f"已发送测试通知: {case['time_frame']}周期 {case['signal_type']}信号")
+            time.sleep(1)  # 避免通知过于频繁
+            
+    except Exception as e:
+        logger.error(f"测试通知系统时出错: {str(e)}")
+
 def main():
     """主函数"""
     try:
@@ -382,4 +568,10 @@ def main():
         logger.error(f"主函数执行出错: {str(e)}")
 
 if __name__ == "__main__":
-    main() 
+    # 测试通知系统
+    logger.info("开始测试通知系统...")
+    test_notification_system()
+    
+    # 测试监控功能
+    logger.info("\n开始测试监控功能...")
+    test_monitoring_and_notification() 
