@@ -227,24 +227,30 @@ class AlertSystem:
     def send_alert(self, stock: str, alert_type: str, message: str, price: float, indicators: Dict):
         """发送警报"""
         try:
+            # 确保所有数值都是标量而不是Series
+            def get_scalar(value):
+                if isinstance(value, pd.Series):
+                    return value.iloc[0]
+                return value
+
             # 构建完整的消息
             full_message = f"""
 股票代码: {stock}
 警报类型: {alert_type}
 
 价格信息:
-- 当前价格: {price:.2f}
-- 成本价格: {indicators.get('cost_basis', 0):.2f}
-- 价格变化: {indicators.get('price_change', 0):.2%}
+- 当前价格: {get_scalar(price):.2f}
+- 成本价格: {get_scalar(indicators.get('cost_basis', 0)):.2f}
+- 价格变化: {get_scalar(indicators.get('price_change', 0)):.2%}
 
 技术指标分析:
-- RSI: {self._get_rsi_explanation(indicators.get('RSI', 0))}
-- MACD: {self._get_macd_explanation(indicators.get('MACD', 0), indicators.get('MACD_Signal', 0))}
-- 成交量: {self._get_volume_explanation(indicators.get('volume', 0), indicators.get('volume_ma20', 0))}
+- RSI: {self._get_rsi_explanation(get_scalar(indicators.get('RSI', 0)))}
+- MACD: {self._get_macd_explanation(get_scalar(indicators.get('MACD', 0)), get_scalar(indicators.get('MACD_Signal', 0)))}
+- 成交量: {self._get_volume_explanation(get_scalar(indicators.get('volume', 0)), get_scalar(indicators.get('volume_ma20', 0)))}
 
 风险控制:
-- 止损价格: {price * (1 - indicators.get('stop_loss', 0.15)):.2f} ({indicators.get('stop_loss', 0.15):.1%})
-- 仓位权重: {indicators.get('weight', 0):.2%}
+- 止损价格: {get_scalar(price) * (1 - get_scalar(indicators.get('stop_loss', 0.15))):.2f} ({get_scalar(indicators.get('stop_loss', 0.15)):.1%})
+- 仓位权重: {get_scalar(indicators.get('weight', 0)):.2%}
 """
             
             # 发送邮件通知

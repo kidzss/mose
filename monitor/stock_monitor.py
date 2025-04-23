@@ -934,30 +934,46 @@ class StockMonitor:
     def _calculate_technical_indicators(self, data: pd.DataFrame) -> Dict:
         """计算技术指标"""
         try:
+            # 确保数据是正确的格式
+            if isinstance(data['Close'], pd.Series):
+                close_data = data['Close']
+                volume_data = data['Volume']
+            else:
+                close_data = data['Close'].squeeze()
+                volume_data = data['Volume'].squeeze()
+
             indicators = {}
             
             # RSI
-            delta = data['Close'].diff()
+            delta = close_data.diff()
             gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
             loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
             rs = gain / loss
             indicators['rsi'] = 100 - (100 / (1 + rs))
             
             # MACD
-            exp1 = data['Close'].ewm(span=12, adjust=False).mean()
-            exp2 = data['Close'].ewm(span=26, adjust=False).mean()
+            exp1 = close_data.ewm(span=12, adjust=False).mean()
+            exp2 = close_data.ewm(span=26, adjust=False).mean()
             indicators['macd'] = exp1 - exp2
             indicators['signal'] = indicators['macd'].ewm(span=9, adjust=False).mean()
             
             # 移动平均线
-            indicators['sma20'] = data['Close'].rolling(window=20).mean()
-            indicators['sma50'] = data['Close'].rolling(window=50).mean()
-            indicators['sma200'] = data['Close'].rolling(window=200).mean()
+            indicators['sma20'] = close_data.rolling(window=20).mean()
+            indicators['sma50'] = close_data.rolling(window=50).mean()
+            indicators['sma200'] = close_data.rolling(window=200).mean()
             
             # 成交量变化
-            indicators['volume_change'] = data['Volume'].pct_change()
+            indicators['volume_change'] = volume_data.pct_change()
             
-            return indicators
+            # 获取最后一个值
+            result = {}
+            for key in indicators:
+                if isinstance(indicators[key], pd.Series):
+                    result[key] = indicators[key].iloc[-1]
+                else:
+                    result[key] = indicators[key]
+            
+            return result
         except Exception as e:
             self.logger.error(f"计算技术指标失败: {str(e)}")
             return {}
@@ -972,28 +988,26 @@ class StockMonitor:
             }
             
             # 检查RSI超卖
-            if not indicators['rsi'].empty and float(indicators['rsi'].iloc[-1]) < 30:
+            if 'rsi' in indicators and indicators['rsi'] < 30:
                 state['signals'].append('RSI超卖')
                 state['risk_level'] = 'warning'
             
             # 检查MACD金叉
-            if (not indicators['macd'].empty and not indicators['signal'].empty and
-                len(indicators['macd']) >= 2 and len(indicators['signal']) >= 2 and
-                float(indicators['macd'].iloc[-2]) < float(indicators['signal'].iloc[-2]) and
-                float(indicators['macd'].iloc[-1]) > float(indicators['signal'].iloc[-1])):
+            if ('macd' in indicators and 'signal' in indicators and
+                indicators['macd'] > indicators['signal']):
                 state['signals'].append('MACD金叉')
                 state['risk_level'] = 'opportunity'
             
             # 检查价格与移动平均线的关系
-            if (not indicators['sma20'].empty and not indicators['sma50'].empty and
-                not indicators['sma200'].empty and
-                float(indicators['sma20'].iloc[-1]) > float(indicators['sma50'].iloc[-1]) and
-                float(indicators['sma50'].iloc[-1]) > float(indicators['sma200'].iloc[-1])):
+            if ('sma20' in indicators and 'sma50' in indicators and
+                'sma200' in indicators and
+                indicators['sma20'] > indicators['sma50'] and
+                indicators['sma50'] > indicators['sma200']):
                 state['signals'].append('均线多头排列')
                 state['risk_level'] = 'opportunity'
             
             # 检查成交量放大
-            if not indicators['volume_change'].empty and float(indicators['volume_change'].iloc[-1]) > 1.5:
+            if 'volume_change' in indicators and indicators['volume_change'] > 1.5:
                 state['signals'].append('成交量放大')
                 state['risk_level'] = 'warning'
             
@@ -1014,13 +1028,13 @@ class StockMonitor:
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'market_state': market_state,
                 'indicators': {
-                    'rsi': round(indicators['rsi'].iloc[-1], 2),
-                    'macd': round(indicators['macd'].iloc[-1], 2),
-                    'signal': round(indicators['signal'].iloc[-1], 2),
-                    'sma20': round(indicators['sma20'].iloc[-1], 2),
-                    'sma50': round(indicators['sma50'].iloc[-1], 2),
-                    'sma200': round(indicators['sma200'].iloc[-1], 2),
-                    'volume_change': round(indicators['volume_change'].iloc[-1] * 100, 2)
+                    'rsi': round(indicators['rsi'], 2),
+                    'macd': round(indicators['macd'], 2),
+                    'signal': round(indicators['signal'], 2),
+                    'sma20': round(indicators['sma20'], 2),
+                    'sma50': round(indicators['sma50'], 2),
+                    'sma200': round(indicators['sma200'], 2),
+                    'volume_change': round(indicators['volume_change'] * 100, 2)
                 }
             }
             return report

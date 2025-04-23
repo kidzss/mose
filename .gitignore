@@ -61,4 +61,14 @@ data_updater.log
 backtest_results_*.png
 cpgw_strategy_equity.png
 best_results.json
-data_quality_report.txt 
+data_quality_report.txt
+
+# Log files
+*.pid
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints 

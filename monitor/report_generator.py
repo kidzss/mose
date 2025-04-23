@@ -4,11 +4,15 @@ from datetime import datetime
 from typing import Dict, List
 import yfinance as yf
 from jinja2 import Template
+import logging
 
 class ReportGenerator:
     """投资组合报告生成器"""
     
-    def __init__(self):
+    def __init__(self, config=None):
+        """初始化报告生成器"""
+        self.config = config or {}
+        self.logger = logging.getLogger(__name__)
         self.report_template = Template("""
         <html>
         <head>
@@ -372,167 +376,6 @@ class ReportGenerator:
             portfolio_daily_return = sum(daily_returns) if daily_returns else 0
             portfolio_total_return = sum((p['market_value'] - p['shares'] * p['cost_basis']) for p in positions) / sum(p['shares'] * p['cost_basis'] for p in positions)
             
-            # 更新HTML模板
-            self.report_template = Template("""
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-                    .header { background-color: #f8f9fa; padding: 20px; border-radius: 5px; }
-                    .summary { margin: 20px 0; }
-                    .position-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    .position-table th, .position-table td { 
-                        border: 1px solid #ddd; 
-                        padding: 12px; 
-                        text-align: left; 
-                    }
-                    .position-table th { background-color: #f8f9fa; }
-                    .profit { color: #28a745; }
-                    .loss { color: #dc3545; }
-                    .risk-metrics { margin: 20px 0; }
-                    .analysis-section {
-                        background-color: #f8f9fa;
-                        padding: 20px;
-                        border-radius: 5px;
-                        margin: 20px 0;
-                    }
-                    .recommendation {
-                        background-color: #e9ecef;
-                        padding: 15px;
-                        margin: 10px 0;
-                        border-left: 4px solid #007bff;
-                    }
-                    .warning {
-                        border-left-color: #ffc107;
-                    }
-                    .risk {
-                        border-left-color: #dc3545;
-                    }
-                    .market-analysis {
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                        gap: 20px;
-                        margin: 20px 0;
-                    }
-                    .market-card {
-                        background-color: white;
-                        padding: 15px;
-                        border-radius: 5px;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h2>每日投资组合诊断报告</h2>
-                    <p>生成时间: {{ timestamp }}</p>
-                </div>
-
-                <div class="analysis-section">
-                    <h3>市场环境分析</h3>
-                    <div class="market-analysis">
-                        <div class="market-card">
-                            <h4>市场情绪</h4>
-                            <p>当前市场情绪: {{ market_analysis.market_sentiment }}</p>
-                            <p>VIX变动: {{ '{:+.2f}%'.format(market_analysis.vix_change) }}</p>
-                        </div>
-                        <div class="market-card">
-                            <h4>主要指数表现</h4>
-                            <p>标普500五日: {{ '{:+.2f}%'.format(market_analysis.sp500_5d_return) }}</p>
-                            <p>纳斯达克五日: {{ '{:+.2f}%'.format(market_analysis.nasdaq_5d_return) }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary">
-                    <h3>投资组合概览</h3>
-                    <p>总市值: ${{ "{:,.2f}".format(total_value) }}</p>
-                    <p>今日收益: <span class="{{ 'profit' if daily_return >= 0 else 'loss' }}">
-                        {{ '{:+.2f}%'.format(daily_return * 100) }}</span></p>
-                    <p>累计收益: <span class="{{ 'profit' if total_return >= 0 else 'loss' }}">
-                        {{ '{:+.2f}%'.format(total_return * 100) }}</span></p>
-                </div>
-
-                <div class="analysis-section">
-                    <h3>板块分析</h3>
-                    {% for sector, stats in position_analysis.sector_stats.items() %}
-                    <div class="market-card">
-                        <h4>{{ sector }}</h4>
-                        <p>总市值: ${{ "{:,.2f}".format(stats.market_value) }}</p>
-                        <p>持仓: {{ ", ".join(pos.symbol for pos in stats.positions) }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <h3>个股持仓明细</h3>
-                <table class="position-table">
-                    <tr>
-                        <th>股票代码</th>
-                        <th>现价</th>
-                        <th>成本价</th>
-                        <th>持仓数量</th>
-                        <th>市值</th>
-                        <th>仓位占比</th>
-                        <th>今日收益</th>
-                        <th>累计收益</th>
-                    </tr>
-                    {% for position in positions %}
-                    <tr>
-                        <td>{{ position.symbol }}</td>
-                        <td>${{ "{:.2f}".format(position.current_price) }}</td>
-                        <td>${{ "{:.2f}".format(position.cost_basis) }}</td>
-                        <td>{{ "{:,.0f}".format(position.shares) }}</td>
-                        <td>${{ "{:,.2f}".format(position.market_value) }}</td>
-                        <td>{{ "{:.2f}%".format(position.weight * 100) }}</td>
-                        <td class="{{ 'profit' if position.daily_return >= 0 else 'loss' }}">
-                            {{ '{:+.2f}%'.format(position.daily_return * 100) }}</td>
-                        <td class="{{ 'profit' if position.total_return >= 0 else 'loss' }}">
-                            {{ '{:+.2f}%'.format(position.total_return * 100) }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-
-                <div class="analysis-section">
-                    <h3>风险指标分析</h3>
-                    <p>投资组合贝塔系数: {{ "{:.2f}".format(portfolio_beta) }}</p>
-                    <p>夏普比率: {{ "{:.2f}".format(sharpe_ratio) }}</p>
-                    <p>最大回撤: {{ "{:.2f}%".format(max_drawdown * 100) }}</p>
-                    <p>年化波动率: {{ "{:.2f}%".format(volatility * 100) }}</p>
-                    <p>在险价值(95%): {{ "{:.2f}%".format(var_95 * 100) }}</p>
-                </div>
-
-                <div class="analysis-section">
-                    <h3>投资建议</h3>
-                    {% for rec in strategy_recommendations %}
-                    <div class="recommendation">
-                        {{ rec }}
-                    </div>
-                    {% endfor %}
-                    
-                    {% if position_analysis.recommendations %}
-                    <h4>个股风险提示</h4>
-                    {% for rec in position_analysis.recommendations %}
-                    <div class="recommendation {{ rec.type }}">
-                        {{ rec.message }}
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-
-                {% if alerts %}
-                <div class="analysis-section">
-                    <h3>今日预警信息</h3>
-                    <ul>
-                    {% for alert in alerts %}
-                        <li>{{ alert }}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </body>
-            </html>
-            """)
-            
             # 生成报告
             report = self.report_template.render(
                 timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -554,4 +397,23 @@ class ReportGenerator:
             return report
         except Exception as e:
             print(f"生成报告时出错: {e}")
-            return f"生成报告时出错: {str(e)}" 
+            return f"生成报告时出错: {str(e)}"
+
+    def generate_report(self, analysis_result: Dict, data: pd.DataFrame, symbol: str) -> Dict:
+        """生成分析报告"""
+        try:
+            report = {
+                'symbol': symbol,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'analysis': analysis_result,
+                'data_summary': {
+                    'last_price': data['close'].iloc[-1] if not data.empty else None,
+                    'price_change': (data['close'].iloc[-1] / data['close'].iloc[-2] - 1) if len(data) > 1 else None,
+                    'volume': data['volume'].iloc[-1] if not data.empty else None,
+                    'volume_change': (data['volume'].iloc[-1] / data['volume'].iloc[-2] - 1) if len(data) > 1 else None
+                }
+            }
+            return report
+        except Exception as e:
+            self.logger.error(f"生成报告失败: {str(e)}")
+            return {} 

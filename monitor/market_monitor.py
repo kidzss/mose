@@ -35,16 +35,49 @@ class Alert:
 
 class MarketMonitor:
     """市场监控类，用于分析市场状态和生成警报"""
-    def __init__(self, config_path: Optional[str] = None):
-        """
-        初始化市场监控器
-        
-        参数:
-            config_path: 配置文件路径
-        """
+    def __init__(self, config=None):
+        """初始化市场监控器"""
+        self.config = config or {}
         self.logger = logging.getLogger(__name__)
-        self.config = self._load_config(config_path) if config_path else {}
         
+    def monitor_market(self, symbols: List[str]) -> Dict:
+        """监控市场状态"""
+        try:
+            # 获取市场数据
+            market_data = self._get_market_data(symbols)
+            
+            # 分析市场状态
+            market_state = self._analyze_market_state(market_data)
+            
+            return market_state
+        except Exception as e:
+            self.logger.error(f"监控市场状态失败: {str(e)}")
+            return {}
+            
+    def _get_market_data(self, symbols: List[str]) -> Dict:
+        """获取市场数据"""
+        try:
+            # 这里应该实现获取市场数据的逻辑
+            return {}
+        except Exception as e:
+            self.logger.error(f"获取市场数据失败: {str(e)}")
+            return {}
+            
+    def _analyze_market_state(self, market_data: Dict) -> Dict:
+        """分析市场状态"""
+        try:
+            # 这里应该实现市场状态分析的逻辑
+            return {
+                'market_condition': 'normal',
+                'risk_level': 'low',
+                'opportunity_sectors': [],
+                'trend': 'neutral',
+                'recommendation': 'hold'
+            }
+        except Exception as e:
+            self.logger.error(f"分析市场状态失败: {str(e)}")
+            return {}
+
     def _load_config(self, config_path: str) -> Dict:
         """加载配置文件"""
         try:
@@ -53,51 +86,6 @@ class MarketMonitor:
         except Exception as e:
             self.logger.error(f"加载配置文件时出错: {str(e)}")
             return {}
-            
-    def _analyze_market_state(self, market_data: Dict) -> Dict:
-        """
-        分析市场状态
-        
-        参数:
-            market_data: 市场数据字典
-            
-        返回:
-            Dict: 市场状态字典
-        """
-        try:
-            if not market_data:
-                return {'market_state': 'unknown'}
-                
-            # 分析市场趋势
-            trend = self._analyze_trend(market_data)
-            
-            # 分析市场动量
-            momentum = self._analyze_momentum(market_data)
-            
-            # 分析市场宽度
-            breadth = self._analyze_market_breadth(market_data)
-            
-            # 分析风险水平
-            risk = self._analyze_risk_level(market_data)
-            
-            # 综合分析
-            market_state = 'neutral'  # 默认状态
-            if trend > 0.6 and momentum > 0.6 and breadth > 0.6 and risk < 0.4:
-                market_state = 'bullish'
-            elif trend < 0.4 and momentum < 0.4 and breadth < 0.4 and risk > 0.6:
-                market_state = 'bearish'
-                
-            return {
-                'market_state': market_state,
-                'trend': trend,
-                'momentum': momentum,
-                'breadth': breadth,
-                'risk': risk
-            }
-            
-        except Exception as e:
-            self.logger.error(f"分析市场状态时出错: {str(e)}")
-            return {'market_state': 'unknown'}
             
     def _analyze_trend(self, market_data: Dict) -> float:
         """分析市场趋势"""
@@ -303,55 +291,3 @@ class MarketMonitor:
         except Exception as e:
             self.logger.error(f"分析风险水平时出错: {str(e)}")
             return 0.5
-
-    def monitor_market(self, market_data: Dict) -> List[Alert]:
-        """
-        监控市场状态并生成警报
-        
-        参数:
-            market_data: 市场数据字典
-            
-        返回:
-            List[Alert]: 警报列表
-        """
-        try:
-            alerts = []
-            
-            # 分析市场状态
-            market_state = self._analyze_market_state(market_data)
-            
-            # 根据市场状态生成警报
-            if market_state['market_state'] == 'bullish':
-                alerts.append(Alert(
-                    alert_type='market',
-                    message='市场进入牛市状态',
-                    level='info'
-                ))
-            elif market_state['market_state'] == 'bearish':
-                alerts.append(Alert(
-                    alert_type='market',
-                    message='市场进入熊市状态',
-                    level='warning'
-                ))
-                
-            # 检查风险水平
-            if market_state['risk'] > 0.7:
-                alerts.append(Alert(
-                    alert_type='risk',
-                    message='市场风险水平较高',
-                    level='warning'
-                ))
-                
-            # 检查趋势变化
-            if market_state['trend'] < 0.3:
-                alerts.append(Alert(
-                    alert_type='trend',
-                    message='市场趋势转弱',
-                    level='warning'
-                ))
-                
-            return alerts
-            
-        except Exception as e:
-            self.logger.error(f"监控市场时出错: {str(e)}")
-            return []
