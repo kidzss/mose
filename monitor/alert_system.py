@@ -6,11 +6,19 @@ from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import logging
 
 class AlertSystem:
     """高级预警系统"""
     
-    def __init__(self):
+    def __init__(self, config=None):
+        """初始化警报系统"""
+        self.config = config or {}
+        self.logger = logging.getLogger(__name__)
+        self.email_config = self.config.get('notification', {}).get('email', {})
+        self.telegram_config = self.config.get('notification', {}).get('telegram', {})
+        self.slack_config = self.config.get('notification', {}).get('slack', {})
+        
         self.technical_indicators = {
             'SMA_20': 20,
             'SMA_50': 50,
@@ -249,19 +257,21 @@ class AlertSystem:
         except Exception as e:
             print(f"发送警报失败: {str(e)}")
 
-    def send_email(self, subject: str, body: str):
+    def send_email(self, subject: str, body: str, is_html: bool = False):
         """发送邮件通知"""
         try:
             msg = MIMEMultipart()
-            msg['From'] = self.config.email.sender_email
-            msg['To'] = ', '.join(self.config.email.receiver_emails)
+            msg['From'] = self.email_config['sender_email']
+            msg['To'] = self.email_config['recipient_email']
             msg['Subject'] = subject
             
-            msg.attach(MIMEText(body, 'plain'))
+            # 根据 is_html 参数决定内容类型
+            content_type = 'html' if is_html else 'plain'
+            msg.attach(MIMEText(body, content_type, 'utf-8'))
             
-            with smtplib.SMTP(self.config.email.smtp_server, self.config.email.smtp_port) as server:
+            with smtplib.SMTP(self.email_config['smtp_server'], self.email_config['smtp_port']) as server:
                 server.starttls()
-                server.login(self.config.email.sender_email, self.config.email.sender_password)
+                server.login(self.email_config['sender_email'], self.email_config['sender_password'])
                 server.send_message(msg)
             
             print(f"邮件发送成功: {subject}")

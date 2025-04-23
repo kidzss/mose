@@ -21,6 +21,7 @@ from .data_fetcher import DataFetcher
 from .report_generator import ReportGenerator
 from .market_monitor import MarketMonitor
 from .stock_manager import StockManager
+from .alert_system import AlertSystem
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class StockMonitor:
         self.report_generator = report_generator
         self.market_monitor = market_monitor
         self.stock_manager = stock_manager
+        self.alert_system = AlertSystem(config)
         
         # 设置参数
         self.check_interval = check_interval
@@ -56,6 +58,8 @@ class StockMonitor:
         self.is_running = False
         self.alerts = []
         self.last_check_time = None
+        
+        self.logger = logging.getLogger(__name__)
         
         logger.info(f"StockMonitor初始化完成，运行模式: {mode}")
         
@@ -896,3 +900,171 @@ class StockMonitor:
             self.logger.error(f"检查警报时发生错误: {e}")
             
         return alerts 
+
+    def analyze_market_bottom(self):
+        """分析市场底部信号"""
+        try:
+            # 获取SPY数据
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=365)  # 获取一年的数据
+            spy_data = self.data_fetcher.get_historical_data('SPY', start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+            
+            if spy_data.empty:
+                self.logger.error("无法获取SPY数据")
+                return None
+            
+            # 计算技术指标
+            indicators = self._calculate_technical_indicators(spy_data)
+            
+            # 分析市场状态
+            market_state = self._analyze_market_state(indicators)
+            
+            # 生成分析报告
+            report = self._generate_analysis_report(market_state, indicators)
+            
+            # 发送通知
+            self._send_notification(report)
+            
+            return report
+            
+        except Exception as e:
+            self.logger.error(f"市场底部分析失败: {str(e)}")
+            return None
+        
+    def _calculate_technical_indicators(self, data: pd.DataFrame) -> Dict:
+        """计算技术指标"""
+        try:
+            indicators = {}
+            
+            # RSI
+            delta = data['Close'].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+            rs = gain / loss
+            indicators['rsi'] = 100 - (100 / (1 + rs))
+            
+            # MACD
+            exp1 = data['Close'].ewm(span=12, adjust=False).mean()
+            exp2 = data['Close'].ewm(span=26, adjust=False).mean()
+            indicators['macd'] = exp1 - exp2
+            indicators['signal'] = indicators['macd'].ewm(span=9, adjust=False).mean()
+            
+            # 移动平均线
+            indicators['sma20'] = data['Close'].rolling(window=20).mean()
+            indicators['sma50'] = data['Close'].rolling(window=50).mean()
+            indicators['sma200'] = data['Close'].rolling(window=200).mean()
+            
+            # 成交量变化
+            indicators['volume_change'] = data['Volume'].pct_change()
+            
+            return indicators
+        except Exception as e:
+            self.logger.error(f"计算技术指标失败: {str(e)}")
+            return {}
+        
+    def _analyze_market_state(self, indicators: Dict) -> Dict:
+        """分析市场状态"""
+        try:
+            state = {
+                'is_bottom': False,
+                'signals': [],
+                'risk_level': 'info'
+            }
+            
+            # 检查RSI超卖
+            if not indicators['rsi'].empty and float(indicators['rsi'].iloc[-1]) < 30:
+                state['signals'].append('RSI超卖')
+                state['risk_level'] = 'warning'
+            
+            # 检查MACD金叉
+            if (not indicators['macd'].empty and not indicators['signal'].empty and
+                len(indicators['macd']) >= 2 and len(indicators['signal']) >= 2 and
+                float(indicators['macd'].iloc[-2]) < float(indicators['signal'].iloc[-2]) and
+                float(indicators['macd'].iloc[-1]) > float(indicators['signal'].iloc[-1])):
+                state['signals'].append('MACD金叉')
+                state['risk_level'] = 'opportunity'
+            
+            # 检查价格与移动平均线的关系
+            if (not indicators['sma20'].empty and not indicators['sma50'].empty and
+                not indicators['sma200'].empty and
+                float(indicators['sma20'].iloc[-1]) > float(indicators['sma50'].iloc[-1]) and
+                float(indicators['sma50'].iloc[-1]) > float(indicators['sma200'].iloc[-1])):
+                state['signals'].append('均线多头排列')
+                state['risk_level'] = 'opportunity'
+            
+            # 检查成交量放大
+            if not indicators['volume_change'].empty and float(indicators['volume_change'].iloc[-1]) > 1.5:
+                state['signals'].append('成交量放大')
+                state['risk_level'] = 'warning'
+            
+            # 综合判断市场底部
+            if len(state['signals']) >= 2 and 'RSI超卖' in state['signals']:
+                state['is_bottom'] = True
+                state['risk_level'] = 'opportunity'
+            
+            return state
+        except Exception as e:
+            self.logger.error(f"分析市场状态失败: {str(e)}")
+            return {}
+        
+    def _generate_analysis_report(self, market_state: Dict, indicators: Dict) -> Dict:
+        """生成分析报告"""
+        try:
+            report = {
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'market_state': market_state,
+                'indicators': {
+                    'rsi': round(indicators['rsi'].iloc[-1], 2),
+                    'macd': round(indicators['macd'].iloc[-1], 2),
+                    'signal': round(indicators['signal'].iloc[-1], 2),
+                    'sma20': round(indicators['sma20'].iloc[-1], 2),
+                    'sma50': round(indicators['sma50'].iloc[-1], 2),
+                    'sma200': round(indicators['sma200'].iloc[-1], 2),
+                    'volume_change': round(indicators['volume_change'].iloc[-1] * 100, 2)
+                }
+            }
+            return report
+        except Exception as e:
+            self.logger.error(f"生成分析报告失败: {str(e)}")
+            return {}
+        
+    def _send_notification(self, report: Dict):
+        """发送通知"""
+        try:
+            if not report or 'market_state' not in report:
+                self.logger.warning("没有有效的报告数据，跳过发送通知")
+                return
+            
+            # 构建HTML格式的邮件内容
+            html_content = f"""
+            <h2>市场底部分析报告</h2>
+            <p>时间: {report['timestamp']}</p>
+            <h3>市场状态</h3>
+            <ul>
+                <li>是否底部: {'是' if report['market_state'].get('is_bottom', False) else '否'}</li>
+                <li>风险等级: {report['market_state'].get('risk_level', 'unknown')}</li>
+                <li>信号: {', '.join(report['market_state'].get('signals', []))}</li>
+            </ul>
+            <h3>技术指标</h3>
+            <ul>
+                <li>RSI: {report['indicators'].get('rsi', 'N/A')}</li>
+                <li>MACD: {report['indicators'].get('macd', 'N/A')}</li>
+                <li>Signal: {report['indicators'].get('signal', 'N/A')}</li>
+                <li>SMA20: {report['indicators'].get('sma20', 'N/A')}</li>
+                <li>SMA50: {report['indicators'].get('sma50', 'N/A')}</li>
+                <li>SMA200: {report['indicators'].get('sma200', 'N/A')}</li>
+                <li>成交量变化: {report['indicators'].get('volume_change', 'N/A')}%</li>
+            </ul>
+            """
+            
+            # 发送邮件
+            self.alert_system.send_email(
+                subject="市场底部分析报告",
+                body=html_content,
+                is_html=True
+            )
+            
+            self.logger.info("市场底部分析报告已发送")
+            
+        except Exception as e:
+            self.logger.error(f"发送通知失败: {str(e)}") 
