@@ -35,8 +35,10 @@ DB_CONFIG = {
 class DataFetcher:
     """数据获取器，负责从各种数据源获取市场数据"""
     
-    def __init__(self):
+    def __init__(self, config=None):
         """初始化数据获取器"""
+        self.config = config or {}
+        self.api_delay = self.config.get('api_delay', 1.0)  # 默认延迟1秒
         self.logger = logging.getLogger(__name__)
         self.max_workers = 5  # 默认最大工作线程数
         self.engine = None
@@ -44,7 +46,26 @@ class DataFetcher:
         self.data_cache = {}
         self.cache_timestamps = {}
         self.cache_expiry = 3600  # 缓存过期时间（秒）
-        self.api_delay = 1.0  # API调用延迟时间（秒）
+        self._executor = None  # 线程池执行器
+        
+    def __del__(self):
+        """析构函数，确保线程池被正确关闭"""
+        self._cleanup()
+        
+    def _cleanup(self):
+        """清理资源"""
+        if self._executor is not None:
+            try:
+                self._executor.shutdown(wait=False)
+                self._executor = None
+            except Exception as e:
+                self.logger.error(f"关闭线程池时出错: {e}")
+                
+    def _get_executor(self):
+        """获取或创建线程池执行器"""
+        if self._executor is None:
+            self._executor = ThreadPoolExecutor(max_workers=self.max_workers)
+        return self._executor
         
     def get_historical_data(
         self,
@@ -83,42 +104,48 @@ class DataFetcher:
             self.logger.error(f"获取 {symbol} 的历史数据时发生错误: {str(e)}")
             return pd.DataFrame()
             
-    def get_latest_data(
-        self,
-        symbols: List[str],
-        days: int = 1,
-        interval: str = '1d'
-    ) -> Dict[str, pd.DataFrame]:
+    def get_latest_data(self, symbols: List[str], days: int = 30) -> Dict[str, pd.DataFrame]:
         """
-        获取最新数据
+        获取多个股票的最新数据
         
         参数:
             symbols: 股票代码列表
             days: 获取最近多少天的数据
-            interval: 数据间隔
             
         返回:
-            股票数据字典
+            字典，键为股票代码，值为对应的DataFrame
         """
         try:
             end_date = dt.datetime.now().strftime('%Y-%m-%d')
             start_date = (dt.datetime.now() - dt.timedelta(days=days)).strftime('%Y-%m-%d')
             
-            data = {}
-            for symbol in symbols:
-                symbol_data = self.get_historical_data(
-                    symbol,
-                    start_date=start_date,
-                    end_date=end_date,
-                    interval=interval
-                )
-                if not symbol_data.empty:
-                    data[symbol] = symbol_data
-                    
-            return data
+            result = {}
+            executor = self._get_executor()
             
+            # 创建任务
+            future_to_symbol = {
+                executor.submit(self.get_historical_data, symbol, start_date, end_date): symbol
+                for symbol in symbols
+            }
+            
+            # 获取结果
+            for future in as_completed(future_to_symbol):
+                symbol = future_to_symbol[future]
+                try:
+                    data = future.result()
+                    if not data.empty:
+                        result[symbol] = data
+                    else:
+                        self.logger.warning(f"未获取到 {symbol} 的数据")
+                except Exception as e:
+                    self.logger.error(f"获取 {symbol} 的数据时出错: {e}")
+                    
+                # API调用间隔
+                time.sleep(self.api_delay)
+                    
+            return result
         except Exception as e:
-            self.logger.error(f"获取最新数据时发生错误: {str(e)}")
+            self.logger.error(f"获取最新数据时出错: {e}")
             return {}
             
     def get_realtime_data(self, symbols: List[str]) -> Dict[str, pd.DataFrame]:
@@ -346,49 +373,6 @@ class DataFetcher:
         except Exception as e:
             self.logger.error(f"保存 {symbol} 的数据到数据库时出错: {e}")
             raise
-            
-    def get_latest_data(self, symbols: List[str], days: int = 30) -> Dict[str, pd.DataFrame]:
-        """
-        获取多个股票的最新数据
-        
-        参数:
-            symbols: 股票代码列表
-            days: 获取最近多少天的数据
-            
-        返回:
-            字典，键为股票代码，值为对应的DataFrame
-        """
-        try:
-            end_date = dt.datetime.now().strftime('%Y-%m-%d')
-            start_date = (dt.datetime.now() - dt.timedelta(days=days)).strftime('%Y-%m-%d')
-            
-            result = {}
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                # 创建任务
-                future_to_symbol = {
-                    executor.submit(self.get_historical_data, symbol, start_date, end_date): symbol
-                    for symbol in symbols
-                }
-                
-                # 获取结果
-                for future in as_completed(future_to_symbol):
-                    symbol = future_to_symbol[future]
-                    try:
-                        data = future.result()
-                        if not data.empty:
-                            result[symbol] = data
-                        else:
-                            self.logger.warning(f"未获取到 {symbol} 的数据")
-                    except Exception as e:
-                        self.logger.error(f"获取 {symbol} 的数据时出错: {e}")
-                        
-                    # API调用间隔
-                    time.sleep(self.api_delay)
-                    
-            return result
-        except Exception as e:
-            self.logger.error(f"获取最新数据时出错: {e}")
-            return {}
             
     def update_all_stocks(
         self,
