@@ -266,6 +266,9 @@ class AlertSystem:
     def send_email(self, subject: str, body: str, is_html: bool = False):
         """发送邮件通知"""
         try:
+            self.logger.info(f"准备发送邮件: {subject}")
+            self.logger.info(f"SMTP服务器: {self.email_config['smtp_server']}:{self.email_config['smtp_port']}")
+            
             msg = MIMEMultipart()
             msg['From'] = self.email_config['sender_email']
             msg['To'] = self.email_config['recipient_email']
@@ -275,15 +278,20 @@ class AlertSystem:
             content_type = 'html' if is_html else 'plain'
             msg.attach(MIMEText(body, content_type, 'utf-8'))
             
+            self.logger.info("正在连接SMTP服务器...")
             with smtplib.SMTP(self.email_config['smtp_server'], self.email_config['smtp_port']) as server:
+                self.logger.info("正在启动TLS加密...")
                 server.starttls()
+                self.logger.info("正在登录SMTP服务器...")
                 server.login(self.email_config['sender_email'], self.email_config['sender_password'])
+                self.logger.info("正在发送邮件...")
                 server.send_message(msg)
             
-            print(f"邮件发送成功: {subject}")
+            self.logger.info(f"邮件发送成功: {subject}")
         
         except Exception as e:
-            print(f"发送邮件时出错: {str(e)}")
+            self.logger.error(f"发送邮件时出错: {str(e)}")
+            self.logger.exception("详细错误信息:")
 
     def _get_rsi_explanation(self, rsi: float) -> str:
         """获取RSI指标的解释"""

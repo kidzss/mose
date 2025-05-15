@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time as dt_time
 from typing import Dict, List, Optional, Any
 import logging
 import asyncio
@@ -15,7 +15,6 @@ from monitor.strategy_manager import StrategyManager
 import threading
 import os
 from pathlib import Path
-import time
 
 from .data_fetcher import DataFetcher
 from .report_generator import ReportGenerator
@@ -33,7 +32,7 @@ class StockMonitor:
         report_generator: ReportGenerator,
         market_monitor: MarketMonitor,
         stock_manager: StockManager,
-        check_interval: int = 300,  # 检查间隔（秒）
+        check_interval: int = 300,  # 检查间隔（秒），默认5分钟
         max_alerts: int = 100,      # 最大警报数量
         mode: str = 'prod',         # 运行模式：'prod' 或 'dev'
         config: Optional[Dict[str, Any]] = None
@@ -58,6 +57,7 @@ class StockMonitor:
         self.is_running = False
         self.alerts = []
         self.last_check_time = None
+        self.last_status_report_time = None  # 上次状态报告时间
         
         self.logger = logging.getLogger(__name__)
         
@@ -85,6 +85,25 @@ class StockMonitor:
             return
             
         self.is_running = True
+        
+        # 获取当前时间
+        current_time = time_module.time()
+        current_datetime = datetime.fromtimestamp(current_time)
+        
+        # 检查是否在交易时间内
+        if self._is_trading_time(current_datetime):
+            self.logger.info("当前是交易时间，执行初始检查...")
+            # 执行初始检查
+            has_signals = self._execute_monitoring()
+            self.logger.info(f"初始检查完成，是否有信号: {has_signals}")
+            
+            # 如果没有信号，发送初始状态报告
+            if not has_signals:
+                self.logger.info("发送初始状态报告...")
+                self._send_status_report()
+                self.last_status_report_time = current_time
+        
+        # 启动监控线程
         self.monitor_thread = threading.Thread(target=self._monitor_loop)
         self.monitor_thread.daemon = True
         self.monitor_thread.start()
@@ -106,78 +125,164 @@ class StockMonitor:
         while self.is_running:
             try:
                 # 获取当前时间
-                current_time = time.time()
+                current_time = time_module.time()
+                current_datetime = datetime.fromtimestamp(current_time)
+                self.logger.info(f"当前时间: {current_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
                 
-                # 检查是否需要执行监控
-                if (self.last_check_time is None or 
-                    current_time - self.last_check_time >= self.check_interval):
+                # 检查是否在交易时间内
+                if self._is_trading_time(current_datetime):
+                    self.logger.info("当前是交易时间，开始检查交易信号...")
                     
-                    # 执行监控
-                    self._execute_monitoring()
-                    
-                    # 更新最后检查时间
-                    self.last_check_time = current_time
-                    
+                    # 检查是否需要执行监控
+                    if (self.last_check_time is None or 
+                        current_time - self.last_check_time >= self.check_interval):
+                        
+                        # 执行监控
+                        has_signals = self._execute_monitoring()
+                        self.logger.info(f"监控执行完成，是否有信号: {has_signals}")
+                        
+                        # 更新最后检查时间
+                        self.last_check_time = current_time
+                        
+                        # 如果没有信号，且距离上次状态报告超过15分钟，发送状态报告
+                        if not has_signals and (self.last_status_report_time is None or 
+                            current_time - self.last_status_report_time >= 900):  # 15分钟 = 900秒
+                            self.logger.info("准备发送状态报告...")
+                            self._send_status_report()
+                            self.last_status_report_time = current_time
+                else:
+                    self.logger.info("当前不是交易时间，等待下一个交易时段...")
+                
                 # 休眠一段时间
-                time.sleep(1)
+                time_module.sleep(1)
                 
             except Exception as e:
-                logger.error(f"监控循环出错: {e}")
-                time.sleep(5)  # 出错后等待一段时间再继续
+                self.logger.error(f"监控循环出错: {e}")
+                self.logger.exception("详细错误信息:")
+                time_module.sleep(5)  # 出错后等待一段时间再继续
                 
-    def _execute_monitoring(self):
-        """执行监控"""
+    def _is_trading_time(self, current_time: datetime) -> bool:
+        """检查是否在交易时间内"""
+        # 检查是否是工作日（周一至周五）
+        if current_time.weekday() >= 5:  # 5是周六，6是周日
+            return False
+            
+        # 检查是否在交易时间内（7:30 AM - 2:00 PM MT）
+        market_open = dt_time(7, 30)  # 卡尔加里时间 7:30 AM
+        market_close = dt_time(14, 0)  # 卡尔加里时间 2:00 PM
+        
+        # 使用卡尔加里时区
+        mt_tz = pytz.timezone('America/Edmonton')  # 使用埃德蒙顿时区（与卡尔加里相同）
+        current_time_mt = current_time.astimezone(mt_tz)
+        current_time_only = current_time_mt.time()
+        
+        self.logger.info(f"当前卡尔加里时间: {current_time_mt.strftime('%Y-%m-%d %H:%M:%S')}")
+        self.logger.info(f"交易时间: {market_open.strftime('%H:%M')} - {market_close.strftime('%H:%M')}")
+        
+        return market_open <= current_time_only <= market_close
+        
+    def _execute_monitoring(self) -> bool:
+        """执行监控，返回是否有信号"""
         try:
+            has_signals = False
             # 获取所有监控的股票
             symbols = self.stock_manager.get_all_symbols()
+            self.logger.info(f"开始监控 {len(symbols)} 只股票...")
             
             # 获取市场监控结果
-            market_results = self.market_monitor.monitor_market(symbols)
+            try:
+                market_results = self.market_monitor.monitor_market(symbols)
+            except Exception as e:
+                self.logger.error(f"获取市场监控结果失败: {e}")
+                market_results = {
+                    'news': {},
+                    'social_sentiment': {},
+                    'sector_rotation': {},
+                    'money_flow': {}
+                }
             
             # 分析每只股票
             for symbol in symbols:
-                # 获取股票数据
-                data = self.stock_manager.get_stock_data(symbol)
-                if isinstance(data, pd.Series):
-                    data = pd.DataFrame(data).T
-                if data.empty:
+                self.logger.info(f"正在分析股票 {symbol}...")
+                try:
+                    # 获取股票数据
+                    end_date = datetime.now()
+                    start_date = end_date - timedelta(days=30)  # 获取30天数据
+                    
+                    # 使用yfinance直接获取数据
+                    import yfinance as yf
+                    stock = yf.Ticker(symbol)
+                    data = stock.history(
+                        start=start_date.strftime('%Y-%m-%d'),
+                        end=end_date.strftime('%Y-%m-%d'),
+                        interval='1d'
+                    )
+                    
+                    if data.empty:
+                        self.logger.warning(f"无法获取 {symbol} 的数据")
+                        continue
+                    
+                    # 标准化列名
+                    column_mapping = {
+                        'Open': 'open',
+                        'High': 'high',
+                        'Low': 'low',
+                        'Close': 'close',
+                        'Volume': 'volume',
+                        'Adj Close': 'adj_close'
+                    }
+                    data.columns = [column_mapping.get(col, col.lower()) for col in data.columns]
+                    
+                    # 使用策略管理器分析股票
+                    analysis_result = self.strategy_manager.analyze_stock(data, symbol)
+                    
+                    # 添加市场监控结果
+                    analysis_result['market_monitoring'] = {
+                        'news': market_results.get('news', {}).get(symbol, {}),
+                        'social_sentiment': market_results.get('social_sentiment', {}).get(symbol, {}),
+                        'sector_rotation': market_results.get('sector_rotation', {}),
+                        'money_flow': market_results.get('money_flow', {}).get(symbol, {})
+                    }
+                    
+                    # 生成报告
+                    report = self.report_generator.generate_report(
+                        analysis_result,
+                        data,
+                        symbol
+                    )
+                    
+                    # 检查是否需要生成警报
+                    if self._check_alerts(symbol, analysis_result, report):
+                        has_signals = True
+                        self.logger.info(f"检测到 {symbol} 的交易信号")
+                        
+                except Exception as e:
+                    self.logger.error(f"分析 {symbol} 时出错: {str(e)}")
                     continue
                     
-                # 使用策略管理器分析股票
-                analysis_result = self.strategy_manager.analyze_stock(data, symbol)
-                
-                # 添加市场监控结果
-                analysis_result['market_monitoring'] = {
-                    'news': market_results['news'].get(symbol, {}),
-                    'social_sentiment': market_results['social_sentiment'].get(symbol, {}),
-                    'sector_rotation': market_results['sector_rotation'],
-                    'money_flow': market_results['money_flow'].get(symbol, {})
-                }
-                
-                # 生成报告
-                report = self.report_generator.generate_report(
-                    analysis_result,
-                    data,
-                    symbol
-                )
-                
-                # 检查是否需要生成警报
-                self._check_alerts(symbol, analysis_result, report)
-                
-        except Exception as e:
-            logger.error(f"执行监控失败: {e}")
+            return has_signals
             
-    def _check_alerts(self, symbol: str, analysis_result: Dict, report: Dict):
+        except Exception as e:
+            self.logger.error(f"执行监控时出错: {str(e)}")
+            return False
+        
+    def _check_alerts(self, symbol: str, analysis_result: Dict, report: Dict) -> bool:
         """
         检查是否需要生成警报
         :param symbol: 股票代码
         :param analysis_result: 分析结果
         :param report: 报告
+        :return: 是否有警报信号
         """
         try:
+            has_alerts = False
+            self.logger.info(f"检查 {symbol} 的警报条件...")
+            
             # 检查风险水平
             if analysis_result.get('risk_level') == 'high':
+                self.logger.info(f"{symbol} 触发高风险警报")
                 self._add_alert(symbol, '高风险警报', report)
+                has_alerts = True
                 
             # 检查市场情绪
             market_monitoring = analysis_result.get('market_monitoring', {})
@@ -185,15 +290,50 @@ class StockMonitor:
             social_sentiment = market_monitoring.get('social_sentiment', {})
             if (news.get('sentiment') == 'negative' and 
                 social_sentiment.get('sentiment') == 'negative'):
+                self.logger.info(f"{symbol} 触发负面市场情绪警报")
                 self._add_alert(symbol, '负面市场情绪警报', report)
+                has_alerts = True
                 
             # 检查资金流向
             money_flow = market_monitoring.get('money_flow', {})
             if money_flow.get('trend') == 'outflow' and money_flow.get('mfi', 50) < 20:
+                self.logger.info(f"{symbol} 触发资金流出警报")
                 self._add_alert(symbol, '资金流出警报', report)
+                has_alerts = True
+                
+            # 检查技术指标
+            signals = analysis_result.get('signals', {})
+            if isinstance(signals, dict):
+                niuniu_signals = signals.get('NiuniuV3', {}).get('signals', {})
+                if isinstance(niuniu_signals, dict):
+                    rsi = niuniu_signals.get('rsi')
+                    if isinstance(rsi, (int, float)):
+                        if rsi > 70:
+                            self.logger.info(f"{symbol} 触发RSI超买警报")
+                            self._add_alert(symbol, 'RSI超买警报', report)
+                            has_alerts = True
+                        elif rsi < 30:
+                            self.logger.info(f"{symbol} 触发RSI超卖警报")
+                            self._add_alert(symbol, 'RSI超卖警报', report)
+                            has_alerts = True
+                    
+                    macd_status = niuniu_signals.get('macd_status')
+                    if isinstance(macd_status, str):
+                        if macd_status == '金叉':
+                            self.logger.info(f"{symbol} 触发MACD金叉警报")
+                            self._add_alert(symbol, 'MACD金叉警报', report)
+                            has_alerts = True
+                        elif macd_status == '死叉':
+                            self.logger.info(f"{symbol} 触发MACD死叉警报")
+                            self._add_alert(symbol, 'MACD死叉警报', report)
+                            has_alerts = True
+            
+            return has_alerts
                 
         except Exception as e:
-            logger.error(f"检查警报失败: {e}")
+            self.logger.error(f"检查警报失败: {e}")
+            self.logger.exception("详细错误信息:")
+            return False
             
     def _add_alert(self, symbol: str, alert_type: str, report: Dict):
         """
@@ -207,7 +347,7 @@ class StockMonitor:
             alert = {
                 'symbol': symbol,
                 'type': alert_type,
-                'timestamp': time.time(),
+                'timestamp': time_module.time(),
                 'report': report
             }
             
@@ -534,8 +674,8 @@ class StockMonitor:
             return False
             
         # 检查是否在交易时间内（7:30 AM - 2:00 PM MT）
-        market_open = time(7, 30)  # 卡尔加里时间 7:30 AM
-        market_close = time(14, 0)  # 卡尔加里时间 2:00 PM
+        market_open = dt_time(7, 30)  # 卡尔加里时间 7:30 AM
+        market_close = dt_time(14, 0)  # 卡尔加里时间 2:00 PM
         
         current_time = now.time()
         return market_open <= current_time <= market_close
@@ -935,12 +1075,26 @@ class StockMonitor:
         """计算技术指标"""
         try:
             # 确保数据是正确的格式
-            if isinstance(data['Close'], pd.Series):
-                close_data = data['Close']
-                volume_data = data['Volume']
+            if isinstance(data, pd.DataFrame):
+                if 'Close' in data.columns:
+                    close_data = data['Close']
+                    volume_data = data['Volume']
+                elif 'close' in data.columns:
+                    close_data = data['close']
+                    volume_data = data['volume']
+                else:
+                    raise ValueError("找不到价格数据列")
+                
+                # 如果是MultiIndex，取第一个level
+                if isinstance(close_data.index, pd.MultiIndex):
+                    close_data = close_data.droplevel(0)
+                    volume_data = volume_data.droplevel(0)
+                
+                # 确保是Series类型
+                close_data = pd.Series(close_data)
+                volume_data = pd.Series(volume_data)
             else:
-                close_data = data['Close'].squeeze()
-                volume_data = data['Volume'].squeeze()
+                raise ValueError("输入数据必须是DataFrame类型")
 
             indicators = {}
             
@@ -969,9 +1123,9 @@ class StockMonitor:
             result = {}
             for key in indicators:
                 if isinstance(indicators[key], pd.Series):
-                    result[key] = indicators[key].iloc[-1]
+                    result[key] = float(indicators[key].iloc[-1])
                 else:
-                    result[key] = indicators[key]
+                    result[key] = float(indicators[key])
             
             return result
         except Exception as e:
@@ -1081,4 +1235,32 @@ class StockMonitor:
             self.logger.info("市场底部分析报告已发送")
             
         except Exception as e:
-            self.logger.error(f"发送通知失败: {str(e)}") 
+            self.logger.error(f"发送通知失败: {str(e)}")
+
+    def _send_status_report(self):
+        """发送状态报告"""
+        try:
+            # 获取所有监控的股票
+            symbols = self.stock_manager.get_all_symbols()
+            
+            # 生成状态报告
+            report = {
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'monitored_stocks': symbols,
+                'status': '正常',
+                'message': '当前无交易信号，系统运行正常'
+            }
+            
+            # 发送状态报告
+            self.alert_system.send_alert(
+                stock='SYSTEM',
+                alert_type='状态报告',
+                message='系统运行状态报告',
+                price=0.0,
+                indicators={'status': 'normal'}
+            )
+            
+            logger.info("状态报告已发送")
+            
+        except Exception as e:
+            logger.error(f"发送状态报告失败: {e}") 

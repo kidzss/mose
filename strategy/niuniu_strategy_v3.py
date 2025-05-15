@@ -100,6 +100,91 @@ class NiuniuStrategyV3(Strategy):
         self.daily_trade_count = 0
         self.last_trade_date = None
         
+    def _preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        预处理数据：标准化列名，处理MultiIndex
+        :param df: 原始数据
+        :return: 处理后的数据
+        """
+        try:
+            # 创建DataFrame的副本
+            processed_df = df.copy()
+            
+            # 如果是MultiIndex，取第一个level
+            if isinstance(processed_df.index, pd.MultiIndex):
+                processed_df.index = processed_df.index.get_level_values(-1)
+            
+            # 标准化列名（转换为小写）
+            column_mapping = {
+                'Close': 'close',
+                'Open': 'open',
+                'High': 'high',
+                'Low': 'low',
+                'Volume': 'volume',
+                'Adj Close': 'adj_close'
+            }
+            processed_df.columns = [column_mapping.get(col, col.lower()) for col in processed_df.columns]
+            
+            # 确保必要的列存在
+            required_columns = ['close', 'high', 'low', 'volume']
+            if not all(col in processed_df.columns for col in required_columns):
+                missing_columns = [col for col in required_columns if col not in processed_df.columns]
+                raise ValueError(f"缺少必要的列: {missing_columns}")
+            
+            # 确保数据类型正确
+            processed_df['close'] = processed_df['close'].astype(float)
+            processed_df['high'] = processed_df['high'].astype(float)
+            processed_df['low'] = processed_df['low'].astype(float)
+            processed_df['volume'] = processed_df['volume'].astype(float)
+            
+            return processed_df
+            
+        except Exception as e:
+            self.logger.error(f"数据预处理失败: {e}")
+            raise
+
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        计算技术指标
+        
+        参数:
+            df: 包含OHLCV数据的DataFrame
+            
+        返回:
+            添加了技术指标的DataFrame
+        """
+        try:
+            # 预处理数据
+            processed_df = self._preprocess_data(df)
+            
+            # 计算移动平均线
+            processed_df['fast_ma'] = talib.SMA(processed_df['close'], timeperiod=self.fast_period)
+            processed_df['slow_ma'] = talib.SMA(processed_df['close'], timeperiod=self.slow_period)
+            
+            # 计算RSI
+            processed_df['RSI'] = talib.RSI(processed_df['close'], timeperiod=self.rsi_period)
+            
+            # 计算ADX
+            processed_df['ADX'] = talib.ADX(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=self.adx_period)
+            
+            # 计算成交量比率
+            volume_ma = talib.SMA(processed_df['volume'], timeperiod=20)
+            processed_df['volume_ratio'] = processed_df['volume'] / volume_ma
+            
+            # 计算波动率
+            processed_df['volatility'] = talib.ATR(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=14)
+            
+            # 确保所有计算的指标都是float类型
+            for col in ['fast_ma', 'slow_ma', 'RSI', 'ADX', 'volume_ratio', 'volatility']:
+                if col in processed_df.columns:
+                    processed_df[col] = processed_df[col].astype(float)
+            
+            return processed_df
+            
+        except Exception as e:
+            self.logger.error(f"计算技术指标时出错: {str(e)}")
+            raise
+
     def extract_signal_components(self, data: pd.DataFrame) -> Dict[str, pd.Series]:
         """
         提取并标准化策略的核心信号组件
@@ -213,55 +298,6 @@ class NiuniuStrategyV3(Strategy):
                 'weight': 0.1
             }
         }
-
-    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        计算技术指标
-        
-        参数:
-            df: 包含OHLCV数据的DataFrame
-            
-        返回:
-            添加了技术指标的DataFrame
-        """
-        try:
-            # 确保列名小写
-            df = df.copy()
-            df.columns = df.columns.str.lower()
-            
-            # 确保数据是数值类型
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
-            
-            # 计算移动平均线
-            df['fast_ma'] = df['close'].rolling(window=self.fast_period).mean()
-            df['slow_ma'] = df['close'].rolling(window=self.slow_period).mean()
-            
-            # 计算RSI
-            df['RSI'] = talib.RSI(df['close'].values, timeperiod=self.rsi_period)
-            
-            # 计算ADX
-            df['ADX'] = talib.ADX(df['high'].values, df['low'].values, df['close'].values, timeperiod=self.adx_period)
-            
-            # 计算成交量比率
-            volume_ma = df['volume'].rolling(window=20).mean()
-            df['volume_ratio'] = df['volume'] / volume_ma
-            
-            # 计算波动率
-            df['volatility'] = df['close'].pct_change().rolling(window=20).std()
-            
-            # 计算ATR
-            df['ATR'] = talib.ATR(df['high'].values, df['low'].values, df['close'].values, timeperiod=14)
-            
-            # 填充NaN值
-            df = df.ffill()
-            
-            return df
-            
-        except Exception as e:
-            self.logger.error(f"计算技术指标时出错: {str(e)}")
-            raise
 
     def _apply_trade_frequency_limits(self, data: pd.DataFrame) -> pd.DataFrame:
         """

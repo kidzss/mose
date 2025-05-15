@@ -332,4 +332,40 @@ def _get_volume_explanation(self, volume: float, volume_ma20: float) -> str:
     elif volume < volume_ma20 * 0.5:
         return f"成交量萎缩，市场活跃度降低"
     else:
-        return f"成交量正常，市场活跃度适中" 
+        return f"成交量正常，市场活跃度适中"
+
+def test_monitor():
+    # 初始化数据获取器
+    data_fetcher = DataFetcher()
+    
+    # 测试股票列表
+    symbols = ['AMD', 'NVDA', 'PFE', 'MSFT', 'TMDX']
+    
+    # 设置时间范围
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    
+    print("开始测试数据获取...")
+    
+    for symbol in symbols:
+        print(f"\n测试 {symbol} 的数据获取:")
+        try:
+            # 获取数据
+            data = data_fetcher.get_historical_data(
+                symbol=symbol,
+                start_date=start_date.strftime('%Y-%m-%d'),
+                end_date=end_date.strftime('%Y-%m-%d')
+            )
+            
+            if not data.empty:
+                print(f"数据形状: {data.shape}")
+                print(f"列名: {data.columns.tolist()}")
+                print(f"前5行数据:\n{data.head()}")
+            else:
+                print(f"未获取到 {symbol} 的数据")
+            
+        except Exception as e:
+            print(f"获取 {symbol} 数据时出错: {str(e)}")
+
+if __name__ == "__main__":
+    test_monitor() 

@@ -87,17 +87,53 @@ class DataFetcher:
             历史数据DataFrame
         """
         try:
+            # 获取数据
             data = yf.download(
                 symbol,
                 start=start_date,
                 end=end_date,
-                interval=interval
+                interval=interval,
+                auto_adjust=True  # 使用自动调整的价格
             )
             
             if data.empty:
                 self.logger.warning(f"无法获取 {symbol} 的历史数据")
                 return pd.DataFrame()
-                
+            
+            # 确保列名是字符串类型
+            data.columns = [str(col) for col in data.columns]
+            
+            # 标准化列名（转换为小写）
+            column_mapping = {
+                'Open': 'open',
+                'High': 'high',
+                'Low': 'low',
+                'Close': 'close',
+                'Volume': 'volume',
+                'Adj Close': 'adj_close'
+            }
+            data.columns = [column_mapping.get(col, col.lower()) for col in data.columns]
+            
+            # 检查必要的列是否存在
+            required_columns = ['open', 'high', 'low', 'close', 'volume']
+            if not all(col in data.columns for col in required_columns):
+                missing_columns = [col for col in required_columns if col not in data.columns]
+                self.logger.error(f"数据缺少必要的列: {missing_columns}")
+                return pd.DataFrame()
+            
+            # 确保数据是数值类型
+            for col in required_columns:
+                data[col] = pd.to_numeric(data[col], errors='coerce')
+            
+            # 处理MultiIndex
+            if isinstance(data.index, pd.MultiIndex):
+                data.index = data.index.get_level_values(-1)
+            
+            # 确保数据是1维的
+            for col in data.columns:
+                if isinstance(data[col].iloc[0], (list, tuple, np.ndarray)):
+                    data[col] = data[col].apply(lambda x: x[0] if isinstance(x, (list, tuple, np.ndarray)) else x)
+            
             return data
             
         except Exception as e:

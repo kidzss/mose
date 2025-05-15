@@ -15,6 +15,7 @@ from monitor.stock_manager import StockManager
 from monitor.alert_system import AlertSystem
 import os
 import json
+import yfinance as yf
 
 # 配置日志
 logging.basicConfig(
@@ -51,7 +52,29 @@ class MarketBottomAnalyzer:
             # 获取SPY数据
             end_date = datetime.now()
             start_date = end_date - timedelta(days=365)  # 获取一年的数据
-            spy_data = self.data_loader.load_historical_data('SPY', start_date, end_date)
+            
+            # 使用yfinance直接获取数据
+            spy = yf.Ticker("SPY")
+            spy_data = spy.history(
+                start=start_date.strftime('%Y-%m-%d'),
+                end=end_date.strftime('%Y-%m-%d'),
+                interval='1d'
+            )
+            
+            if spy_data.empty:
+                logger.error("无法获取SPY数据")
+                return None
+            
+            # 标准化列名
+            column_mapping = {
+                'Open': 'open',
+                'High': 'high',
+                'Low': 'low',
+                'Close': 'close',
+                'Volume': 'volume',
+                'Adj Close': 'adj_close'
+            }
+            spy_data.columns = [column_mapping.get(col, col.lower()) for col in spy_data.columns]
             
             # 计算技术指标
             indicators = self._calculate_technical_indicators(spy_data)
@@ -76,81 +99,117 @@ class MarketBottomAnalyzer:
             
     def _calculate_technical_indicators(self, data):
         """计算技术指标"""
-        indicators = {}
-        
-        # RSI
-        delta = data['close'].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-        rs = gain / loss
-        indicators['rsi'] = 100 - (100 / (1 + rs))
-        
-        # MACD
-        exp1 = data['close'].ewm(span=12, adjust=False).mean()
-        exp2 = data['close'].ewm(span=26, adjust=False).mean()
-        indicators['macd'] = exp1 - exp2
-        indicators['signal'] = indicators['macd'].ewm(span=9, adjust=False).mean()
-        
-        # 移动平均线
-        indicators['sma20'] = data['close'].rolling(window=20).mean()
-        indicators['sma50'] = data['close'].rolling(window=50).mean()
-        indicators['sma200'] = data['close'].rolling(window=200).mean()
-        
-        # 成交量变化
-        indicators['volume_change'] = data['volume'].pct_change()
-        
-        return indicators
-        
+        try:
+            indicators = {}
+            
+            # 确保数据列名正确
+            if 'close' not in data.columns:
+                logger.error("找不到价格数据列")
+                return {}
+            
+            # RSI
+            delta = data['close'].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+            rs = gain / loss
+            indicators['rsi'] = 100 - (100 / (1 + rs))
+            
+            # MACD
+            exp1 = data['close'].ewm(span=12, adjust=False).mean()
+            exp2 = data['close'].ewm(span=26, adjust=False).mean()
+            indicators['macd'] = exp1 - exp2
+            indicators['signal'] = indicators['macd'].ewm(span=9, adjust=False).mean()
+            
+            # 移动平均线
+            indicators['sma20'] = data['close'].rolling(window=20).mean()
+            indicators['sma50'] = data['close'].rolling(window=50).mean()
+            indicators['sma200'] = data['close'].rolling(window=200).mean()
+            
+            # 成交量变化
+            if 'volume' in data.columns:
+                indicators['volume_change'] = data['volume'].pct_change()
+            else:
+                indicators['volume_change'] = pd.Series(0, index=data.index)
+            
+            # 获取最后一个值
+            result = {}
+            for key in indicators:
+                if isinstance(indicators[key], pd.Series):
+                    result[key] = float(indicators[key].iloc[-1])
+                else:
+                    result[key] = float(indicators[key])
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"计算技术指标失败: {e}")
+            return {}
+            
     def _analyze_market_state(self, indicators):
         """分析市场状态"""
-        state = {
-            'is_bottom': False,
-            'signals': [],
-            'risk_level': 'info'
-        }
-        
-        # 检查RSI超卖
-        if indicators['rsi'].iloc[-1] < 30:
-            state['signals'].append('RSI超卖')
-            state['risk_level'] = 'warning'
+        try:
+            state = {
+                'is_bottom': False,
+                'signals': [],
+                'risk_level': 'info'
+            }
             
-        # 检查MACD金叉
-        if indicators['macd'].iloc[-2] < indicators['signal'].iloc[-2] and \
-           indicators['macd'].iloc[-1] > indicators['signal'].iloc[-1]:
-            state['signals'].append('MACD金叉')
-            state['risk_level'] = 'opportunity'
+            # 检查RSI超卖
+            if 'rsi' in indicators and indicators['rsi'] < 30:
+                state['signals'].append('RSI超卖')
+                state['risk_level'] = 'warning'
             
-        # 检查价格与移动平均线的关系
-        if indicators['sma20'].iloc[-1] > indicators['sma50'].iloc[-1] and \
-           indicators['sma50'].iloc[-1] > indicators['sma200'].iloc[-1]:
-            state['signals'].append('均线多头排列')
-            state['risk_level'] = 'opportunity'
+            # 检查MACD金叉
+            if ('macd' in indicators and 'signal' in indicators and
+                indicators['macd'] > indicators['signal']):
+                state['signals'].append('MACD金叉')
+                state['risk_level'] = 'opportunity'
             
-        # 检查成交量放大
-        if indicators['volume_change'].iloc[-1] > 1.5:
-            state['signals'].append('成交量放大')
-            state['risk_level'] = 'warning'
+            # 检查价格与移动平均线的关系
+            if ('sma20' in indicators and 'sma50' in indicators and
+                'sma200' in indicators and
+                indicators['sma20'] > indicators['sma50'] and
+                indicators['sma50'] > indicators['sma200']):
+                state['signals'].append('均线多头排列')
+                state['risk_level'] = 'opportunity'
             
-        # 综合判断市场底部
-        if len(state['signals']) >= 2 and 'RSI超卖' in state['signals']:
-            state['is_bottom'] = True
-            state['risk_level'] = 'opportunity'
+            # 检查成交量放大
+            if 'volume_change' in indicators and indicators['volume_change'] > 1.5:
+                state['signals'].append('成交量放大')
+                state['risk_level'] = 'warning'
             
-        return state
+            # 综合判断市场底部
+            if len(state['signals']) >= 2 and 'RSI超卖' in state['signals']:
+                state['is_bottom'] = True
+                state['risk_level'] = 'opportunity'
+            
+            return state
+            
+        except Exception as e:
+            logger.error(f"分析市场状态失败: {e}")
+            return {}
         
     async def _analyze_semiconductor_sector(self):
         """分析半导体板块"""
         state = {}
         
         # 分析AMD
-        amd_data = await self.stock_monitor.get_stock_analysis('AMD')
-        if "error" not in amd_data:
-            state['AMD状态'] = self._analyze_stock_state(amd_data)
+        try:
+            amd = yf.Ticker("AMD")
+            amd_data = amd.history(period="1mo")
+            if not amd_data.empty:
+                state['AMD状态'] = self._analyze_stock_state(amd_data)
+        except Exception as e:
+            logger.error(f"分析AMD失败: {e}")
             
         # 分析NVDA
-        nvda_data = await self.stock_monitor.get_stock_analysis('NVDA')
-        if "error" not in nvda_data:
-            state['NVDA状态'] = self._analyze_stock_state(nvda_data)
+        try:
+            nvda = yf.Ticker("NVDA")
+            nvda_data = nvda.history(period="1mo")
+            if not nvda_data.empty:
+                state['NVDA状态'] = self._analyze_stock_state(nvda_data)
+        except Exception as e:
+            logger.error(f"分析NVDA失败: {e}")
             
         # 板块整体判断
         if 'AMD状态' in state and 'NVDA状态' in state:
@@ -205,13 +264,13 @@ class MarketBottomAnalyzer:
             'market_state': market_state,
             'semiconductor_state': semiconductor_state,
             'indicators': {
-                'rsi': round(indicators['rsi'].iloc[-1], 2),
-                'macd': round(indicators['macd'].iloc[-1], 2),
-                'signal': round(indicators['signal'].iloc[-1], 2),
-                'sma20': round(indicators['sma20'].iloc[-1], 2),
-                'sma50': round(indicators['sma50'].iloc[-1], 2),
-                'sma200': round(indicators['sma200'].iloc[-1], 2),
-                'volume_change': round(indicators['volume_change'].iloc[-1] * 100, 2)
+                'rsi': round(indicators['rsi'], 2),
+                'macd': round(indicators['macd'], 2),
+                'signal': round(indicators['signal'], 2),
+                'sma20': round(indicators['sma20'], 2),
+                'sma50': round(indicators['sma50'], 2),
+                'sma200': round(indicators['sma200'], 2),
+                'volume_change': round(indicators['volume_change'] * 100, 2)
             }
         }
         

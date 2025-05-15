@@ -9,6 +9,57 @@ class TechnicalAnalysis:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         
+    def _preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        预处理数据：标准化列名，处理MultiIndex
+        :param df: 原始数据
+        :return: 处理后的数据
+        """
+        try:
+            # 创建DataFrame的副本
+            processed_df = df.copy()
+            
+            # 如果是MultiIndex，取第一个level
+            if isinstance(processed_df.index, pd.MultiIndex):
+                processed_df.index = processed_df.index.get_level_values(-1)
+            
+            # 确保列名是字符串类型
+            processed_df.columns = [str(col) for col in processed_df.columns]
+            
+            # 标准化列名（转换为小写）
+            column_mapping = {
+                'Close': 'close',
+                'Open': 'open',
+                'High': 'high',
+                'Low': 'low',
+                'Volume': 'volume',
+                'Adj Close': 'adj_close'
+            }
+            processed_df.columns = [column_mapping.get(col, col.lower()) for col in processed_df.columns]
+            
+            # 确保必要的列存在
+            required_columns = ['close', 'high', 'low', 'volume']
+            if not all(col in processed_df.columns for col in required_columns):
+                missing_columns = [col for col in required_columns if col not in processed_df.columns]
+                raise ValueError(f"缺少必要的列: {missing_columns}")
+            
+            # 确保数据类型正确
+            processed_df['close'] = pd.to_numeric(processed_df['close'], errors='coerce')
+            processed_df['high'] = pd.to_numeric(processed_df['high'], errors='coerce')
+            processed_df['low'] = pd.to_numeric(processed_df['low'], errors='coerce')
+            processed_df['volume'] = pd.to_numeric(processed_df['volume'], errors='coerce')
+            
+            # 确保数据是1维的
+            for col in processed_df.columns:
+                if isinstance(processed_df[col].iloc[0], (list, tuple, np.ndarray)):
+                    processed_df[col] = processed_df[col].apply(lambda x: x[0] if isinstance(x, (list, tuple, np.ndarray)) else x)
+            
+            return processed_df
+            
+        except Exception as e:
+            self.logger.error(f"数据预处理失败: {e}")
+            raise
+        
     def calculate_bollinger_bands(self, df: pd.DataFrame, period: int = 20, std_dev: float = 2.0) -> Dict:
         """
         计算布林带
@@ -18,7 +69,10 @@ class TechnicalAnalysis:
         :return: 布林带数据
         """
         try:
-            close = df['close'].values
+            # 预处理数据
+            processed_df = self._preprocess_data(df)
+            close = processed_df['close'].values
+            
             upper, middle, lower = talib.BBANDS(
                 close,
                 timeperiod=period,
@@ -28,11 +82,11 @@ class TechnicalAnalysis:
             )
             
             return {
-                'upper': upper[-1],
-                'middle': middle[-1],
-                'lower': lower[-1],
-                'bandwidth': (upper[-1] - lower[-1]) / middle[-1],
-                'position': (close[-1] - lower[-1]) / (upper[-1] - lower[-1])
+                'upper': float(upper[-1]),
+                'middle': float(middle[-1]),
+                'lower': float(lower[-1]),
+                'bandwidth': float((upper[-1] - lower[-1]) / middle[-1]),
+                'position': float((close[-1] - lower[-1]) / (upper[-1] - lower[-1]))
             }
             
         except Exception as e:
@@ -49,9 +103,11 @@ class TechnicalAnalysis:
         :return: KDJ数据
         """
         try:
-            high = df['high'].values
-            low = df['low'].values
-            close = df['close'].values
+            # 预处理数据
+            processed_df = self._preprocess_data(df)
+            high = processed_df['high'].values
+            low = processed_df['low'].values
+            close = processed_df['close'].values
             
             # 计算RSV
             lowest_low = talib.MIN(low, k_period)
@@ -68,9 +124,9 @@ class TechnicalAnalysis:
             j = 3 * k - 2 * d
             
             return {
-                'k': k[-1],
-                'd': d[-1],
-                'j': j[-1],
+                'k': float(k[-1]),
+                'd': float(d[-1]),
+                'j': float(j[-1]),
                 'signal': self._get_kdj_signal(k[-1], d[-1], j[-1])
             }
             
@@ -85,15 +141,16 @@ class TechnicalAnalysis:
         :return: 成交量指标数据
         """
         try:
-            # 确保数据类型是 double
-            close = df['close'].astype(float).values
-            volume = df['volume'].astype(float).values
+            # 预处理数据
+            processed_df = self._preprocess_data(df)
+            close = processed_df['close'].values
+            volume = processed_df['volume'].values
             
             # 计算OBV
             obv = talib.OBV(close, volume)
             
             # 计算VWAP
-            vwap = (df['close'].astype(float) * df['volume'].astype(float)).cumsum() / df['volume'].astype(float).cumsum()
+            vwap = (processed_df['close'] * processed_df['volume']).cumsum() / processed_df['volume'].cumsum()
             
             # 计算成交量移动平均
             volume_ma5 = talib.MA(volume, timeperiod=5)
@@ -122,25 +179,28 @@ class TechnicalAnalysis:
             if len(df) < lookback_period:
                 return {}
                 
+            # 预处理数据
+            processed_df = self._preprocess_data(df)
+            
             # 获取最高价和最低价
-            high = df['high'].max()
-            low = df['low'].min()
+            high = processed_df['high'].max()
+            low = processed_df['low'].min()
             range_size = high - low
             
             # 计算斐波那契回调位
             levels = {
-                '0.0': low,
-                '0.236': low + range_size * 0.236,
-                '0.382': low + range_size * 0.382,
-                '0.5': low + range_size * 0.5,
-                '0.618': low + range_size * 0.618,
-                '0.786': low + range_size * 0.786,
-                '1.0': high
+                '0.0': float(low),
+                '0.236': float(low + range_size * 0.236),
+                '0.382': float(low + range_size * 0.382),
+                '0.5': float(low + range_size * 0.5),
+                '0.618': float(low + range_size * 0.618),
+                '0.786': float(low + range_size * 0.786),
+                '1.0': float(high)
             }
             
             # 计算当前价格所在位置
-            current_price = df['close'].iloc[-1]
-            position = (current_price - low) / range_size
+            current_price = float(processed_df['close'].iloc[-1])
+            position = float((current_price - low) / range_size)
             
             return {
                 'levels': levels,
