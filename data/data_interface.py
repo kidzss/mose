@@ -268,6 +268,14 @@ class MySQLDataSource(DataSource):
             'ADJCLOSE': 'adj_close'
         }, inplace=True)
         
+        # 确保日期列是datetime类型
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            
+        # 设置日期为索引
+        if 'date' in df.columns and not isinstance(df.index, pd.DatetimeIndex):
+            df.set_index('date', inplace=True)
+        
         return df
 
 

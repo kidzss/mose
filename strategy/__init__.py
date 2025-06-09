@@ -1,23 +1,40 @@
 """
-Strategy package initialization
+股票交易策略和分析模块
 """
 
-from .strategy_base import Strategy
-from .cpgw_strategy import CPGWStrategy
-from .uss_gold_triangle_risk import USSGoldTriangleRisk
-from .momentum_strategy import MomentumStrategy
-from .niuniu_strategy_v3 import NiuniuStrategyV3
-from .tdi_strategy import TDIStrategy
-from .uss_market_forecast import USSMarketForecast
-from .bollinger_bands_strategy import BollingerBandsStrategy
+from typing import Dict, List, Any, Optional, Union
+import logging
+import os
+import sys
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# 市场环境分类器
+from .market_environment_classifier import MarketEnvironmentClassifier, MarketEnvironment
+
+# 动态策略选择器
+from .dynamic_strategy_selector import DynamicStrategySelector
+
+# 信号质量评估器
+from .signal_quality_evaluator import SignalQualityEvaluator, SignalStrength
+
+# 高级提醒系统
+from .advanced_alert_system import AdvancedAlertSystem, AlertLevel, AlertCategory
+
+# 版本信息
+__version__ = '0.1.0'
 
 __all__ = [
-    'Strategy',
-    'CPGWStrategy',
-    'USSGoldTriangleRisk',
-    'MomentumStrategy',
-    'NiuniuStrategyV3',
-    'TDIStrategy',
-    'USSMarketForecast',
-    'BollingerBandsStrategy'
+    'MarketEnvironment',
+    'MarketEnvironmentClassifier',
+    'DynamicStrategySelector',
+    'SignalQualityEvaluator',
+    'SignalStrength',
+    'AdvancedAlertSystem',
+    'AlertLevel',
+    'AlertCategory'
 ] 
