@@ -3,6 +3,10 @@ import numpy as np
 from typing import Dict, List, Optional, Any
 
 from .strategy_base import Strategy
+# 导入指标模块
+from .indicators.indicators import TechnicalIndicators
+from .indicators.oscillators import stochastic_rsi
+from .indicators.volatility import bollinger_bandwidth
 
 class BollingerBandsStrategy(Strategy):
     """
@@ -66,25 +70,22 @@ class BollingerBandsStrategy(Strategy):
             # 复制数据以避免修改原始数据
             df = data.copy()
             
-            # 计算布林带
+            # 使用指标模块计算布林带
             bb_length = self.parameters['bb_length']
             bb_std = self.parameters['bb_std']
             
-            df['bb_middle'] = df['close'].rolling(window=bb_length).mean()
-            price_std = df['close'].rolling(window=bb_length).std()
-            df['bb_upper'] = df['bb_middle'] + bb_std * price_std
-            df['bb_lower'] = df['bb_middle'] - bb_std * price_std
+            # 计算布林带
+            bb_result = TechnicalIndicators.calculate_bb(df['close'], window=bb_length, num_std=bb_std)
+            df['bb_middle'] = bb_result['middle']
+            df['bb_upper'] = bb_result['upper'] 
+            df['bb_lower'] = bb_result['lower']
             
             # 计算RSI
             rsi_length = self.parameters['rsi_length']
-            delta = df['close'].diff()
-            gain = delta.where(delta > 0, 0).rolling(window=rsi_length).mean()
-            loss = -delta.where(delta < 0, 0).rolling(window=rsi_length).mean()
-            rs = gain / loss
-            df['rsi'] = 100 - (100 / (1 + rs))
+            df['rsi'] = TechnicalIndicators.calculate_rsi(df['close'], window=rsi_length)
             
             # 计算价格位置（布林带百分比）
-            df['bb_pct'] = (df['close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
+            df['bb_pct'] = bb_result['b_percent']
             
             # 价格触及/突破布林带的条件
             df['price_below_lower'] = df['close'] <= df['bb_lower']

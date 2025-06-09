@@ -1,5 +1,6 @@
 advisor
 backtest
+config
 data
 monitor
 strategy

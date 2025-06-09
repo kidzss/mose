@@ -1,57 +1,0 @@
-2025-04-23 09:08:53,925 - monitor.stock_manager - INFO - 从数据库加载监控股票列表成功，共 10 只股票
-2025-04-23 09:08:53,949 - monitor.stock_monitor - INFO - StockMonitor初始化完成，运行模式: prod
-2025-04-23 09:08:54,001 - monitor.stock_monitor - INFO - 当前卡尔加里时间: 2025-04-23 09:08:53
-2025-04-23 09:08:54,001 - monitor.stock_monitor - INFO - 交易时间: 07:30 - 14:00
-2025-04-23 09:08:54,002 - monitor.stock_monitor - INFO - 当前是交易时间，执行初始检查...
-2025-04-23 09:08:54,002 - monitor.stock_monitor - INFO - 开始监控 7 只股票...
-2025-04-23 09:08:54,002 - monitor.stock_monitor - INFO - 正在分析股票 GOOG...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:08:54,606 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:08:54,607 - monitor.data_fetcher - WARNING - 未获取到 GOOG 的数据
-2025-04-23 09:08:55,611 - StockManager - ERROR - 获取股票 GOOG 数据失败: 'GOOG'
-2025-04-23 09:08:55,611 - monitor.stock_monitor - WARNING - 无法获取 GOOG 的数据
-2025-04-23 09:08:55,612 - monitor.stock_monitor - INFO - 正在分析股票 TSLA...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:08:55,698 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:08:55,699 - monitor.data_fetcher - WARNING - 未获取到 TSLA 的数据
-2025-04-23 09:08:56,702 - StockManager - ERROR - 获取股票 TSLA 数据失败: 'TSLA'
-2025-04-23 09:08:56,703 - monitor.stock_monitor - WARNING - 无法获取 TSLA 的数据
-2025-04-23 09:08:56,703 - monitor.stock_monitor - INFO - 正在分析股票 AMD...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:08:56,785 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:08:56,785 - monitor.data_fetcher - WARNING - 未获取到 AMD 的数据
-2025-04-23 09:08:57,790 - StockManager - ERROR - 获取股票 AMD 数据失败: 'AMD'
-2025-04-23 09:08:57,790 - monitor.stock_monitor - WARNING - 无法获取 AMD 的数据
-2025-04-23 09:08:57,790 - monitor.stock_monitor - INFO - 正在分析股票 NVDA...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:08:57,912 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:08:57,913 - monitor.data_fetcher - WARNING - 未获取到 NVDA 的数据
-2025-04-23 09:08:58,913 - StockManager - ERROR - 获取股票 NVDA 数据失败: 'NVDA'
-2025-04-23 09:08:58,914 - monitor.stock_monitor - WARNING - 无法获取 NVDA 的数据
-2025-04-23 09:08:58,914 - monitor.stock_monitor - INFO - 正在分析股票 PFE...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:08:59,069 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:08:59,069 - monitor.data_fetcher - WARNING - 未获取到 PFE 的数据
-2025-04-23 09:09:00,073 - StockManager - ERROR - 获取股票 PFE 数据失败: 'PFE'
-2025-04-23 09:09:00,073 - monitor.stock_monitor - WARNING - 无法获取 PFE 的数据
-2025-04-23 09:09:00,074 - monitor.stock_monitor - INFO - 正在分析股票 MSFT...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:09:00,239 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:09:00,240 - monitor.data_fetcher - WARNING - 未获取到 MSFT 的数据
-2025-04-23 09:09:01,244 - StockManager - ERROR - 获取股票 MSFT 数据失败: 'MSFT'
-2025-04-23 09:09:01,245 - monitor.stock_monitor - WARNING - 无法获取 MSFT 的数据
-2025-04-23 09:09:01,246 - monitor.stock_monitor - INFO - 正在分析股票 TMDX...
-[*********************100%***********************]  1 of 1 completed
-2025-04-23 09:09:01,485 - monitor.data_fetcher - ERROR - 数据缺少必要的列: ['Open', 'High', 'Low', 'Close', 'Volume']
-2025-04-23 09:09:01,486 - monitor.data_fetcher - WARNING - 未获取到 TMDX 的数据
-2025-04-23 09:09:02,487 - StockManager - ERROR - 获取股票 TMDX 数据失败: 'TMDX'
-2025-04-23 09:09:02,487 - monitor.stock_monitor - WARNING - 无法获取 TMDX 的数据
-2025-04-23 09:09:02,487 - monitor.stock_monitor - INFO - 初始检查完成，是否有信号: False
-2025-04-23 09:09:02,488 - monitor.stock_monitor - INFO - 发送初始状态报告...
-2025-04-23 09:09:02,488 - monitor.stock_monitor - INFO - 状态报告已发送
-2025-04-23 09:09:02,488 - monitor.stock_monitor - INFO - 当前时间: 2025-04-23 09:09:02
-2025-04-23 09:09:02,489 - monitor.stock_monitor - INFO - 监控已启动
-2025-04-23 09:09:02,489 - monitor.stock_monitor - INFO - 当前卡尔加里时间: 2025-04-23 09:09:02
-2025-04-23 09:09:02,489 - monitor.stock_monitor - INFO - 交易时间: 07:30 - 14:00
-2025-04-23 09:09:02,490 - monitor.stock_monitor - INFO - 当前是交易时间，开始检查交易信号...
-警报已发送: SYSTEM - 状态报告

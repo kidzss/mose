@@ -4,6 +4,10 @@ from typing import Dict, List, Optional, Any
 import logging
 
 from .strategy_base import Strategy
+# 导入指标模块
+from .indicators.indicators import TechnicalIndicators
+from .indicators.oscillators import stochastic_oscillator, williams_r
+from .indicators.volume import volume_ratio, on_balance_volume
 
 class MeanReversionStrategy(Strategy):
     """
@@ -71,23 +75,25 @@ class MeanReversionStrategy(Strategy):
             
             df = data.copy()
             
-            # 计算RSI
-            delta = df['close'].diff()
-            gain = delta.where(delta > 0, 0).rolling(window=self.parameters['rsi_length']).mean()
-            loss = -delta.where(delta < 0, 0).rolling(window=self.parameters['rsi_length']).mean()
-            rs = gain / loss
-            df['rsi'] = 100 - (100 / (1 + rs))
+            # 使用指标模块计算RSI
+            df['rsi'] = TechnicalIndicators.calculate_rsi(df['close'], window=self.parameters['rsi_length'])
             
-            # 计算随机指标
-            low_min = df['low'].rolling(window=self.parameters['stoch_length']).min()
-            high_max = df['high'].rolling(window=self.parameters['stoch_length']).max()
-            k = 100 * (df['close'] - low_min) / (high_max - low_min)
-            df['stoch_k'] = k.rolling(window=self.parameters['stoch_smooth']).mean()
-            df['stoch_d'] = df['stoch_k'].rolling(window=self.parameters['stoch_smooth']).mean()
+            # 使用指标模块计算随机指标
+            stoch_result = stochastic_oscillator(
+                df['high'], 
+                df['low'], 
+                df['close'], 
+                k_period=self.parameters['stoch_length'],
+                d_period=self.parameters['stoch_smooth'],
+                smooth_k=self.parameters['stoch_smooth']
+            )
+            df['stoch_k'] = stoch_result['k']
+            df['stoch_d'] = stoch_result['d']
             
-            # 计算成交量指标
+            # 使用指标模块计算成交量指标
+            vol_ratio = volume_ratio(df['volume'], window=self.parameters['volume_ma_length'])
             df['volume_ma'] = df['volume'].rolling(window=self.parameters['volume_ma_length']).mean()
-            df['volume_ratio'] = df['volume'] / df['volume_ma']
+            df['volume_ratio'] = vol_ratio
             
             # 计算价格形态
             df['body'] = df['close'] - df['open']

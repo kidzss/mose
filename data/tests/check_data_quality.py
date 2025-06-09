@@ -1,7 +1,7 @@
 from data.data_updater import MarketDataUpdater, DB_CONFIG
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import logging
 from sqlalchemy import create_engine, text
 import sys
@@ -10,9 +10,18 @@ import pandas_market_calendars as mcal
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename='data_quality_check.log',
+    filemode='w'
 )
 logger = logging.getLogger(__name__)
+
+# 添加控制台输出
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+console.setFormatter(formatter)
+logger.addHandler(console)
 
 class DataQualityChecker:
     def __init__(self, db_config):
@@ -57,7 +66,6 @@ class DataQualityChecker:
                 COUNT(DISTINCT Date) as total_days
             FROM stock_time_code 
             WHERE Code = :symbol
-            AND Volume > 0  -- 确保是有效的交易日
             AND Date <= CURDATE()  -- 只检查到今天为止的数据
         """)
         
@@ -78,13 +86,15 @@ class DataQualityChecker:
             return []
         
         logger.info(f"股票 {symbol} 交易日历天数: {len(trading_days)}")
+        logger.info(f"股票 {symbol} 交易日历前5天: {trading_days[:5]}")
+        logger.info(f"股票 {symbol} 交易日历后5天: {trading_days[-5:]}")
         
-        # 获取实际的数据日期
+        # 获取实际的数据日期（包括所有记录，不管成交量如何）
         query = text("""
-            SELECT Date FROM stock_time_code 
+            SELECT DISTINCT Date 
+            FROM stock_time_code 
             WHERE Code = :symbol 
             AND Date BETWEEN :start_date AND :end_date
-            AND Volume > 0  -- 只考虑有交易的日期
             ORDER BY Date
         """)
         
@@ -94,14 +104,23 @@ class DataQualityChecker:
                 "start_date": first_date,
                 "end_date": last_date
             })
-            dates = [row[0].strftime('%Y-%m-%d') if isinstance(row[0], datetime) else row[0] 
+            # 统一转换为字符串格式
+            dates = [row[0].strftime('%Y-%m-%d') if isinstance(row[0], (datetime, date)) else row[0] 
                     for row in result]
         
         logger.info(f"股票 {symbol} 实际数据天数: {len(dates)}")
+        logger.info(f"股票 {symbol} 实际数据前5天: {dates[:5]}")
+        logger.info(f"股票 {symbol} 实际数据后5天: {dates[-5:]}")
         
         # 确保日期格式统一，都转换为字符串进行比较
-        trading_days_set = set(trading_days)
-        dates_set = set(dates)
+        trading_days_set = set(trading_days)  # 已经是字符串格式
+        dates_set = set(dates)  # 现在也是字符串格式
+        
+        # 添加集合运算的调试信息
+        logger.info(f"股票 {symbol} 交易日历集合大小: {len(trading_days_set)}")
+        logger.info(f"股票 {symbol} 实际数据集合大小: {len(dates_set)}")
+        logger.info(f"股票 {symbol} 交易日历集合示例: {sorted(list(trading_days_set))[:5]}")
+        logger.info(f"股票 {symbol} 实际数据集合示例: {sorted(list(dates_set))[:5]}")
         
         # 计算缺失的交易日
         missing_dates = sorted(list(trading_days_set - dates_set))  # 使用集合运算找出缺失的日期
@@ -112,12 +131,20 @@ class DataQualityChecker:
             logger.info(f"股票 {symbol} 缺失天数: {len(missing_dates)}")
             logger.info(f"股票 {symbol} 第一个实际数据日期: {dates[0] if dates else 'N/A'}")
             logger.info(f"股票 {symbol} 最后一个实际数据日期: {dates[-1] if dates else 'N/A'}")
-            
-            # 添加更多调试信息以验证日期范围
             logger.info(f"股票 {symbol} 交易日历范围: {trading_days[0]} 到 {trading_days[-1]}")
             logger.info(f"股票 {symbol} 实际数据比例: {len(dates)}/{len(trading_days)} = {len(dates)/len(trading_days):.2%}")
-        
-        return missing_dates
+            
+            # 添加更多调试信息
+            logger.info(f"股票 {symbol} 交易日历和实际数据的交集大小: {len(trading_days_set & dates_set)}")
+            logger.info(f"股票 {symbol} 交易日历和实际数据的并集大小: {len(trading_days_set | dates_set)}")
+            logger.info(f"股票 {symbol} 交易日历和实际数据的差集大小: {len(trading_days_set - dates_set)}")
+            logger.info(f"股票 {symbol} 实际数据和交易日历的差集大小: {len(dates_set - trading_days_set)}")
+            
+            return missing_dates
+        else:
+            logger.info(f"股票 {symbol} 数据完整，无缺失日期")
+            logger.info(f"股票 {symbol} 实际数据比例: {len(dates)}/{len(trading_days)} = {len(dates)/len(trading_days):.2%}")
+            return []
     
     def check_data_anomalies(self, symbol, lookback_days=30):
         """检查数据异常"""
