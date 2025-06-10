@@ -71,4 +71,12 @@ data_quality_report.txt
 htmlcov/
 
 # Jupyter Notebook
-.ipynb_checkpoints 
+.ipynb_checkpoints
+
+# Machine Learning Models
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.pkl
+*.pickle 
