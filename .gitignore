@@ -41,7 +41,7 @@ logs/
 # Database
 *.db
 *.sqlite3
-
+*.sql
 # OS
 .DS_Store
 .DS_Store?
