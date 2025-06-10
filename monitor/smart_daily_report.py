@@ -954,7 +954,7 @@ class SmartDailyReportGenerator:
             f.write(html_content)
         
         logger.info(f"日报生成完成: {report_filename}")
-        return report_filename
+        return html_content  # 返回HTML内容而不是文件名
 
 def main():
     """主函数 - 生成用户持仓股票日报"""
