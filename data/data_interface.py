@@ -922,6 +922,15 @@ class DataInterface:
         
         return df
     
+    def get_latest_data(self, symbol: str, n_bars: int = 1, 
+                       timeframe: str = 'daily', source: str = None) -> pd.DataFrame:
+        """获取最新的n条数据"""
+        # 获取数据源
+        data_source = self.get_data_source(source)
+        
+        # 获取数据
+        return data_source.get_latest_data(symbol, n_bars, timeframe)
+    
     def get_multiple_symbols_data(self, symbols: List[str], start_date: Union[str, dt.datetime], 
                                 end_date: Union[str, dt.datetime], timeframe: str = 'daily',
                                 source: str = None) -> Dict[str, pd.DataFrame]:

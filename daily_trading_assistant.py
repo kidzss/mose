@@ -1,34 +1,52 @@
 #!/usr/bin/env python3
 """
-日常交易助手 - 边用边优化实施方案
-整合策略分析、投资组合监控、股票筛选
+每日交易助手 - 使用data模块接口
+提供投资组合分析、股票筛选和市场洞察
 """
 
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
 import sys
 import os
-import pandas as pd
-import yfinance as yf
-from datetime import datetime, timedelta
 import json
+import warnings
+warnings.filterwarnings('ignore')
 
 # 添加项目路径
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from data.data_interface import DataInterface
+from strategy.tdi_strategy import TDIStrategy
 
 class DailyTradingAssistant:
-    """日常交易助手"""
-    
     def __init__(self):
-        """初始化"""
-        from monitor.enhanced_portfolio_advisor import EnhancedPortfolioAdvisor
-        from monitor.enhanced_stock_screener import EnhancedStockScreener
-        from strategy.strategy_factory import StrategyFactory
+        """初始化交易助手"""
+        try:
+            self.data_interface = DataInterface()
+            self.tdi_strategy = TDIStrategy()
+            print("✅ 每日交易助手初始化成功")
+        except Exception as e:
+            print(f"❌ 初始化失败: {e}")
+            sys.exit(1)
+    
+    def get_available_stocks(self):
+        """获取所有可用股票代码 - 使用data模块接口"""
+        try:
+            symbols = self.data_interface.get_available_symbols()
+            print(f"📊 从数据库获取到 {len(symbols)} 只可用股票")
+            return symbols
+        except Exception as e:
+            print(f"❌ 获取股票列表失败: {e}")
+            return []
+    
+    def analyze_portfolio(self):
+        """分析投资组合"""
+        print("\n📊 投资组合分析")
+        print("="*40)
         
-        self.portfolio_advisor = EnhancedPortfolioAdvisor()
-        self.stock_screener = EnhancedStockScreener()
-        self.strategy_factory = StrategyFactory()
-        
-        # 你的实际投资组合
-        self.portfolio = {
+        # 实际投资组合（已清仓AIG）
+        portfolio = {
             'AMD': {'shares': 48, 'cost_basis': 126.214},
             'GOOGL': {'shares': 34, 'cost_basis': 170.54},
             'PFE': {'shares': 80, 'cost_basis': 25.899},
@@ -37,30 +55,22 @@ class DailyTradingAssistant:
             'ADBE': {'shares': 5, 'cost_basis': 346.896}
         }
         
-        print("✅ 日常交易助手初始化完成")
-    
-    def analyze_portfolio(self):
-        """分析投资组合"""
-        print("\n📊 投资组合分析")
-        print("="*40)
-        
         current_prices = {}
         total_cost = 0
         total_value = 0
         
         # 获取实时价格
-        for symbol in self.portfolio.keys():
+        for symbol in portfolio.keys():
             try:
-                ticker = yf.Ticker(symbol)
-                hist = ticker.history(period='2d')
-                if not hist.empty:
-                    current_prices[symbol] = hist['Close'].iloc[-1]
+                latest_data = self.data_interface.get_latest_data(symbol, n_bars=1)
+                if not latest_data.empty:
+                    current_prices[symbol] = latest_data['close'].iloc[-1]
             except Exception as e:
                 print(f"⚠️  {symbol}: 获取价格失败")
         
         # 分析每只股票
         recommendations = []
-        for symbol, info in self.portfolio.items():
+        for symbol, info in portfolio.items():
             if symbol in current_prices:
                 cost = info['shares'] * info['cost_basis']
                 value = info['shares'] * current_prices[symbol]
@@ -70,17 +80,23 @@ class DailyTradingAssistant:
                 total_cost += cost
                 total_value += value
                 
-                # 获取策略信号
-                signal = self._get_strategy_signal(symbol)
+                # 获取综合分析
+                analysis = self._get_comprehensive_analysis(symbol)
                 
                 print(f"{symbol:5}: ${current_prices[symbol]:7.2f} | "
-                      f"盈亏{pnl_pct:+6.2f}% | {signal}")
+                      f"盈亏{pnl_pct:+6.2f}% | {analysis['signal']} | {analysis['fundamental']}")
                 
                 # 生成建议
                 if pnl_pct < -10:
                     recommendations.append(f"⚠️  {symbol}: 亏损较大，考虑止损或加仓")
                 elif pnl_pct > 20:
                     recommendations.append(f"🎯 {symbol}: 收益良好，考虑部分止盈")
+                
+                # 基于综合分析的额外建议
+                if analysis['score'] < -0.5 and pnl_pct > 0:
+                    recommendations.append(f"📊 {symbol}: 技术+基本面转弱，考虑减仓")
+                elif analysis['score'] > 0.5 and pnl_pct < 0:
+                    recommendations.append(f"💡 {symbol}: 技术+基本面良好，逢低可加仓")
         
         total_pnl = total_value - total_cost
         total_pnl_pct = (total_pnl / total_cost) * 100 if total_cost > 0 else 0
@@ -99,29 +115,36 @@ class DailyTradingAssistant:
         print("\n🔍 筛选投资机会")
         print("="*40)
         
-        # 候选股票池
-        candidates = [
-            'AAPL', 'MSFT', 'AMZN', 'NFLX', 'META',
-            'CRM', 'INTC', 'ORCL', 'IBM', 'QCOM'
-        ]
+        # 候选股票池 - 从数据库中的前50只股票
+        try:
+            available_stocks = self.get_available_stocks()
+            candidates = available_stocks[:50] if available_stocks else []
+        except:
+            candidates = [
+                'AAPL', 'MSFT', 'AMZN', 'NFLX', 'META',
+                'CRM', 'INTC', 'ORCL', 'IBM', 'QCOM'
+            ]
         
         opportunities = []
         for symbol in candidates:
             try:
-                signal = self._get_strategy_signal(symbol)
-                if "买入" in signal:
-                    ticker = yf.Ticker(symbol)
-                    hist = ticker.history(period='5d')
-                    if not hist.empty:
-                        price = hist['Close'].iloc[-1]
-                        opportunities.append((symbol, price, signal))
+                analysis = self._get_comprehensive_analysis(symbol)
+                
+                # 综合评分 > 0.3 才推荐
+                if analysis['score'] > 0.3:
+                    latest_data = self.data_interface.get_latest_data(symbol, n_bars=1)
+                    if not latest_data.empty:
+                        price = latest_data['close'].iloc[-1]
+                        opportunities.append((symbol, price, f"{analysis['signal']} | {analysis['fundamental']}", analysis['score']))
             except:
                 continue
         
         if opportunities:
             print("📈 发现投资机会:")
-            for symbol, price, signal in opportunities:
-                print(f"   {symbol}: ${price:.2f} - {signal}")
+            # 按评分排序
+            opportunities.sort(key=lambda x: x[3], reverse=True)
+            for symbol, price, analysis, score in opportunities:
+                print(f"   {symbol}: ${price:.2f} - {analysis} (评分:{score:.2f})")
         else:
             print("   暂无明显投资机会")
         
@@ -132,47 +155,61 @@ class DailyTradingAssistant:
         print("\n🎯 今日策略信号")
         print("="*40)
         
+        # 组合股票 + 主要指数
+        portfolio_symbols = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE']
         signals = {}
-        for symbol in list(self.portfolio.keys()) + ['SPY', 'QQQ']:
-            signal = self._get_strategy_signal(symbol)
-            signals[symbol] = signal
-            print(f"   {symbol:5}: {signal}")
+        
+        for symbol in portfolio_symbols + ['SPY', 'QQQ']:
+            analysis = self._get_comprehensive_analysis(symbol)
+            signals[symbol] = analysis
+            print(f"   {symbol:5}: {analysis['signal']} | {analysis['fundamental']} (评分:{analysis['score']:.2f})")
         
         return signals
     
-    def _get_strategy_signal(self, symbol):
-        """获取策略信号（简化版）"""
+    def _get_comprehensive_analysis(self, symbol):
+        """获取综合分析（技术信号+基本面）"""
         try:
             # 获取价格数据
-            ticker = yf.Ticker(symbol)
-            hist = ticker.history(period='60d')
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=60)
+            hist = self.data_interface.get_historical_data(symbol, start_date, end_date)
             
             if hist.empty:
-                return "无数据"
+                return {"signal": "无数据", "fundamental": "无数据", "score": 0}
             
-            # 使用TDI策略分析
-            tdi_strategy = self.strategy_factory.create_strategy('TDI')
+            # 1. 技术信号分析
+            signals_data = self.tdi_strategy.generate_signals(hist)
             
-            # 标准化数据格式
-            data = hist.copy()
-            data.columns = [col.lower() for col in data.columns]
-            
-            # 生成信号
-            signals_data = tdi_strategy.generate_signals(data)
-            
-            if 'signal' in signals_data.columns:
+            if 'signal' in signals_data.columns and not signals_data.empty:
                 latest_signal = signals_data['signal'].iloc[-1]
                 if latest_signal > 0:
-                    return "🟢 买入信号"
+                    tech_signal = "🟢 买入"
+                    tech_score = 1
                 elif latest_signal < 0:
-                    return "🔴 卖出信号"
+                    tech_signal = "🔴 卖出"
+                    tech_score = -1
                 else:
-                    return "⚪ 观望"
+                    tech_signal = "⚪ 观望"
+                    tech_score = 0
             else:
-                return "无信号"
+                tech_signal = "无信号"
+                tech_score = 0
+            
+            # 2. 基本面简化评估（待接入基本面数据源）
+            fundamental_score = 3  # 默认中性评分
+            fundamental_status = "🟡 待评估"
+            
+            # 综合评分
+            total_score = tech_score + (fundamental_score - 3) * 0.5  # 基本面影响权重较小
+            
+            return {
+                "signal": tech_signal,
+                "fundamental": fundamental_status,
+                "score": total_score
+            }
                 
         except Exception as e:
-            return f"分析失败: {str(e)[:20]}"
+            return {"signal": f"分析失败", "fundamental": "无数据", "score": 0}
     
     def save_daily_log(self, portfolio_pnl, opportunities, signals):
         """保存日常记录"""
