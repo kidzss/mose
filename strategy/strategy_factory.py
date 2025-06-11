@@ -8,12 +8,8 @@ from pathlib import Path
 
 from .strategy_base import Strategy
 from .tdi_strategy import TDIStrategy
-from .bollinger_bands_strategy import BollingerBandsStrategy
-from .custom_strategy import CustomStrategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
 from .combined_strategy import CombinedStrategy
-from .uss_market_forecast import USSMarketForecast
-from .uss_gold_triangle_risk import USSGoldTriangleRisk
 from .cpgw_strategy import CPGWStrategy
 
 # 配置日志
@@ -33,16 +29,12 @@ class StrategyFactory:
         self._register_builtin_strategies()
 
     def _register_builtin_strategies(self):
-        """注册内置策略"""
+        """注册内置核心策略"""
         self.register_strategy("TDI", TDIStrategy)
-        self.register_strategy("BollingerBands", BollingerBandsStrategy)
-        self.register_strategy("Custom", CustomStrategy)
         self.register_strategy("NiuniuV3", NiuniuStrategyV3)
-        self.register_strategy("Combined", CombinedStrategy)
-        self.register_strategy("MarketForecast", USSMarketForecast)
-        self.register_strategy("GoldTriangle", USSGoldTriangleRisk)
         self.register_strategy("CPGW", CPGWStrategy)
-        logger.info(f"注册了 {len(self.strategies)} 个内置策略")
+        self.register_strategy("Combined", CombinedStrategy)
+        logger.info(f"✅ 注册了 {len(self.strategies)} 个核心策略")
 
     def register_strategy(self, name: str, strategy_class: Type[Strategy]) -> None:
         """
@@ -69,17 +61,19 @@ class StrategyFactory:
         """
         strategy_map = {
             'tdi': TDIStrategy,
-            'bollinger_bands': BollingerBandsStrategy,
-            'custom': CustomStrategy,
             'niuniu_v3': NiuniuStrategyV3,
+            'cpgw': CPGWStrategy,
             'combined': CombinedStrategy,
-            'market_forecast': USSMarketForecast,
-            'gold_triangle': USSGoldTriangleRisk,
-            'cpgw': CPGWStrategy
+            # 兼容性别名
+            'TDI': TDIStrategy,
+            'NiuniuV3': NiuniuStrategyV3,
+            'CPGW': CPGWStrategy,
+            'Combined': CombinedStrategy
         }
         
         if strategy_name not in strategy_map:
-            raise ValueError(f"Unknown strategy: {strategy_name}")
+            available_strategies = ', '.join(strategy_map.keys())
+            raise ValueError(f"未知策略: {strategy_name}. 可用策略: {available_strategies}")
             
         return strategy_map[strategy_name](**kwargs)
 
@@ -98,9 +92,14 @@ class StrategyFactory:
 
         strategies = {}
         for name in self.strategies:
-            strategy = self.create_strategy(name, parameters.get(name))
-            if strategy:
+            try:
+                strategy_class = self.strategies[name]
+                strategy_params = parameters.get(name, {})
+                strategy = strategy_class(**strategy_params)
                 strategies[name] = strategy
+                logger.info(f"✅ 创建策略实例: {name}")
+            except Exception as e:
+                logger.error(f"❌ 创建策略 {name} 实例失败: {e}")
 
         return strategies
 
@@ -122,11 +121,18 @@ class StrategyFactory:
         if not strategy_class:
             return None
 
-        return {
-            'name': name,
-            'description': strategy_class.__doc__,
-            'parameters': strategy_class(None).get_strategy_info()
-        }
+        try:
+            # 创建一个临时实例以获取信息
+            temp_strategy = strategy_class()
+            return {
+                'name': name,
+                'description': strategy_class.__doc__ or f"{name} 策略",
+                'class_name': strategy_class.__name__,
+                'module': strategy_class.__module__
+            }
+        except Exception as e:
+            logger.error(f"获取策略 {name} 信息时出错: {e}")
+            return None
 
     def get_all_strategies_info(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -137,5 +143,39 @@ class StrategyFactory:
         """
         result = {}
         for name in self.strategies:
-            result[name] = self.get_strategy_info(name)
+            info = self.get_strategy_info(name)
+            if info:
+                result[name] = info
         return result
+
+    def get_core_strategies(self) -> List[str]:
+        """获取核心策略列表"""
+        return ['TDI', 'NiuniuV3', 'CPGW']
+
+    def create_combined_strategy(self, weights: Optional[Dict[str, float]] = None) -> CombinedStrategy:
+        """
+        创建配置好的组合策略
+        
+        参数:
+            weights: 策略权重，默认为 {'niuniu': 0.5, 'tdi': 0.3, 'cpgw': 0.2}
+        
+        返回:
+            配置好的组合策略实例
+        """
+        default_weights = {
+            'weight_niuniu': 0.50,
+            'weight_tdi': 0.30, 
+            'weight_cpgw': 0.20
+        }
+        
+        if weights:
+            # 转换权重格式
+            for key, value in weights.items():
+                if key == 'niuniu':
+                    default_weights['weight_niuniu'] = value
+                elif key == 'tdi':
+                    default_weights['weight_tdi'] = value
+                elif key == 'cpgw':
+                    default_weights['weight_cpgw'] = value
+        
+        return CombinedStrategy(parameters=default_weights)

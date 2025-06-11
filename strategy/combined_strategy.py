@@ -8,315 +8,239 @@ import json
 from .strategy_base import Strategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
 from .cpgw_strategy import CPGWStrategy
-from .market_analysis import MarketAnalysis
-from .market_sentiment_strategy import MarketSentimentStrategy
-from .trend_following_strategy import TrendFollowingStrategy
-from .momentum_strategy import MomentumStrategy
-from .mean_reversion_strategy import MeanReversionStrategy
-from .bollinger_bands_strategy import BollingerBandsStrategy
-from .breakout_strategy import BreakoutStrategy
-from .intraday_momentum_strategy import IntradayMomentumStrategy
-from .position_manager import PositionManager
 from .tdi_strategy import TDIStrategy
-from .uss_gold_triangle_risk import USSGoldTriangleRisk
+from .market_analysis import MarketAnalysis
 
 logger = logging.getLogger(__name__)
 
 class CombinedStrategy(Strategy):
     """
-    组合策略类
-    将多个策略的信号组合成一个最终信号
+    简化的组合策略类
+    整合三个核心策略：NiuniuV3、TDI、CPGW
     """
     
-    def __init__(self, name: str = "Combined Strategy", parameters: dict = None):
+    def __init__(self, name: str = "Optimized Combined Strategy", parameters: dict = None):
         """初始化策略"""
         default_params = {
-            'weight_tdi': 0.4,
-            'weight_niuniu': 0.3,
-            'weight_gold_triangle': 0.3,
+            # 核心策略权重
+            'weight_niuniu': 0.50,   # 主要策略
+            'weight_tdi': 0.30,      # 短期策略
+            'weight_cpgw': 0.20,     # 补充策略
+            
+            # 信号阈值
+            'signal_threshold': 0.6,  # 信号确认阈值
+            'consensus_required': 2,  # 至少需要2个策略同意
+            
+            # 风险管理
+            'max_position_size': 0.3,
+            'stop_loss_atr': 2.0,
+            'take_profit_atr': 3.0,
+            
+            # 市场环境适应
+            'use_market_adaptation': True,
+            'volatility_threshold': 0.02,
         }
+        
         if parameters:
             default_params.update(parameters)
         super().__init__(name, default_params)
         
-        # 初始化子策略
-        self.tdi_strategy = TDIStrategy()
-        self.niuniu_strategy = NiuniuStrategyV3()
-        self.gold_triangle_strategy = USSGoldTriangleRisk()
-        
-        # 设置基础参数
-        self.parameters = default_params.copy()  # 使用default_params作为基础参数
-        self.parameters.update({
-            'cooldown_period': 10,
-            'risk_params': {
-                'max_drawdown': 0.25,
-                'volatility_limit': 0.35,
-                'position_limit': 0.9
-            },
-            'weight_adjust_params': {
-                'market_regime_factor': 1.15,
-                'volatility_factor': 1.1,
-                'sentiment_factor': 1.05,
-                'min_adjust_interval': 5
-            }
-        })
-        
-        # 初始化各个策略
-        self.strategies = {
-            # 长期策略
-            'cpgw': CPGWStrategy(),
-            'niuniu': NiuniuStrategyV3(),
-            
-            # 短期策略
-            'intraday': IntradayMomentumStrategy(),
-            'breakout': BreakoutStrategy(),
-            
-            # 中期策略
-            'trend': TrendFollowingStrategy(),
-            'momentum': MomentumStrategy(),
-            'mean_reversion': MeanReversionStrategy(),
-            'bollinger': BollingerBandsStrategy(),
-        }
-        
-        # 初始化仓位管理器
-        self.position_manager = PositionManager()
-        
-        # 初始化市场分析器
-        self.market_analyzer = MarketAnalysis()
-        
-        # 初始化市场情绪策略
-        self.sentiment_strategy = MarketSentimentStrategy()
-        
-        # 设置冷却期
-        self.cooldown_period = self.parameters['cooldown_period']
-        
-        # 设置风险参数
-        self.risk_params = self.parameters['risk_params']
-        
-        # 设置权重调整参数
-        self.weight_adjust_params = self.parameters['weight_adjust_params']
-        
-        # 记录上次调整时间
-        self.last_adjust_time = None
-        
-        # 设置基础权重
-        self.base_weights = {
-            # 长期策略
-            'cpgw': 0.25,
-            'niuniu': 0.25,
-            
-            # 短期策略
-            'intraday': 0.10,
-            'breakout': 0.10,
-            
-            # 中期策略
-            'trend': 0.10,
-            'momentum': 0.10,
-            'mean_reversion': 0.05,
-            'bollinger': 0.05,
-        }
-        
-        # 设置权重限制
-        self.weight_limits = {
-            # 长期策略
-            'cpgw': (0.15, 0.35),
-            'niuniu': (0.15, 0.35),
-            
-            # 短期策略
-            'intraday': (0.05, 0.15),
-            'breakout': (0.05, 0.15),
-            
-            # 中期策略
-            'trend': (0.05, 0.15),
-            'momentum': (0.05, 0.15),
-            'mean_reversion': (0.02, 0.08),
-            'bollinger': (0.02, 0.08),
-        }
-        
-        # 初始化日志记录器
-        self.logger = logging.getLogger(__name__)
-        
-        # 记录初始化完成
-        self.logger.info("CombinedStrategy initialized successfully")
-        
-    def _load_config(self, config_path: str) -> Dict:
-        """加载配置文件"""
+        # 初始化核心策略
         try:
-            if config_path:
-                with open(config_path, 'r') as f:
-                    return json.load(f)
-            return {}
+            self.niuniu_strategy = NiuniuStrategyV3()
+            self.tdi_strategy = TDIStrategy()
+            self.cpgw_strategy = CPGWStrategy()
+            
+            # 市场分析器
+            self.market_analyzer = MarketAnalysis()
+            
+            logger.info("✅ 组合策略初始化成功 - 集成了3个核心策略")
         except Exception as e:
-            logger.error(f"加载配置文件时出错: {str(e)}")
-            return {}
-    
+            logger.error(f"❌ 组合策略初始化失败: {e}")
+            raise
+        
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
-        """计算策略所需的技术指标"""
+        """计算所有策略需要的技术指标"""
         df = data.copy()
         
-        # 计算各个子策略的指标
-        df = self.tdi_strategy.calculate_indicators(df)
-        df = self.niuniu_strategy.calculate_indicators(df)
-        df = self.gold_triangle_strategy.calculate_indicators(df)
-        
-        return df
+        try:
+            # 让每个策略计算自己的指标
+            df = self.niuniu_strategy.calculate_indicators(df)
+            df = self.tdi_strategy.calculate_indicators(df)
+            df = self.cpgw_strategy.calculate_indicators(df)
+            
+            # 添加一些组合策略特有的指标
+            df['volatility'] = df['close'].pct_change().rolling(20).std() * np.sqrt(252)
+            
+            return df
+        except Exception as e:
+            logger.error(f"计算指标时出错: {e}")
+            return data
         
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
-        """生成交易信号"""
+        """生成组合交易信号"""
         df = data.copy()
         
-        # 计算技术指标
-        df = self.calculate_indicators(df)
-        
-        # 获取各个策略的信号
-        tdi_signals = self.tdi_strategy.generate_signals(df)['signal']
-        niuniu_signals = self.niuniu_strategy.generate_signals(df)['signal']
-        gold_triangle_signals = self.gold_triangle_strategy.generate_signals(df)['signal']
-        
-        # 加权组合信号
-        df['signal'] = (
-            self.parameters['weight_tdi'] * tdi_signals +
-            self.parameters['weight_niuniu'] * niuniu_signals +
-            self.parameters['weight_gold_triangle'] * gold_triangle_signals
-        )
-        
-        # 信号标准化
-        df['signal'] = np.sign(df['signal'])  # 转换为 -1, 0, 1
-        
-        return df
-        
-    def get_position_size(self, data: pd.DataFrame, signal: int) -> float:
-        """获取仓位大小"""
-        # 使用子策略的平均建议仓位
-        tdi_size = self.tdi_strategy.get_position_size(data, signal)
-        niuniu_size = self.niuniu_strategy.get_position_size(data, signal)
-        gold_triangle_size = self.gold_triangle_strategy.get_position_size(data, signal)
-        
-        return (tdi_size + niuniu_size + gold_triangle_size) / 3
-        
-    def get_stop_loss(self, data: pd.DataFrame, current_price: float, direction: int) -> float:
-        """获取止损价格"""
-        # 使用最保守的止损价格
-        tdi_stop = self.tdi_strategy.get_stop_loss(data, current_price, direction)
-        niuniu_stop = self.niuniu_strategy.get_stop_loss(data, current_price, direction)
-        gold_triangle_stop = self.gold_triangle_strategy.get_stop_loss(data, current_price, direction)
-        
-        if direction > 0:
-            return max(tdi_stop, niuniu_stop, gold_triangle_stop)
-        else:
-            return min(tdi_stop, niuniu_stop, gold_triangle_stop)
-        
-    def get_take_profit(self, data: pd.DataFrame, current_price: float, direction: int) -> float:
-        """获取止盈价格"""
-        # 使用最激进的止盈价格
-        tdi_tp = self.tdi_strategy.get_take_profit(data, current_price, direction)
-        niuniu_tp = self.niuniu_strategy.get_take_profit(data, current_price, direction)
-        gold_triangle_tp = self.gold_triangle_strategy.get_take_profit(data, current_price, direction)
-        
-        if direction > 0:
-            return min(tdi_tp, niuniu_tp, gold_triangle_tp)
-        else:
-            return max(tdi_tp, niuniu_tp, gold_triangle_tp)
-    
-    def _adjust_weights(self, df: pd.DataFrame) -> Dict[str, float]:
-        """
-        根据市场环境动态调整策略权重
-        
-        Args:
-            df: 市场数据
-            
-        Returns:
-            Dict[str, float]: 调整后的策略权重
-        """
         try:
-            # 获取当前市场环境
-            market_regime = self.market_analyzer.analyze_market_regime(df)
-            volatility_regime = self.market_analyzer.analyze_volatility_regime(df)
-            sentiment = self.sentiment_strategy.analyze_sentiment(df)
+            # 计算技术指标
+            df = self.calculate_indicators(df)
             
-            # 初始化调整后的权重
-            adjusted_weights = self.base_weights.copy()
+            # 获取各策略信号
+            niuniu_signals = self.niuniu_strategy.generate_signals(df)
+            tdi_signals = self.tdi_strategy.generate_signals(df)
+            cpgw_signals = self.cpgw_strategy.generate_signals(df)
             
-            # 根据市场环境调整权重
-            if market_regime == 'bullish':
-                # 牛市环境下增加趋势和动量策略权重
-                adjusted_weights['cpgw'] *= 1.1
-                adjusted_weights['niuniu'] *= 1.1
-            elif market_regime == 'bearish':
-                # 熊市环境下增加反转和均值回归策略权重
-                adjusted_weights['cpgw'] *= 1.1
-                adjusted_weights['niuniu'] *= 1.1
-            else:  # neutral
-                # 震荡市环境下增加日内和突破策略权重
-                adjusted_weights['cpgw'] *= 1.1
-                adjusted_weights['niuniu'] *= 1.1
+            # 提取信号值
+            niuniu_signal = niuniu_signals['signal'] if 'signal' in niuniu_signals.columns else 0
+            tdi_signal = tdi_signals['signal'] if 'signal' in tdi_signals.columns else 0
+            cpgw_signal = cpgw_signals['signal'] if 'signal' in cpgw_signals.columns else 0
             
-            # 根据波动率调整权重
-            if volatility_regime == 'high':
-                # 高波动环境下降低风险策略权重
-                adjusted_weights['cpgw'] *= 0.8
-                adjusted_weights['niuniu'] *= 0.8
-            else:  # low
-                # 低波动环境下增加趋势策略权重
-                adjusted_weights['cpgw'] *= 1.2
-                adjusted_weights['niuniu'] *= 1.2
-            
-            # 根据市场情绪调整权重
-            if sentiment == 'bullish':
-                # 看多情绪下增加趋势策略权重
-                adjusted_weights['cpgw'] *= 1.1
-                adjusted_weights['niuniu'] *= 1.1
-            elif sentiment == 'bearish':
-                # 看空情绪下增加反转策略权重
-                adjusted_weights['cpgw'] *= 1.1
-                adjusted_weights['niuniu'] *= 1.1
-            
-            # 确保权重在限制范围内
-            for strategy, (min_weight, max_weight) in self.weight_limits.items():
-                adjusted_weights[strategy] = max(min_weight, min(adjusted_weights[strategy], max_weight))
-            
-            # 归一化权重
-            total_weight = sum(adjusted_weights.values())
-            adjusted_weights = {k: v/total_weight for k, v in adjusted_weights.items()}
-            
-            # 记录权重调整
-            self.logger.info(f"Adjusted weights: {adjusted_weights}")
-            
-            return adjusted_weights
-            
-        except Exception as e:
-            self.logger.error(f"Error adjusting weights: {str(e)}")
-            return self.base_weights
-    
-    def _apply_risk_management(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        应用风险管理规则
-        """
-        try:
-            # 计算当前回撤
-            if 'returns' in data.columns:
-                data['equity'] = (1 + data['returns']).cumprod()
-                data['drawdown'] = (data['equity'] / data['equity'].cummax() - 1)
-                
-                # 如果回撤超过限制，逐步减少仓位
-                drawdown_mask = data['drawdown'] < -self.risk_params['max_drawdown']
-                data.loc[drawdown_mask, 'signal'] = data.loc[drawdown_mask, 'signal'] * 0.5
-            
-            # 应用仓位限制
-            data['signal'] = data['signal'].clip(
-                lower=-self.risk_params['position_limit'],
-                upper=self.risk_params['position_limit']
+            # 计算加权组合信号
+            combined_signal = (
+                self.parameters['weight_niuniu'] * niuniu_signal +
+                self.parameters['weight_tdi'] * tdi_signal +
+                self.parameters['weight_cpgw'] * cpgw_signal
             )
             
-            return data
+            # 应用市场环境调整
+            if self.parameters['use_market_adaptation']:
+                combined_signal = self._apply_market_adaptation(df, combined_signal)
+            
+            # 信号过滤和标准化
+            final_signal = self._filter_signals(combined_signal, niuniu_signal, tdi_signal, cpgw_signal)
+            
+            df['signal'] = final_signal
+            df['signal_strength'] = abs(combined_signal)
+            
+            # 保存各策略的原始信号用于分析
+            df['niuniu_signal'] = niuniu_signal
+            df['tdi_signal'] = tdi_signal
+            df['cpgw_signal'] = cpgw_signal
+            
+            return df
             
         except Exception as e:
-            logger.error(f"应用风险管理时出错: {str(e)}")
-            return data
+            logger.error(f"生成信号时出错: {e}")
+            df['signal'] = 0
+            return df
     
-    def _check_cooldown(self) -> bool:
-        """检查是否过了冷却期"""
-        if self.last_adjust_time is None:
-            return True
-        days_since_last_adjust = (datetime.now() - self.last_adjust_time).days
-        return days_since_last_adjust >= self.weight_adjust_params['min_adjust_interval'] 
+    def _apply_market_adaptation(self, data: pd.DataFrame, signal: pd.Series) -> pd.Series:
+        """根据市场环境调整信号"""
+        try:
+            current_volatility = data['volatility'].iloc[-1] if not data['volatility'].empty else 0
+            
+            # 高波动市场中降低信号强度
+            if current_volatility > self.parameters['volatility_threshold']:
+                adjustment_factor = 0.7
+                logger.debug(f"高波动市场，调整信号强度：{adjustment_factor}")
+                signal *= adjustment_factor
+            
+            return signal
+        except Exception as e:
+            logger.error(f"市场适应调整出错: {e}")
+            return signal
+    
+    def _filter_signals(self, combined_signal: pd.Series, niuniu_signal: pd.Series, 
+                       tdi_signal: pd.Series, cpgw_signal: pd.Series) -> pd.Series:
+        """过滤和标准化信号"""
+        try:
+            final_signal = pd.Series(0, index=combined_signal.index)
+            
+            for i in range(len(combined_signal)):
+                signals = [niuniu_signal.iloc[i], tdi_signal.iloc[i], cpgw_signal.iloc[i]]
+                combined_val = combined_signal.iloc[i]
+                
+                # 计算同向信号数量
+                positive_signals = sum(1 for s in signals if s > 0)
+                negative_signals = sum(1 for s in signals if s < 0)
+                
+                # 需要足够的共识才产生信号
+                if positive_signals >= self.parameters['consensus_required'] and combined_val > self.parameters['signal_threshold']:
+                    final_signal.iloc[i] = 1
+                elif negative_signals >= self.parameters['consensus_required'] and combined_val < -self.parameters['signal_threshold']:
+                    final_signal.iloc[i] = -1
+                else:
+                    final_signal.iloc[i] = 0
+                    
+            return final_signal
+            
+        except Exception as e:
+            logger.error(f"信号过滤出错: {e}")
+            return pd.Series(0, index=combined_signal.index)
+    
+    def get_position_size(self, data: pd.DataFrame, signal: int) -> float:
+        """计算建议仓位大小"""
+        try:
+            if signal == 0:
+                return 0.0
+            
+            # 基础仓位大小
+            base_size = 0.1
+            
+            # 根据信号强度调整
+            if 'signal_strength' in data.columns and not data['signal_strength'].empty:
+                signal_strength = data['signal_strength'].iloc[-1]
+                size_multiplier = min(signal_strength * 2, 1.0)  # 最大不超过100%
+                base_size *= size_multiplier
+            
+            # 应用最大仓位限制
+            return min(base_size, self.parameters['max_position_size'])
+            
+        except Exception as e:
+            logger.error(f"计算仓位大小出错: {e}")
+            return 0.05  # 默认5%仓位
+    
+    def get_stop_loss(self, data: pd.DataFrame, current_price: float, direction: int) -> float:
+        """获取止损价格"""
+        try:
+            if 'ATR' in data.columns and not data['ATR'].empty:
+                atr = data['ATR'].iloc[-1]
+                stop_distance = atr * self.parameters['stop_loss_atr']
+            else:
+                # 如果没有ATR，使用价格的2%作为止损
+                stop_distance = current_price * 0.02
+            
+            if direction > 0:  # 多头
+                return current_price - stop_distance
+            else:  # 空头
+                return current_price + stop_distance
+                
+        except Exception as e:
+            logger.error(f"计算止损价格出错: {e}")
+            # 默认2%止损
+            return current_price * (0.98 if direction > 0 else 1.02)
+    
+    def get_take_profit(self, data: pd.DataFrame, current_price: float, direction: int) -> float:
+        """获取止盈价格"""
+        try:
+            if 'ATR' in data.columns and not data['ATR'].empty:
+                atr = data['ATR'].iloc[-1]
+                profit_distance = atr * self.parameters['take_profit_atr']
+            else:
+                # 如果没有ATR，使用价格的3%作为止盈
+                profit_distance = current_price * 0.03
+            
+            if direction > 0:  # 多头
+                return current_price + profit_distance
+            else:  # 空头
+                return current_price - profit_distance
+                
+        except Exception as e:
+            logger.error(f"计算止盈价格出错: {e}")
+            # 默认3%止盈
+            return current_price * (1.03 if direction > 0 else 0.97)
+    
+    def get_strategy_summary(self) -> Dict[str, Any]:
+        """获取策略配置摘要"""
+        return {
+            'name': self.name,
+            'strategies': ['NiuniuV3', 'TDI', 'CPGW'],
+            'weights': {
+                'niuniu': self.parameters['weight_niuniu'],
+                'tdi': self.parameters['weight_tdi'],
+                'cpgw': self.parameters['weight_cpgw']
+            },
+            'signal_threshold': self.parameters['signal_threshold'],
+            'consensus_required': self.parameters['consensus_required'],
+            'max_position_size': self.parameters['max_position_size']
+        } 
