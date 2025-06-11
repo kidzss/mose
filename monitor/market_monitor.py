@@ -13,7 +13,7 @@ import yfinance as yf
 from bs4 import BeautifulSoup
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
-import talib
+# talib 已移除，使用内置实现
 import traceback
 import redis
 from sqlalchemy import text

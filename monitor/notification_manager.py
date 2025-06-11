@@ -14,7 +14,7 @@ try:
 except ImportError:
     default_config = None
     
-from alert_system import AlertSystem
+from .alert_system import AlertSystem
 
 # 配置日志
 logging.basicConfig(

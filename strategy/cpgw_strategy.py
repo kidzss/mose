@@ -116,9 +116,39 @@ class CPGWStrategy(Strategy):
     
     def get_position_size(self, df: pd.DataFrame, current_price: float) -> float:
         """根据市场环境和信号强度动态调整仓位大小"""
-        # 使用基类的position_size方法
-        signal = df['signal'].iloc[-1] if 'signal' in df.columns else 0
-        return super().get_position_size(df, signal)
+        try:
+            # 获取信号
+            signal = df['signal'].iloc[-1] if 'signal' in df.columns and len(df) > 0 else 0
+            
+            if signal == 0:
+                return 0.0
+            
+            # 基础仓位
+            base_position = 0.1
+            
+            # 根据RSI强度调整
+            if 'rsi' in df.columns and len(df) > 0:
+                rsi = df['rsi'].iloc[-1]
+                if not pd.isna(rsi):
+                    if signal > 0 and rsi < 25:  # 强超卖
+                        base_position *= 1.5
+                    elif signal < 0 and rsi > 75:  # 强超买
+                        base_position *= 1.5
+            
+            # 根据波动率调整
+            if 'volatility' in df.columns and len(df) > 0:
+                vol = df['volatility'].iloc[-1]
+                if not pd.isna(vol) and vol > 0:
+                    # 高波动时减少仓位
+                    vol_adj = min(1.0, 0.02 / vol)
+                    base_position *= vol_adj
+            
+            # 限制最大仓位
+            return min(base_position, 0.3)
+            
+        except Exception as e:
+            logger.error(f"计算仓位大小出错: {e}")
+            return 0.05  # 默认5%仓位
     
     def get_stop_loss(self, df: pd.DataFrame, entry_price: float, position: str) -> float:
         """根据市场环境动态调整止损价格"""

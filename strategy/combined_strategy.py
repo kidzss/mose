@@ -127,28 +127,50 @@ class CombinedStrategy(Strategy):
     def _apply_market_adaptation(self, data: pd.DataFrame, signal: pd.Series) -> pd.Series:
         """根据市场环境调整信号"""
         try:
-            current_volatility = data['volatility'].iloc[-1] if not data['volatility'].empty else 0
+            # 检查volatility列是否存在
+            if 'volatility' not in data.columns or data['volatility'].empty:
+                return signal
+            
+            current_volatility = data['volatility'].iloc[-1] if len(data) > 0 else 0
             
             # 高波动市场中降低信号强度
-            if current_volatility > self.parameters['volatility_threshold']:
+            if pd.notna(current_volatility) and current_volatility > self.parameters['volatility_threshold']:
                 adjustment_factor = 0.7
                 logger.debug(f"高波动市场，调整信号强度：{adjustment_factor}")
-                signal *= adjustment_factor
+                signal = signal * adjustment_factor
             
             return signal
         except Exception as e:
             logger.error(f"市场适应调整出错: {e}")
             return signal
     
-    def _filter_signals(self, combined_signal: pd.Series, niuniu_signal: pd.Series, 
-                       tdi_signal: pd.Series, cpgw_signal: pd.Series) -> pd.Series:
+    def _filter_signals(self, combined_signal: pd.Series, niuniu_signal, 
+                       tdi_signal, cpgw_signal) -> pd.Series:
         """过滤和标准化信号"""
         try:
-            final_signal = pd.Series(0, index=combined_signal.index)
+            # 处理不同类型的信号输入
+            def _extract_signal_value(signal, index):
+                if isinstance(signal, pd.Series):
+                    return signal.iloc[index] if len(signal) > index else 0
+                elif isinstance(signal, (int, float)):
+                    return signal
+                else:
+                    return 0
             
-            for i in range(len(combined_signal)):
-                signals = [niuniu_signal.iloc[i], tdi_signal.iloc[i], cpgw_signal.iloc[i]]
-                combined_val = combined_signal.iloc[i]
+            if isinstance(combined_signal, pd.Series):
+                final_signal = pd.Series(0, index=combined_signal.index)
+            else:
+                # 如果combined_signal不是Series，创建默认的
+                final_signal = pd.Series(0, index=range(len(combined_signal)) if hasattr(combined_signal, '__len__') else range(1))
+            
+            for i in range(len(final_signal)):
+                # 提取各策略信号值
+                niuniu_val = _extract_signal_value(niuniu_signal, i)
+                tdi_val = _extract_signal_value(tdi_signal, i)
+                cpgw_val = _extract_signal_value(cpgw_signal, i)
+                
+                signals = [niuniu_val, tdi_val, cpgw_val]
+                combined_val = _extract_signal_value(combined_signal, i)
                 
                 # 计算同向信号数量
                 positive_signals = sum(1 for s in signals if s > 0)
@@ -166,7 +188,11 @@ class CombinedStrategy(Strategy):
             
         except Exception as e:
             logger.error(f"信号过滤出错: {e}")
-            return pd.Series(0, index=combined_signal.index)
+            # 返回安全的默认信号
+            if isinstance(combined_signal, pd.Series):
+                return pd.Series(0, index=combined_signal.index)
+            else:
+                return pd.Series(0, index=range(1))
     
     def get_position_size(self, data: pd.DataFrame, signal: int) -> float:
         """计算建议仓位大小"""

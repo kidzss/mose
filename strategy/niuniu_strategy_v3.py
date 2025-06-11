@@ -2,7 +2,14 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional, List, Tuple
 import logging
-import talib
+
+# 可选导入 talib
+try:
+    import talib
+    HAS_TALIB = True
+except ImportError:
+    HAS_TALIB = False
+    logging.warning("TA-Lib not found. Using fallback implementations for technical indicators.")
 
 from .strategy_base import Strategy, MarketRegime
 from .signal_interface import SignalComponent, SignalMetadata, SignalType, SignalTimeframe
@@ -117,7 +124,7 @@ class NiuniuStrategyV3(Strategy):
             # 标准化列名（转换为小写）
             column_mapping = {
                 'Close': 'close',
-                'Open': 'open',
+                'Open': 'open', 
                 'High': 'high',
                 'Low': 'low',
                 'Volume': 'volume',
@@ -125,17 +132,23 @@ class NiuniuStrategyV3(Strategy):
             }
             processed_df.columns = [column_mapping.get(col, col.lower()) for col in processed_df.columns]
             
+            # 去除重复列（保留第一个）
+            processed_df = processed_df.loc[:, ~processed_df.columns.duplicated()]
+            
             # 确保必要的列存在
             required_columns = ['close', 'high', 'low', 'volume']
             if not all(col in processed_df.columns for col in required_columns):
                 missing_columns = [col for col in required_columns if col not in processed_df.columns]
                 raise ValueError(f"缺少必要的列: {missing_columns}")
             
-            # 确保数据类型正确
-            processed_df['close'] = processed_df['close'].astype(float)
-            processed_df['high'] = processed_df['high'].astype(float)
-            processed_df['low'] = processed_df['low'].astype(float)
-            processed_df['volume'] = processed_df['volume'].astype(float)
+            # 确保数据类型正确并处理可能的多列问题
+            for col in ['close', 'high', 'low', 'volume']:
+                if col in processed_df.columns:
+                    col_data = processed_df[col]
+                    # 如果是DataFrame，取第一列
+                    if isinstance(col_data, pd.DataFrame):
+                        col_data = col_data.iloc[:, 0]
+                    processed_df[col] = pd.to_numeric(col_data, errors='coerce')
             
             return processed_df
             
@@ -157,22 +170,25 @@ class NiuniuStrategyV3(Strategy):
             # 预处理数据
             processed_df = self._preprocess_data(df)
             
-            # 计算移动平均线
-            processed_df['fast_ma'] = talib.SMA(processed_df['close'], timeperiod=self.fast_period)
-            processed_df['slow_ma'] = talib.SMA(processed_df['close'], timeperiod=self.slow_period)
-            
-            # 计算RSI
-            processed_df['RSI'] = talib.RSI(processed_df['close'], timeperiod=self.rsi_period)
-            
-            # 计算ADX
-            processed_df['ADX'] = talib.ADX(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=self.adx_period)
+            if HAS_TALIB:
+                # 使用 TA-Lib 计算指标
+                processed_df['fast_ma'] = talib.SMA(processed_df['close'], timeperiod=self.fast_period)
+                processed_df['slow_ma'] = talib.SMA(processed_df['close'], timeperiod=self.slow_period)
+                processed_df['RSI'] = talib.RSI(processed_df['close'], timeperiod=self.rsi_period)
+                processed_df['ADX'] = talib.ADX(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=self.adx_period)
+                volume_ma = talib.SMA(processed_df['volume'], timeperiod=20)
+                processed_df['volatility'] = talib.ATR(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=14)
+            else:
+                # 使用 pandas 的 fallback 实现
+                processed_df['fast_ma'] = processed_df['close'].rolling(window=self.fast_period).mean()
+                processed_df['slow_ma'] = processed_df['close'].rolling(window=self.slow_period).mean()
+                processed_df['RSI'] = self._calculate_rsi_fallback(processed_df['close'], self.rsi_period)
+                processed_df['ADX'] = self._calculate_adx_fallback(processed_df, self.adx_period)
+                volume_ma = processed_df['volume'].rolling(window=20).mean()
+                processed_df['volatility'] = self._calculate_atr_fallback(processed_df, 14)
             
             # 计算成交量比率
-            volume_ma = talib.SMA(processed_df['volume'], timeperiod=20)
             processed_df['volume_ratio'] = processed_df['volume'] / volume_ma
-            
-            # 计算波动率
-            processed_df['volatility'] = talib.ATR(processed_df['high'], processed_df['low'], processed_df['close'], timeperiod=14)
             
             # 确保所有计算的指标都是float类型
             for col in ['fast_ma', 'slow_ma', 'RSI', 'ADX', 'volume_ratio', 'volatility']:
@@ -184,6 +200,46 @@ class NiuniuStrategyV3(Strategy):
         except Exception as e:
             self.logger.error(f"计算技术指标时出错: {str(e)}")
             raise
+    
+    def _calculate_rsi_fallback(self, prices: pd.Series, period: int = 14) -> pd.Series:
+        """RSI fallback实现"""
+        delta = prices.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+        rs = gain / loss
+        return 100 - (100 / (1 + rs))
+    
+    def _calculate_adx_fallback(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
+        """ADX fallback实现（简化版本）"""
+        high = df['high']
+        low = df['low']
+        close = df['close']
+        
+        # 计算True Range
+        tr1 = high - low
+        tr2 = abs(high - close.shift(1))
+        tr3 = abs(low - close.shift(1))
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        
+        # 简化的ADX计算（基于价格范围的波动率）
+        atr = tr.rolling(window=period).mean()
+        price_range = (high - low).rolling(window=period).mean()
+        adx = (atr / price_range) * 100
+        
+        return adx.fillna(20)  # 默认值
+    
+    def _calculate_atr_fallback(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
+        """ATR fallback实现"""
+        high = df['high']
+        low = df['low']
+        close = df['close']
+        
+        tr1 = high - low
+        tr2 = abs(high - close.shift(1))
+        tr3 = abs(low - close.shift(1))
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        
+        return tr.rolling(window=period).mean()
 
     def extract_signal_components(self, data: pd.DataFrame) -> Dict[str, pd.Series]:
         """
