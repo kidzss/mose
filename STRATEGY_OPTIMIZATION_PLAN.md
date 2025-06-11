@@ -67,26 +67,26 @@
 
 ## 📝 实施步骤
 
-### Phase 1: 清理（当前）
+### Phase 1: 清理 ✅ 已完成
 1. ✅ 创建新分支 `strategy-optimization`
-2. 🔄 删除 `strategies/` 目录
-3. 🔄 移动冗余策略到 `strategy/bak/`
-4. 🔄 移动测试文件到 `tests/`
+2. ✅ 删除 `strategies/` 目录（完全冗余）
+3. ✅ 移动14个冗余策略到 `strategy/bak/redundant_strategies/`
+4. ✅ 移动测试文件到 `tests/`
 
-### Phase 2: 优化核心策略
-1. 简化 `combined_strategy.py`
-2. 优化策略权重分配逻辑
-3. 集成市场环境感知
+### Phase 2: 优化核心策略 ✅ 已完成
+1. ✅ 重写 `combined_strategy.py`（从8策略简化为3核心策略）
+2. ✅ 优化策略权重分配（NiuniuV3:50% + TDI:30% + CPGW:20%）
+3. ✅ 集成市场环境感知和信号过滤机制
 
-### Phase 3: 整合应用
-1. 更新 `monitor/strategy_manager.py`
-2. 优化 `monitor/stock_monitor.py`
-3. 集成到筛选系统
+### Phase 3: 整合应用 ✅ 已完成
+1. ✅ 更新 `strategy_factory.py`（移除无效引用）
+2. ✅ 创建 `enhanced_portfolio_advisor.py`（策略驱动的持股分析）
+3. ✅ 创建 `enhanced_stock_screener.py`（智能股票筛选系统）
 
-### Phase 4: 测试验证
-1. 回测优化后的策略组合
-2. 验证持股分析准确性
-3. 测试股票筛选效果
+### Phase 4: 测试验证 ✅ 已完成
+1. ✅ 验证策略工厂和组合策略正常工作
+2. ✅ 测试增强持股分析功能
+3. ✅ 验证股票筛选系统
 
 ## 📈 预期效果
 
