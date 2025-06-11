@@ -14,10 +14,14 @@ from typing import Dict, List, Optional
 # 添加项目根目录到路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from .smart_daily_report import SmartDailyReportGenerator
-from .alert_system import AlertSystem
-from .notification_manager import NotificationManager
-from config.trading_config import default_config
+from smart_daily_report import SmartDailyReportGenerator
+# 简化依赖 - 直接使用内置邮件功能
+# from alert_system import AlertSystem
+# from notification_manager import NotificationManager
+try:
+    from config.trading_config import default_config
+except ImportError:
+    default_config = None
 
 # 配置日志
 logging.basicConfig(

@@ -15,6 +15,18 @@ if not exist "smart_daily_email_sender.py" (
 echo ✅ 找到智能日报系统文件
 echo.
 
+echo 🐍 激活 openbb 环境...
+call conda activate openbb
+if errorlevel 1 (
+    echo ❌ 错误：无法激活 openbb 环境
+    echo 请确保已安装 conda 和 openbb 环境
+    pause
+    exit /b 1
+)
+
+echo ✅ openbb 环境已激活
+echo.
+
 echo 🚀 启动智能日报定时任务...
 echo ⏰ 系统将在美股收盘后30分钟自动发送邮件
 echo 📅 只在交易日执行
