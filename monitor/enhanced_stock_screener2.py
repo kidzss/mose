@@ -221,11 +221,12 @@ class EnhancedStockScreener:
         results = []
         print(f"\n⏳ 正在分析股票...")
         
-        # 限制分析数量避免太慢
-        analyze_count = min(50, len(stock_list))
-        for i, symbol in enumerate(stock_list[:analyze_count]):
-            if i % 10 == 0:
-                print(f"   进度: {i}/{analyze_count}")
+        # 分析所有股票，不再限制数量
+        analyze_count = len(stock_list)
+        print(f"   将分析全部 {analyze_count} 只股票...")
+        for i, symbol in enumerate(stock_list):
+            if i % 50 == 0:
+                print(f"   进度: {i}/{analyze_count} ({i/analyze_count*100:.1f}%)")
             
             analysis = self._analyze_stock_comprehensive(symbol)
             if analysis and analysis['total_score'] >= min_score:

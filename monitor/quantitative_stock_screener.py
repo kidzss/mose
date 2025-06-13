@@ -242,7 +242,9 @@ class QuantitativeStockScreener:
                     len(symbol) <= 5):              # 排除过长的代码
                     filtered_symbols.append(symbol)
             
-            return filtered_symbols[:100]  # 限制为前100只股票进行测试
+            # 移除限制，分析所有可用股票
+            logger.info(f"获取到 {len(filtered_symbols)} 只可用股票，将进行全量分析")
+            return filtered_symbols
             
         except Exception as e:
             logger.error(f"获取股票池失败: {e}")
