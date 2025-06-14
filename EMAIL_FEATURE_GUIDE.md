@@ -83,7 +83,22 @@ screener.send_report_email(
 )
 ```
 
-### 方法3: 命令行参数
+### 方法3: 统一邮件API
+
+```python
+from utils.unified_email_api import send_html, send_markdown, send_text
+
+# 发送HTML邮件
+send_html(subject="报告", html_content="<h1>分析报告</h1>")
+
+# 发送Markdown邮件
+send_markdown(subject="分析", md_content="# 分析报告")
+
+# 发送文本邮件
+send_text(subject="通知", content="Hello World")
+```
+
+### 方法4: 命令行参数
 
 ```bash
 # 基本用法
@@ -144,13 +159,11 @@ python run_screening_with_email.py --send-report
 ### 自定义SMTP服务器
 
 ```python
-from utils.email_sender import EmailSender
+from utils.unified_email_api import UnifiedEmailAPI
 
 # 使用其他邮件服务
-email_sender = EmailSender(
-    smtp_server="smtp.outlook.com",  # Outlook
-    smtp_port=587
-)
+api = UnifiedEmailAPI()
+# 配置会自动从环境变量或配置文件加载
 ```
 
 ### 支持的邮件服务
@@ -158,66 +171,47 @@ email_sender = EmailSender(
 | 服务商 | SMTP服务器 | 端口 | 说明 |
 |--------|------------|------|------|
 | Gmail | smtp.gmail.com | 587 | 推荐，需要应用专用密码 |
-| Outlook | smtp.outlook.com | 587 | 支持 |
-| Yahoo | smtp.mail.yahoo.com | 587 | 支持 |
-| QQ邮箱 | smtp.qq.com | 587 | 需要开启SMTP |
+| Outlook | smtp-mail.outlook.com | 587 | 支持，需要应用专用密码 |
+| Yahoo | smtp.mail.yahoo.com | 587 | 支持，需要应用专用密码 |
+| QQ邮箱 | smtp.qq.com | 587 | 支持，需要授权码 |
 
-## 🛠️ 故障排除
+## 🚨 故障排除
 
 ### 常见问题
 
-1. **邮件发送失败**
-   ```
-   ❌ 邮件发送失败: (535, '5.7.8 Username and Password not accepted')
-   ```
-   **解决**: 检查Gmail应用专用密码是否正确
+1. **认证失败**
+   - 确保使用应用专用密码而不是普通密码
+   - 检查两步验证是否已开启
 
-2. **环境变量未设置**
-   ```
-   ❌ 邮件配置不完整
-   ```
-   **解决**: 运行 `python setup_email_config.py` 重新配置
+2. **连接超时**
+   - 检查网络连接
+   - 确认SMTP服务器和端口正确
 
-3. **网络连接问题**
-   ```
-   ❌ 邮件发送失败: [Errno 11001] getaddrinfo failed
-   ```
-   **解决**: 检查网络连接和防火墙设置
+3. **邮件发送失败**
+   - 检查邮箱配置
+   - 查看日志获取详细错误信息
 
 ### 测试邮件配置
 
 ```python
-from utils.email_sender import EmailSender
+from utils.unified_email_api import test_email_config
 
-email_sender = EmailSender()
-if email_sender.test_email_config():
-    print("✅ 邮件配置正确")
+# 测试邮件配置
+if test_email_config():
+    print("✅ 邮件配置正常")
 else:
     print("❌ 邮件配置有问题")
 ```
 
-## 📝 使用示例
+## 📝 更新日志
 
-### 示例1: 日常筛选
+- **v2.0**: 新增统一邮件API，简化邮件发送
+- **v1.5**: 支持Markdown报告邮件
+- **v1.0**: 基础HTML邮件功能
 
-```bash
-# 每日筛选，发送邮件
-python run_screening_with_email.py --subject "📈 每日股票筛选 $(date +%Y-%m-%d)"
-```
+---
 
-### 示例2: 高标准筛选
-
-```bash
-# 高标准筛选，只要最优股票
-python run_screening_with_email.py --min-score 70 --max-results 10 --subject "🏆 精选优质股票"
-```
-
-### 示例3: 完整报告
-
-```bash
-# 发送筛选结果和执行报告
-python run_screening_with_email.py --send-report --subject "📊 完整投资分析报告"
-```
+💡 **提示**: 建议使用统一邮件API (`utils/unified_email_api.py`) 进行所有邮件发送操作，它提供了更简单、更统一的接口。
 
 ## 🎯 最佳实践
 

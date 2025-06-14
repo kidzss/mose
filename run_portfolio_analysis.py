@@ -9,7 +9,6 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from monitor.smart_daily_report import SmartDailyReportGenerator
-from utils.email_sender import EmailSender
 from datetime import datetime
 import logging
 import tempfile

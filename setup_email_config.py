@@ -1,69 +1,75 @@
+#!/usr/bin/env python3
 """
-邮件配置设置脚本
-
-帮助用户设置邮件发送功能的环境变量
+邮件配置设置工具
 """
 
 import os
-import sys
-from utils.email_sender import EmailSender
+import json
+from utils.unified_email_api import UnifiedEmailAPI
 
 def setup_email_config():
     """设置邮件配置"""
-    print("🔧 邮件功能配置向导")
+    print("📧 邮件配置设置工具")
     print("=" * 50)
     
-    print("\n📧 Gmail配置说明:")
-    print("1. 使用Gmail账户发送邮件")
-    print("2. 需要开启两步验证并生成应用专用密码")
-    print("3. 应用专用密码生成地址: https://myaccount.google.com/apppasswords")
+    # 获取当前配置
+    api = UnifiedEmailAPI()
     
-    print("\n🔑 请输入邮件配置信息:")
+    print("当前配置:")
+    print(f"  SMTP服务器: {api.smtp_server}")
+    print(f"  SMTP端口: {api.smtp_port}")
+    print(f"  发送邮箱: {api.sender_email or '未设置'}")
+    print(f"  接收邮箱: {api.receiver_email or '未设置'}")
     
-    # 获取发送方邮箱
-    sender_email = input("发送方邮箱 (Gmail): ").strip()
-    if not sender_email.endswith('@gmail.com'):
-        print("⚠️  建议使用Gmail邮箱以确保兼容性")
+    print("\n请设置以下信息:")
     
-    # 获取应用专用密码
-    print("\n🔐 应用专用密码获取步骤:")
-    print("1. 登录 Google 账户")
-    print("2. 进入 '安全性' 设置")
-    print("3. 开启 '两步验证'")
-    print("4. 生成 '应用专用密码'")
-    print("5. 选择 '邮件' 应用类型")
+    # 获取用户输入
+    sender_email = input("发送邮箱 (Gmail推荐): ").strip()
+    sender_password = input("应用专用密码: ").strip()
+    receiver_email = input("接收邮箱: ").strip()
     
-    sender_password = input("应用专用密码 (16位): ").strip()
+    if not all([sender_email, sender_password, receiver_email]):
+        print("❌ 所有字段都必须填写")
+        return False
     
-    # 获取接收方邮箱
-    receiver_email = input("接收方邮箱: ").strip()
+    # 创建配置目录
+    os.makedirs('configs', exist_ok=True)
     
-    # 设置环境变量
-    os.environ['EMAIL_SENDER'] = sender_email
-    os.environ['EMAIL_PASSWORD'] = sender_password
-    os.environ['EMAIL_RECEIVER'] = receiver_email
+    # 保存配置
+    config = {
+        'smtp_server': 'smtp.gmail.com',
+        'smtp_port': 587,
+        'sender_email': sender_email,
+        'sender_password': sender_password,
+        'recipient_email': receiver_email
+    }
     
-    print("\n✅ 邮件配置已设置到当前会话")
-    print("💡 如需永久保存，请将以下内容添加到系统环境变量:")
-    print(f"EMAIL_SENDER={sender_email}")
-    print(f"EMAIL_PASSWORD={sender_password}")
-    print(f"EMAIL_RECEIVER={receiver_email}")
+    with open('configs/email_config.json', 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
+    
+    print("\n✅ 配置已保存到 configs/email_config.json")
+    print("\n💡 提示:")
+    print("1. 确保已开启Gmail的两步验证")
+    print("2. 使用应用专用密码而不是普通密码")
+    print("3. 可以设置环境变量来覆盖配置:")
+    print("   export EMAIL_SENDER=your_email@gmail.com")
+    print("   export EMAIL_PASSWORD=your_app_password")
+    print("   export EMAIL_RECEIVER=receiver@email.com")
     
     # 测试配置
     print("\n🧪 测试邮件配置...")
-    email_sender = EmailSender()
-    if email_sender.test_email_config():
-        print("🎉 邮件配置测试成功！")
+    if api.test():
+        print("✅ 邮件配置测试成功！")
         return True
     else:
-        print("❌ 邮件配置测试失败，请检查配置信息")
+        print("❌ 邮件配置测试失败，请检查设置")
         return False
 
 def test_email_sending():
     """测试邮件发送功能"""
     print("\n📧 测试邮件发送功能...")
     
-    email_sender = EmailSender()
+    email_sender = UnifiedEmailAPI()
     
     # 创建测试数据
     test_results = [
@@ -114,8 +120,8 @@ def main():
     print("=" * 60)
     
     # 检查现有配置
-    email_sender = EmailSender()
-    if email_sender.test_email_config():
+    api = UnifiedEmailAPI()
+    if api.test():
         print("✅ 检测到现有邮件配置")
         choice = input("是否重新配置? (y/N): ").strip().lower()
         if choice != 'y':
@@ -137,4 +143,4 @@ def main():
     print("   screener.screen_and_email()  # 筛选并发送邮件")
 
 if __name__ == "__main__":
-    main() 
+    setup_email_config() 

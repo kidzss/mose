@@ -12,6 +12,9 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from data.data_updater import MarketDataUpdater, DB_CONFIG
+from data.market_sentiment_analyzer import MarketSentimentAnalyzer
+from utils.unified_email_api import send_html
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Optional, Tuple, Any
@@ -27,6 +30,9 @@ from strategy.strategy_factory import StrategyFactory
 from utils.email_sender import EmailSender
 from utils.alpha_vantage_client import AlphaVantageClient
 from utils.yfinance_client import YFinanceClient
+from data.data_updater import MarketDataUpdater, DB_CONFIG
+from data.market_sentiment_analyzer import MarketSentimentAnalyzer
+from utils.unified_email_api import send_html
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -394,7 +400,6 @@ class Phase2ProfessionalScreener:
         self.strategy_factory = StrategyFactory()
         self.ff_factors = FamaFrenchFactors()
         self.quality_factors = QualityFactors()
-        self.email_sender = EmailSender()
         self.alpha_vantage = AlphaVantageClient()
         self.yfinance_client = YFinanceClient()
         
@@ -889,12 +894,16 @@ class Phase2ProfessionalScreener:
                     }
                 }
                 
-                # 发送邮件
-                success = self.email_sender.send_screening_results(
-                    results=results,
-                    summary=summary,
-                    subject=email_subject
-                )
+                # 创建HTML报告内容
+                html_content = self._create_screening_report_html(results, summary)
+                
+                # 使用统一API发送邮件
+                if not email_subject:
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
+                    best_stock = summary.get('best_stock', 'N/A')
+                    email_subject = f"🚀 股票筛选报告 | {timestamp} | 最佳: {best_stock}"
+                
+                success = send_html(subject=email_subject, html_content=html_content)
                 
                 if success:
                     logger.info("📧 筛选结果邮件发送成功")
@@ -906,6 +915,105 @@ class Phase2ProfessionalScreener:
         except Exception as e:
             logger.error(f"筛选和邮件发送失败: {e}")
             return []
+    
+    def _create_screening_report_html(self, results: List[Dict], summary: Dict) -> str:
+        """创建筛选报告的HTML内容"""
+        try:
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # 构建HTML报告
+            html_content = f"""
+            <h1>🚀 股票筛选报告</h1>
+            
+            <div class="info">
+                <h3>📊 筛选摘要</h3>
+                <ul>
+                    <li><strong>筛选时间</strong>: {timestamp}</li>
+                    <li><strong>分析股票数</strong>: {summary.get('total_stocks_analyzed', 0)} 只</li>
+                    <li><strong>发现优质股票</strong>: {summary.get('qualified_stocks_found', 0)} 只</li>
+                    <li><strong>高质量股票</strong>: {summary.get('high_quality_stocks', 0)} 只</li>
+                    <li><strong>最佳股票</strong>: {summary.get('best_stock', 'N/A')} (评分: {summary.get('best_score', 0):.1f})</li>
+                </ul>
+            </div>
+            
+            <h2>🏆 TOP 筛选结果</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>股票代码</th>
+                        <th>多因子评分</th>
+                        <th>质量因子</th>
+                        <th>夏普比率</th>
+                        <th>最大回撤</th>
+                        <th>当前价格</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
+            
+            # 添加筛选结果
+            for i, stock in enumerate(results[:20], 1):  # 显示前20只
+                quality_class = "high-quality" if stock['quality_factor'] > 0.6 else "medium-quality"
+                html_content += f"""
+                <tr class="{quality_class}">
+                    <td>{i}</td>
+                    <td><strong>{stock['symbol']}</strong></td>
+                    <td>{stock['multifactor_score']:.1f}</td>
+                    <td>{stock['quality_factor']:.2f}</td>
+                    <td>{stock['sharpe_ratio']:.2f}</td>
+                    <td>{stock['max_drawdown']:.1f}%</td>
+                    <td>${stock['current_price']:.2f}</td>
+                </tr>
+                """
+            
+            html_content += """
+                </tbody>
+            </table>
+            
+            <h2>🎯 最佳投资标的分析</h2>
+            """
+            
+            if results:
+                best_stock = results[0]
+                html_content += f"""
+                <div class="success">
+                    <h3>🏆 {best_stock['symbol']} - 最佳选择</h3>
+                    <ul>
+                        <li><strong>多因子评分</strong>: {best_stock['multifactor_score']:.1f}/100</li>
+                        <li><strong>质量因子</strong>: {best_stock['quality_factor']:.2f}</li>
+                        <li><strong>动量因子</strong>: {best_stock['momentum_factor']:.2f}</li>
+                        <li><strong>夏普比率</strong>: {best_stock['sharpe_ratio']:.2f}</li>
+                        <li><strong>最大回撤</strong>: {best_stock['max_drawdown']:.1f}%</li>
+                        <li><strong>当前价格</strong>: ${best_stock['current_price']:.2f}</li>
+                    </ul>
+                </div>
+                """
+            
+            # 添加投资建议
+            html_content += """
+            <h2>💡 投资建议</h2>
+            <div class="success">
+                <h4>🎯 核心策略</h4>
+                <ol>
+                    <li><strong>重点关注</strong>: 质量因子>0.6的高质量股票</li>
+                    <li><strong>风险控制</strong>: 优先选择最大回撤<20%的股票</li>
+                    <li><strong>分散投资</strong>: 建议配置前10只股票，单只占比不超过15%</li>
+                    <li><strong>定期调整</strong>: 每月重新筛选，动态优化组合</li>
+                </ol>
+            </div>
+            """
+            
+            # 使用统一API的HTML模板
+            from utils.unified_email_api import UnifiedEmailAPI
+            api = UnifiedEmailAPI()
+            styled_html = api._create_html_template(html_content, "股票筛选报告")
+            
+            return styled_html
+            
+        except Exception as e:
+            logger.error(f"创建HTML报告失败: {e}")
+            return f"<html><body><h1>报告生成失败</h1><p>{str(e)}</p></body></html>"
     
     def send_report_email(self, report_file_path: str, subject: str = None) -> bool:
         """
@@ -919,7 +1027,12 @@ class Phase2ProfessionalScreener:
             bool: 发送是否成功
         """
         try:
-            return self.email_sender.send_markdown_report(report_file_path, subject)
+            # 读取markdown文件内容
+            with open(report_file_path, 'r', encoding='utf-8') as f:
+                md_content = f.read()
+            
+            from utils.unified_email_api import send_markdown
+            return send_markdown(subject=subject or "📊 筛选报告", md_content=md_content)
         except Exception as e:
             logger.error(f"报告邮件发送失败: {e}")
             return False
