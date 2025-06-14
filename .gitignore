@@ -59,6 +59,12 @@ env/
 # Logs
 *.log
 logs/
+data_fetcher.log
+monitor.log
+trading_monitor.log
+market_bottom.log
+real_time_monitor.log
+data_updater.log
 
 # Local configuration
 .env
@@ -132,4 +138,60 @@ results/
 outputs/
 reports/
 *.html
-智能股票日报_*.html 
+智能股票日报_*.html
+
+# Image files (charts, plots, screenshots)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+
+# Analysis charts and plots
+*_analysis_*.png
+*_chart_*.png
+*_plot_*.png
+*_graph_*.png
+*_figure_*.png
+
+# Stock analysis images
+*_analysis_*.png
+AMD_analysis_*.png
+GOOGL_analysis_*.png
+PFE_analysis_*.png
+NVDA_analysis_*.png
+TSLA_analysis_*.png
+ADBE_analysis_*.png
+MSFT_analysis_*.png
+EOG_analysis_*.png
+PHM_analysis_*.png
+CF_analysis_*.png
+
+# Generated reports and documents
+智能股票日报_*.html
+*_report.html
+*_analysis.html
+*_summary.html
+
+# Temporary and cache files
+*.cache
+*.bak
+*.backup
+*.old
+*.orig
+
+# Data files that shouldn't be committed
+*.csv
+*.xlsx
+*.xls
+*.json
+!config/*.json
+!requirements*.txt
+
+# Test and temporary directories
+test_*/
+temp_*/
+tmp_*/
+cache_*/ 
