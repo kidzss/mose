@@ -46,7 +46,7 @@ class SmartDailyReportGenerator:
             watch_targets: 观察目标股票（准备买入的股票）
         """
         # 用户持仓股票列表 + 观察股票
-        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT']
+        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF']
         self.auto_update_data = auto_update_data
         self.data_source_type = None
         
@@ -72,6 +72,27 @@ class SmartDailyReportGenerator:
                 'previous_gain': 22.4,  # 约22.4%收益
                 'target_buy_below': 420.0,  # 建议买入价格下方
                 'reason': '准备再次买入，关注买入时机'
+            },
+            'EOG': {
+                'previous_buy': None,  # 从未购买过
+                'previous_sell': None,
+                'previous_gain': None,
+                'target_buy_below': 110.00,  # 基于50日均线支撑位($111.91)下方2%
+                'reason': '能源板块龙头，技术面强势，关注50日均线支撑买入机会，当前价格$125.28，等待回调至$110以下'
+            },
+            'PHM': {
+                'previous_buy': None,  # 从未购买过
+                'previous_sell': None,
+                'previous_gain': None,
+                'target_buy_below': 98.00,  # 基于50日均线支撑位($100.16)下方2%
+                'reason': '地产龙头，业绩稳健，接近买入区域，当前价格$101.61，关注50日均线支撑买入机会'
+            },
+            'CF': {
+                'previous_buy': None,  # 从未购买过
+                'previous_sell': None,
+                'previous_gain': None,
+                'target_buy_below': 84.00,  # 基于布林带下轨支撑位($85.69)下方2%
+                'reason': '化肥龙头，周期回暖，当前价格$99.93，等待回调至布林带下轨支撑位附近买入'
             }
         }
         
@@ -875,9 +896,7 @@ class SmartDailyReportGenerator:
                         
                         <div class="previous-trade">
                             <strong>📊 历史交易记录:</strong><br>
-                            买入价: ${buy_timing['previous_buy']:.2f} | 
-                            卖出价: ${buy_timing['previous_sell']:.2f} | 
-                            收益: +{buy_timing['previous_gain']:.1f}%
+                            {f"买入价: ${buy_timing['previous_buy']:.2f} | 卖出价: ${buy_timing['previous_sell']:.2f} | 收益: +{buy_timing['previous_gain']:.1f}%" if buy_timing['previous_buy'] is not None else "暂无历史交易记录"}
                         </div>
                         
                         <p><strong>🎯 目标买入价:</strong> ${buy_timing['target_price']:.2f}</p>
@@ -983,8 +1002,12 @@ def main():
     
     print("\n👀 观察中的股票(准备买入):")
     for symbol, info in generator.watch_targets.items():
-        print(f"   • {symbol}: 历史买入${info['previous_buy']:.2f}→卖出${info['previous_sell']:.2f} (+{info['previous_gain']:.1f}%)")
+        if info['previous_buy'] is not None:
+            print(f"   • {symbol}: 历史买入${info['previous_buy']:.2f}→卖出${info['previous_sell']:.2f} (+{info['previous_gain']:.1f}%)")
+        else:
+            print(f"   • {symbol}: 暂无历史交易记录")
         print(f"     目标买入价: <${info['target_buy_below']:.2f}")
+        print(f"     买入理由: {info['reason']}")
     
     print("\n💡 数据更新建议:")
     print("   • 工作日收盘后自动运行")

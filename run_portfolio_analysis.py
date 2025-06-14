@@ -86,7 +86,7 @@ def show_portfolio_summary():
         print(f"{symbol:6s}: {info['shares']:3d}股 | 成本${info['cost']:8.3f} | "
               f"权重{info['weight']:5.2f}% | 投资${info['investment']:8.2f}")
     
-    print("\n观察股票: MSFT (准备买入)")
+    print("\n观察股票: MSFT, EOG, PHM, CF (准备买入)")
     print("=" * 60)
 
 if __name__ == "__main__":
