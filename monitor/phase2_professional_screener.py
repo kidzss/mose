@@ -13,7 +13,6 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data.data_updater import MarketDataUpdater, DB_CONFIG
-from data.market_sentiment_analyzer import MarketSentimentAnalyzer
 from utils.unified_email_api import send_html
 import pandas as pd
 import numpy as np
@@ -27,11 +26,9 @@ warnings.filterwarnings('ignore')
 # 导入基础模块
 from data.data_interface import DataInterface
 from strategy.strategy_factory import StrategyFactory
-from utils.email_sender import EmailSender
 from utils.alpha_vantage_client import AlphaVantageClient
 from utils.yfinance_client import YFinanceClient
 from data.data_updater import MarketDataUpdater, DB_CONFIG
-from data.market_sentiment_analyzer import MarketSentimentAnalyzer
 from utils.unified_email_api import send_html
 
 # 配置日志
