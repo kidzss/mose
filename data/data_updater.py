@@ -1006,8 +1006,9 @@ class MarketDataUpdater:
                 start_date = last_update + timedelta(days=1)
                 logger.info(f"将获取股票 {symbol} 从 {start_date.strftime('%Y-%m-%d')} 到 {end_date.strftime('%Y-%m-%d')} 的数据")
                 
-                # 检查是否需要更新
-                if start_date.date() >= end_date.date():
+                # 修复日期判断逻辑：只有当开始日期严格大于结束日期时才跳过
+                # 原来的逻辑 start_date.date() >= end_date.date() 有问题
+                if start_date.date() > end_date.date():
                     logger.info(f"股票 {symbol} 数据已是最新，无需更新")
                     return True
             else:
