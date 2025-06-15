@@ -20,7 +20,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from strategy.market_environment_classifier import MarketEnvironmentClassifier
 from strategy.dynamic_strategy_selector import DynamicStrategySelector
 from strategy.signal_quality_evaluator import SignalQualityEvaluator
-from .alert_system import AlertSystem as AdvancedAlertSystem
+from monitor.alert_system import AlertSystem as AdvancedAlertSystem
 from data.data_interface import DataInterface
 from data.data_updater import MarketDataUpdater
 from config.trading_config import default_config

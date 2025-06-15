@@ -13,11 +13,11 @@ echo    ✓ 每月组合优化（每月第一个周日 20:00）
 echo    ✓ 自动发送邮件报告
 echo.
 echo 📊 分析内容：
-echo    • 持仓股票实时表现分析
-echo    • 盈亏统计和风险评估
-echo    • 技术指标和市场情绪
-echo    • 个性化投资建议
-echo    • 投资组合优化建议
+echo    - 持仓股票实时表现分析
+echo    - 盈亏统计和风险评估
+echo    - 技术指标和市场情绪
+echo    - 个性化投资建议
+echo    - 投资组合优化建议
 echo.
 echo 📈 持仓股票：
 echo    - AMD, GOOGL, PFE, NVDA, TSLA, ADBE
