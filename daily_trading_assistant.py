@@ -45,15 +45,30 @@ class DailyTradingAssistant:
         print("\n📊 投资组合分析")
         print("="*40)
         
-        # 实际投资组合（已清仓AIG）
-        portfolio = {
-            'AMD': {'shares': 48, 'cost_basis': 126.214},
-            'GOOGL': {'shares': 34, 'cost_basis': 170.54},
-            'PFE': {'shares': 80, 'cost_basis': 25.899},
-            'NVDA': {'shares': 40, 'cost_basis': 138.843},
-            'TSLA': {'shares': 8, 'cost_basis': 254.096},
-            'ADBE': {'shares': 5, 'cost_basis': 346.896}
-        }
+        # 从统一配置文件加载实际投资组合
+        try:
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            positions = config_loader.get_positions()
+            
+            portfolio = {}
+            for symbol, info in positions.items():
+                portfolio[symbol] = {
+                    'shares': info.get('shares', 0),
+                    'cost_basis': info.get('cost_basis', 0)
+                }
+            print("✅ 已从统一配置文件加载最新持仓信息")
+        except Exception as e:
+            print(f"⚠️  加载统一配置失败，使用默认配置: {e}")
+            # 保留最新的持仓信息作为后备
+            portfolio = {
+                'AMD': {'shares': 48, 'cost_basis': 126.214},
+                'GOOGL': {'shares': 34, 'cost_basis': 170.54},
+                'PFE': {'shares': 80, 'cost_basis': 25.899},
+                'NVDA': {'shares': 40, 'cost_basis': 138.843},
+                'TSLA': {'shares': 4, 'cost_basis': 254.096},
+                'EOG': {'shares': 5, 'cost_basis': 122.119}
+            }
         
         current_prices = {}
         total_cost = 0
@@ -155,8 +170,15 @@ class DailyTradingAssistant:
         print("\n🎯 今日策略信号")
         print("="*40)
         
-        # 组合股票 + 主要指数
-        portfolio_symbols = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE']
+        # 组合股票 + 主要指数 - 从统一配置获取
+        try:
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            portfolio_symbols = config_loader.get_portfolio_symbols()
+        except:
+            # 后备方案
+            portfolio_symbols = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'EOG']
+            
         signals = {}
         
         for symbol in portfolio_symbols + ['SPY', 'QQQ']:

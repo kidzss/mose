@@ -66,8 +66,18 @@ trading_config = {
 
 def load_portfolio_config():
     """加载持仓配置"""
-    with open('monitor/configs/portfolio_config.json', 'r') as f:
-        return json.load(f)
+    try:
+        from utils.portfolio_config_loader import get_portfolio_config
+        config_loader = get_portfolio_config()
+        return config_loader.to_legacy_format()
+    except Exception as e:
+        print(f"⚠️  加载统一配置失败: {e}")
+        # 后备方案 - 尝试旧配置文件
+        try:
+            with open('bak/portfolio_config_old.json', 'r') as f:
+                return json.load(f)
+        except:
+            return {'positions': {}, 'monitor_config': {}}
 
 def get_strategy_signals(data: pd.DataFrame) -> Dict:
     """获取各个策略的信号"""

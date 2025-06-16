@@ -66,15 +66,26 @@ def show_portfolio_summary():
     print("\n📋 当前持仓概览:")
     print("=" * 60)
     
-    # 默认持仓信息
-    portfolio = {
-        'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.16, 'investment': 6058.27},
-        'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 22.12, 'investment': 5798.36},
-        'PFE': {'cost': 25.899, 'shares': 80, 'weight': 7.07, 'investment': 2071.92},
-        'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.95, 'investment': 5553.72},
-        'TSLA': {'cost': 254.096, 'shares': 8, 'weight': 8.72, 'investment': 2032.77},
-        'ADBE': {'cost': 346.896, 'shares': 5, 'weight': 7.67, 'investment': 1734.48}
-    }
+    # 从统一配置文件加载持仓信息
+    try:
+        from utils.portfolio_config_loader import get_portfolio_config
+        config_loader = get_portfolio_config()
+        portfolio = config_loader.to_smart_report_format()
+        portfolio_summary = config_loader.get_portfolio_summary()
+        watchlist = config_loader.get_watchlist_symbols()
+        print("✅ 已从统一配置文件加载最新持仓信息")
+    except Exception as e:
+        logger.warning(f"加载统一配置失败，使用默认配置: {e}")
+        # 保留最新的持仓信息作为后备
+        portfolio = {
+            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},
+            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
+            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
+            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
+            'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
+            'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
+        }
+        watchlist = ['MSFT', 'ADBE', 'PHM', 'CF']
     
     total_investment = sum(p['investment'] for p in portfolio.values())
     
@@ -86,7 +97,19 @@ def show_portfolio_summary():
         print(f"{symbol:6s}: {info['shares']:3d}股 | 成本${info['cost']:8.3f} | "
               f"权重{info['weight']:5.2f}% | 投资${info['investment']:8.2f}")
     
-    print("\n观察股票: MSFT, EOG, PHM, CF (准备买入)")
+    print(f"\n观察股票: {', '.join(watchlist)} (准备买入)")
+    try:
+        # 显示观察股票的目标价格
+        if 'config_loader' in locals():
+            watchlist_details = config_loader.get_watchlist()
+            print("观察股票详情:")
+            for symbol in watchlist:
+                details = watchlist_details.get(symbol, {})
+                target_price = details.get('target_buy_price', 'N/A')
+                reason = details.get('reason', '无描述')
+                print(f"  {symbol}: 目标价格 ${target_price} - {reason}")
+    except:
+        pass
     print("=" * 60)
 
 if __name__ == "__main__":

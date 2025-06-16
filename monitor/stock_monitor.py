@@ -388,10 +388,10 @@ class StockMonitor:
     def load_watchlist(self):
         """加载监控列表和观察列表"""
         try:
-            # 从portfolio_config.json获取当前持仓
-            with open('monitor/configs/portfolio_config.json', 'r') as f:
-                config = json.load(f)
-                self.monitored_stocks = set(config['positions'].keys())
+            # 从统一配置文件获取当前持仓
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            self.monitored_stocks = set(config_loader.get_portfolio_symbols())
                 
             # 从watchlist.json加载观察列表
             with open('monitor/configs/watchlist.json', 'r') as f:

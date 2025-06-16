@@ -60,9 +60,20 @@ async def send_test_email():
         data_source = YahooFinanceRealTimeSource()
         alert_system = AlertSystem(default_config)
         
-        # 加载持仓配置
-        with open('monitor/configs/portfolio_config.json', 'r') as f:
-            portfolio_config = json.load(f)
+        # 加载持仓配置 - 使用统一配置文件
+        try:
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            portfolio_config = config_loader.to_legacy_format()
+            logger.info("✅ 已从统一配置文件加载持仓信息")
+        except Exception as e:
+            logger.error(f"⚠️  加载统一配置失败: {e}")
+            # 后备方案 - 尝试旧配置文件
+            try:
+                with open('bak/portfolio_config_old.json', 'r') as f:
+                    portfolio_config = json.load(f)
+            except:
+                portfolio_config = {'positions': {}, 'monitor_config': {}}
             
         # 获取GOOG的实时数据
         real_time_data = await data_source.get_realtime_data(['GOOG'])
@@ -123,9 +134,20 @@ async def main():
         data_source = YahooFinanceRealTimeSource()
         alert_system = AlertSystem(default_config)
         
-        # 加载持仓配置
-        with open('monitor/configs/portfolio_config.json', 'r') as f:
-            portfolio_config = json.load(f)
+        # 加载持仓配置 - 使用统一配置文件
+        try:
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            portfolio_config = config_loader.to_legacy_format()
+            logger.info("✅ 已从统一配置文件加载持仓信息")
+        except Exception as e:
+            logger.error(f"⚠️  加载统一配置失败: {e}")
+            # 后备方案 - 尝试旧配置文件
+            try:
+                with open('bak/portfolio_config_old.json', 'r') as f:
+                    portfolio_config = json.load(f)
+            except:
+                portfolio_config = {'positions': {}, 'monitor_config': {}}
             
         monitored_stocks = list(portfolio_config['positions'].keys())
         

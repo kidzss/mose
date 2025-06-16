@@ -50,23 +50,54 @@ class SmartDailyReportGenerator:
         self.auto_update_data = auto_update_data
         self.data_source_type = None
         
-        # 用户持仓信息 (更新日期: 2025-06-15, 基于精确金额数据)
-        self.portfolio = portfolio or {
-            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},   # $21,903.42 × 21.86%
-            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83}, # $21,903.42 × 21.53%
-            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},    # $21,903.42 × 6.97%
-            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24}, # $21,903.42 × 20.92%
-            'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},   # $21,903.42 × 4.74%
-            'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}      # $21,903.42 × 2.20%
-        }
+        # 用户持仓信息 - 从统一配置文件加载 (更新日期: 2025-06-16)
+        if portfolio is None:
+            # 从统一配置加载持仓信息
+            try:
+                from utils.portfolio_config_loader import get_portfolio_config
+                config_loader = get_portfolio_config()
+                self.portfolio = config_loader.to_smart_report_format()
+                logger.info("✅ 从统一配置文件成功加载持仓信息")
+            except Exception as e:
+                logger.warning(f"加载统一配置失败，使用默认配置: {e}")
+                # 保留原有默认配置作为后备
+                self.portfolio = {
+                    'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},
+                    'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
+                    'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
+                    'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
+                    'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
+                    'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
+                }
+        else:
+            self.portfolio = portfolio
         
-        # 投资组合总价值计算 (基于美元货币基金精确金额$3,262.53)
-        self.total_portfolio_value = 27884.87  # 总资产价值 (重新计算)
-        self.total_stock_investment = 21903.42  # 总股票投资金额 (78.55% × $27,884.87)
-        self.portfolio_allocation = 78.55  # 股票占总投资组合的比例 (实际数据)
-        self.cash_allocation = 9.75  # 现金占比 ($2,718.77)
-        self.money_fund_allocation = 11.70  # 美元货币型基金占比
-        self.money_fund_value = 3262.53  # 美元货币型基金精确金额
+        # 投资组合总价值计算 - 从统一配置文件获取
+        try:
+            if 'config_loader' in locals():
+                portfolio_summary = config_loader.get_portfolio_summary()
+                self.total_portfolio_value = portfolio_summary.get('total_value', 27884.87)
+                self.total_stock_investment = portfolio_summary.get('stock_allocation', {}).get('total_amount', 21903.42)
+                self.portfolio_allocation = portfolio_summary.get('stock_allocation', {}).get('percentage', 78.55)
+                self.cash_allocation = portfolio_summary.get('cash_allocation', {}).get('percentage', 9.75)
+                self.money_fund_allocation = portfolio_summary.get('money_fund_allocation', {}).get('percentage', 11.70)
+                self.money_fund_value = portfolio_summary.get('money_fund_allocation', {}).get('amount', 3262.53)
+            else:
+                # 使用默认值
+                self.total_portfolio_value = 27884.87
+                self.total_stock_investment = 21903.42
+                self.portfolio_allocation = 78.55
+                self.cash_allocation = 9.75
+                self.money_fund_allocation = 11.70
+                self.money_fund_value = 3262.53
+        except Exception as e:
+            logger.warning(f"获取投资组合价值配置失败，使用默认值: {e}")
+            self.total_portfolio_value = 27884.87
+            self.total_stock_investment = 21903.42
+            self.portfolio_allocation = 78.55
+            self.cash_allocation = 9.75
+            self.money_fund_allocation = 11.70
+            self.money_fund_value = 3262.53
         
         # 观察目标股票（准备买入的股票）
         self.watch_targets = watch_targets or {
@@ -972,7 +1003,13 @@ class SmartDailyReportGenerator:
         html_content = self._generate_html_report(results)
         
         # 保存报告文件
-        report_filename = f"智能股票日报_{datetime.now().strftime('%Y%m%d_%H%M')}.html"
+        # 使用统一路径配置生成报告文件名
+        try:
+            from config.paths_config import get_report_path
+            report_filename = get_report_path()
+        except ImportError:
+            # 后备方案
+            report_filename = f"智能股票日报_{datetime.now().strftime('%Y%m%d_%H%M')}.html"
         with open(report_filename, 'w', encoding='utf-8') as f:
             f.write(html_content)
         

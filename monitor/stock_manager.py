@@ -138,10 +138,10 @@ class StockManager:
             股票代码列表
         """
         try:
-            # 从portfolio_config.json获取当前持仓
-            with open('monitor/configs/portfolio_config.json', 'r') as f:
-                config = json.load(f)
-                symbols = list(config['positions'].keys())
+            # 从统一配置文件获取当前持仓
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            symbols = config_loader.get_portfolio_symbols()
                 
             return symbols
         except Exception as e:
