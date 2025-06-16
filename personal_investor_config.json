@@ -1,0 +1,23 @@
+{
+  "email": "kidzss@gmail.com",
+  "risk_tolerance": "moderate",
+  "max_position_size": 0.2,
+  "min_quality_factor": 0.7,
+  "max_results": 15,
+  "min_score": 60,
+  "investment_goals": {
+    "time_horizon": "3-5年",
+    "risk_preference": "中等风险",
+    "investment_amount": "可承受20%亏损"
+  },
+  "preferred_sectors": [
+    "科技",
+    "消费",
+    "医疗",
+    "金融"
+  ],
+  "excluded_sectors": [
+    "能源",
+    "原材料"
+  ]
+}

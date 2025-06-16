@@ -268,14 +268,6 @@ class MySQLDataSource(DataSource):
             'ADJCLOSE': 'adj_close'
         }, inplace=True)
         
-        # 确保日期列是datetime类型
-        if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
-            
-        # 设置日期为索引
-        if 'date' in df.columns and not isinstance(df.index, pd.DatetimeIndex):
-            df.set_index('date', inplace=True)
-        
         return df
 
 
@@ -921,15 +913,6 @@ class DataInterface:
         df['lower_band'] = df['ma20'] - (df['close'].rolling(window=20).std() * 2)
         
         return df
-    
-    def get_latest_data(self, symbol: str, n_bars: int = 1, 
-                       timeframe: str = 'daily', source: str = None) -> pd.DataFrame:
-        """获取最新的n条数据"""
-        # 获取数据源
-        data_source = self.get_data_source(source)
-        
-        # 获取数据
-        return data_source.get_latest_data(symbol, n_bars, timeframe)
     
     def get_multiple_symbols_data(self, symbols: List[str], start_date: Union[str, dt.datetime], 
                                 end_date: Union[str, dt.datetime], timeframe: str = 'daily',

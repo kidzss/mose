@@ -2,9 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyc
-*.pyo
-*.pyd
+*.so
 .Python
 build/
 develop-eggs/
@@ -21,34 +19,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
 
 # Virtual Environment
 venv/
 ENV/
-env/
-.venv/
 
 # IDE
 .idea/
@@ -59,12 +33,6 @@ env/
 # Logs
 *.log
 logs/
-data_fetcher.log
-monitor.log
-trading_monitor.log
-market_bottom.log
-real_time_monitor.log
-data_updater.log
 
 # Local configuration
 .env
@@ -73,11 +41,6 @@ data_updater.log
 # Database
 *.db
 *.sqlite3
-
-# Large backup files
-*.sql
-mose_backup.sql
-*backup*.sql
 
 # OS
 .DS_Store
@@ -98,100 +61,4 @@ data_updater.log
 backtest_results_*.png
 cpgw_strategy_equity.png
 best_results.json
-data_quality_report.txt
-
-# Log files
-*.pid
-
-# Test coverage
-.coverage
-htmlcov/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# MyPy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# Additional Python cache files
-*.egg-info/
-__pycache__/
-.cache/
-
-# OpenBB and financial data
-openbb_logs/
-OpenBB/
-
-# Email attachments and temporary files
-temp/
-tmp/
-*.tmp
-*.temp
-
-# Strategy backtest results
-results/
-outputs/
-reports/
-*.html
-智能股票日报_*.html
-
-# Image files (charts, plots, screenshots)
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.svg
-
-# Analysis charts and plots
-*_analysis_*.png
-*_chart_*.png
-*_plot_*.png
-*_graph_*.png
-*_figure_*.png
-
-# Stock analysis images
-*_analysis_*.png
-AMD_analysis_*.png
-GOOGL_analysis_*.png
-PFE_analysis_*.png
-NVDA_analysis_*.png
-TSLA_analysis_*.png
-ADBE_analysis_*.png
-MSFT_analysis_*.png
-EOG_analysis_*.png
-PHM_analysis_*.png
-CF_analysis_*.png
-
-# Generated reports and documents
-智能股票日报_*.html
-*_report.html
-*_analysis.html
-*_summary.html
-
-# Temporary and cache files
-*.cache
-*.bak
-*.backup
-*.old
-*.orig
-
-# Data files that shouldn't be committed
-*.csv
-*.xlsx
-*.xls
-*.json
-!config/*.json
-!requirements*.txt
-
-# Test and temporary directories
-test_*/
-temp_*/
-tmp_*/
-cache_*/ 
+data_quality_report.txt 

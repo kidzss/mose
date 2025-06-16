@@ -16,7 +16,7 @@ class DatabaseConfig:
     host: str = "localhost"
     port: int = 3306
     user: str = "root"
-    password: str = "123456"  # 根据实际情况设置密码
+    password: str = ""  # 根据实际情况设置密码
     database: str = "mose"
 
 @dataclass
@@ -125,6 +125,6 @@ default_config = TradingConfig(
         sender_password="wlkp dbbz xpgk rkhy"  # 替换为从Google生成的应用专用密码
     ),
     database=DatabaseConfig(
-        password="123456"  # 更新为正确的数据库密码
+        password=""  # 设置正确的数据库密码
     )
 ) 

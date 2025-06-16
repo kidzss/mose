@@ -1,0 +1,109 @@
+{
+    "meta": {
+        "last_updated": "2025-06-16",
+        "total_assets": 27884.87,
+        "currency": "USD",
+        "description": "最新精确的投资组合配置 - 基于用户提供的精确数据"
+    },
+    "portfolio": {
+        "total_value": 27884.87,
+        "stock_allocation": {
+            "total_amount": 21903.42,
+            "percentage": 78.55
+        },
+        "cash_allocation": {
+            "amount": 2718.77,
+            "percentage": 9.75
+        },
+        "money_fund_allocation": {
+            "amount": 3262.53,
+            "percentage": 11.70,
+            "description": "美元货币型基金"
+        }
+    },
+    "positions": {
+        "AMD": {
+            "shares": 48,
+            "cost_basis": 126.214,
+            "weight": 21.86,
+            "investment_amount": 4788.89,
+            "sector": "Technology",
+            "stop_loss_threshold": 0.08
+        },
+        "GOOGL": {
+            "shares": 34,
+            "cost_basis": 170.540,
+            "weight": 21.53,
+            "investment_amount": 4715.83,
+            "sector": "Technology", 
+            "stop_loss_threshold": 0.12
+        },
+        "NVDA": {
+            "shares": 40,
+            "cost_basis": 138.843,
+            "weight": 20.92,
+            "investment_amount": 4582.24,
+            "sector": "Technology",
+            "stop_loss_threshold": 0.08
+        },
+        "PFE": {
+            "shares": 80,
+            "cost_basis": 25.899,
+            "weight": 6.97,
+            "investment_amount": 1526.65,
+            "sector": "Healthcare",
+            "stop_loss_threshold": 0.10
+        },
+        "TSLA": {
+            "shares": 4,
+            "cost_basis": 254.096,
+            "weight": 4.74,
+            "investment_amount": 1038.22,
+            "sector": "Automotive",
+            "stop_loss_threshold": 0.15
+        },
+        "EOG": {
+            "shares": 5,
+            "cost_basis": 122.119,
+            "weight": 2.20,
+            "investment_amount": 481.88,
+            "sector": "Energy",
+            "stop_loss_threshold": 0.10
+        }
+    },
+    "watchlist": {
+        "MSFT": {
+            "target_buy_price": 420.0,
+            "previous_transactions": {
+                "last_buy": 370.95,
+                "last_sell": 453.97,
+                "profit_percentage": 22.4
+            },
+            "reason": "准备再次买入，关注买入时机"
+        },
+        "ADBE": {
+            "target_buy_price": 380.0,
+            "previous_transactions": {
+                "last_buy": 346.896,
+                "last_sell": 398.2,
+                "profit_percentage": 14.8
+            },
+            "reason": "刚刚获利了结，等待回调至$380以下再次买入机会"
+        },
+        "PHM": {
+            "target_buy_price": 98.0,
+            "reason": "地产龙头，业绩稳健，接近买入区域，关注50日均线支撑买入机会"
+        },
+        "CF": {
+            "target_buy_price": 84.0,
+            "reason": "化肥龙头，周期回暖，等待回调至布林带下轨支撑位附近买入"
+        }
+    },
+    "monitoring_config": {
+        "price_alert_threshold": 0.05,
+        "loss_alert_threshold": 0.05,
+        "profit_target": 0.25,
+        "check_interval": 60,
+        "email_notifications": true
+    }
+} 

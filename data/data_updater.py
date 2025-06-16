@@ -14,11 +14,8 @@ from config.trading_config import default_config
 import pymysql
 from typing import List, Dict, Any
 
-# 添加项目根目录到 Python 路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # 配置日志
 logging.basicConfig(
@@ -181,15 +178,16 @@ class DatabaseManager:
                     """
                     conn.execute(text(clean_query))
                     conn.commit()
+                    
                     logger.info("已清理stock_time_code表中的无效日期数据")
                 finally:
                     # 恢复原来的SQL模式
                     conn.execute(text(f"SET SESSION sql_mode='{original_mode}'"))
             
             # 1. 将stock_time_code中有而stock_code_time中没有的记录插入stock_code_time
-            insert_code_time_query = """
-                INSERT IGNORE INTO stock_code_time
-                SELECT
+            sync_to_code_time_query = """
+                INSERT IGNORE INTO stock_code_time 
+                SELECT 
                     t.Code,
                     t.Date,
                     t.Open,
@@ -197,7 +195,6 @@ class DatabaseManager:
                     t.Low,
                     t.Close,
                     t.Volume,
-                    t.Amount,
                     t.AdjClose,
                     t.Dividends,
                     t.StockSplits,
@@ -205,23 +202,42 @@ class DatabaseManager:
                 FROM stock_time_code t
                 LEFT JOIN stock_code_time c ON t.Code = c.Code AND t.Date = c.Date
                 WHERE c.Code IS NULL
+                    AND t.Date IS NOT NULL
+                    AND t.Date REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+                    AND t.Date != '0000-00-00'
             """
+            
+            # 临时关闭严格模式执行同步操作
             with self.engine.connect() as conn:
-                conn.execute(text(insert_code_time_query))
-                conn.commit()
+                # 保存当前的SQL模式
+                result = conn.execute(text("SELECT @@SESSION.sql_mode"))
+                original_mode = result.scalar()
+                
+                try:
+                    # 临时关闭严格模式
+                    conn.execute(text("SET SESSION sql_mode=''"))
+                    
+                    # 执行同步
+                    result = conn.execute(text(sync_to_code_time_query))
+                    affected_rows = result.rowcount
+                    conn.commit()
+                    
+                    logger.info(f"从stock_time_code同步到stock_code_time: {affected_rows}条记录")
+                finally:
+                    # 恢复原来的SQL模式
+                    conn.execute(text(f"SET SESSION sql_mode='{original_mode}'"))
             
             # 2. 将stock_code_time中有而stock_time_code中没有的记录插入stock_time_code
-            insert_time_code_query = """
-                INSERT IGNORE INTO stock_time_code
-                SELECT
-                    c.Date,
+            sync_to_time_code_query = """
+                INSERT IGNORE INTO stock_time_code 
+                SELECT 
                     c.Code,
+                    c.Date,
                     c.Open,
                     c.High,
                     c.Low,
                     c.Close,
                     c.Volume,
-                    c.Amount,
                     c.AdjClose,
                     c.Dividends,
                     c.StockSplits,
@@ -229,74 +245,35 @@ class DatabaseManager:
                 FROM stock_code_time c
                 LEFT JOIN stock_time_code t ON c.Code = t.Code AND c.Date = t.Date
                 WHERE t.Code IS NULL
+                    AND c.Date IS NOT NULL
+                    AND c.Date REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+                    AND c.Date != '0000-00-00'
             """
-            with self.engine.connect() as conn:
-                conn.execute(text(insert_time_code_query))
-                conn.commit()
             
-            # 查询不一致的记录数量
-            inconsistent_query = """
-                SELECT COUNT(*) AS inconsistent_count
-                FROM stock_time_code t
-                JOIN stock_code_time c ON t.Code = c.Code AND t.Date = c.Date
-                WHERE 
-                    t.Open != c.Open OR 
-                    t.High != c.High OR 
-                    t.Low != c.Low OR 
-                    t.Close != c.Close OR 
-                    t.Volume != c.Volume OR
-                    t.Amount != c.Amount OR
-                    t.AdjClose != c.AdjClose OR
-                    t.Dividends != c.Dividends OR
-                    t.StockSplits != c.StockSplits OR
-                    t.Capital_Gains != c.Capital_Gains
-            """
+            # 临时关闭严格模式执行同步操作
             with self.engine.connect() as conn:
-                result = conn.execute(text(inconsistent_query))
-                inconsistent_count = result.scalar()
-            
-            # 如果存在不一致的记录，尝试同步它们
-            if inconsistent_count > 0:
-                logger.info(f"发现 {inconsistent_count} 条不一致的记录，正在同步...")
+                # 保存当前的SQL模式
+                result = conn.execute(text("SELECT @@SESSION.sql_mode"))
+                original_mode = result.scalar()
                 
-                # 更新stock_code_time表使用stock_time_code的数据
-                update_code_time_query = """
-                    UPDATE stock_code_time c
-                    JOIN stock_time_code t ON c.Code = t.Code AND c.Date = t.Date
-                    SET 
-                        c.Open = t.Open,
-                        c.High = t.High,
-                        c.Low = t.Low,
-                        c.Close = t.Close,
-                        c.Volume = t.Volume,
-                        c.Amount = t.Amount,
-                        c.AdjClose = t.AdjClose,
-                        c.Dividends = t.Dividends,
-                        c.StockSplits = t.StockSplits,
-                        c.Capital_Gains = t.Capital_Gains
-                    WHERE 
-                        t.Open != c.Open OR 
-                        t.High != c.High OR 
-                        t.Low != c.Low OR 
-                        t.Close != c.Close OR 
-                        t.Volume != c.Volume OR
-                        t.Amount != c.Amount OR
-                        t.AdjClose != c.AdjClose OR
-                        t.Dividends != c.Dividends OR
-                        t.StockSplits != c.StockSplits OR
-                        t.Capital_Gains != c.Capital_Gains
-                """
-                with self.engine.connect() as conn:
-                    conn.execute(text(update_code_time_query))
+                try:
+                    # 临时关闭严格模式
+                    conn.execute(text("SET SESSION sql_mode=''"))
+                    
+                    # 执行同步
+                    result = conn.execute(text(sync_to_time_code_query))
+                    affected_rows = result.rowcount
                     conn.commit()
-                
-                logger.info("同步完成")
-            else:
-                logger.info("两个表的数据已完全一致")
+                    
+                    logger.info(f"从stock_code_time同步到stock_time_code: {affected_rows}条记录")
+                finally:
+                    # 恢复原来的SQL模式
+                    conn.execute(text(f"SET SESSION sql_mode='{original_mode}'"))
             
         except Exception as e:
-            logger.error(f"同步表差异时出错: {e}")
-            
+            logger.error(f"同步表之间差异时出错: {str(e)}")
+            raise
+
     def save_stock_data(self, symbol: str, df: pd.DataFrame) -> bool:
         """
         保存股票数据到数据库
@@ -323,8 +300,9 @@ class DatabaseManager:
             if 'Amount' in df.columns:
                 df = df.drop('Amount', axis=1)
             
-            # 查询已有记录，用于后续确定是插入新记录而不是替换旧记录
+            # 分别保存到两个表
             try:
+                # 获取连接
                 conn = pymysql.connect(
                     host=self.config['host'],
                     port=self.config['port'],
@@ -335,81 +313,44 @@ class DatabaseManager:
                 
                 try:
                     with conn.cursor() as cursor:
-                        # 获取现有数据的日期
-                        cursor.execute(
-                            "SELECT Date FROM stock_time_code WHERE Code = %s",
-                            (symbol,)
-                        )
-                        existing_dates = set([row[0] for row in cursor.fetchall()])
-                        
-                        # 检查有多少新记录
-                        df_dates = set(df['Date'].tolist())
-                        new_dates = df_dates - existing_dates
-                        
-                        logger.info(f"股票 {symbol} 数据分析: 总获取记录数 {len(df)}, 需要插入的新记录数 {len(new_dates)}")
-                        
-                        if len(new_dates) == 0:
-                            logger.info(f"股票 {symbol} 没有新数据需要添加，跳过保存")
-                            return True
-                            
-                        # 只保留新记录
-                        df_new = df[df['Date'].isin(new_dates)]
-                        if df_new.empty:
-                            logger.info(f"过滤后股票 {symbol} 没有新数据需要添加，跳过保存")
-                            return True
-                            
-                        logger.info(f"将为股票 {symbol} 插入 {len(df_new)} 条新记录")
+                        # 临时关闭严格模式
+                        cursor.execute("SET SESSION sql_mode=''")
                         
                         # 获取列名
-                        columns = df_new.columns.tolist()
+                        columns = df.columns.tolist()
                         column_names = ', '.join(['`' + col + '`' for col in columns])
                         
                         # 构建占位符
                         placeholders = ', '.join(['%s'] * len(columns))
                         
-                        # 准备数据，确保两个表插入完全相同的数据
-                        insert_data = []
-                        for _, row in df_new.iterrows():
+                        # 构建SQL - 使用REPLACE INTO
+                        sql = f"""
+                        REPLACE INTO stock_time_code ({column_names})
+                        VALUES ({placeholders})
+                        """
+                        
+                        # 逐行插入
+                        for _, row in df.iterrows():
                             values = [row[col] for col in columns]
-                            insert_data.append(values)
-                        
-                        # 构建SQL - 使用INSERT IGNORE而不是REPLACE INTO
-                        sql_time_code = f"""
-                        INSERT IGNORE INTO stock_time_code ({column_names})
-                        VALUES ({placeholders})
-                        """
-                        
-                        sql_code_time = f"""
-                        INSERT IGNORE INTO stock_code_time ({column_names})
-                        VALUES ({placeholders})
-                        """
-                        
-                        # 批量插入新记录到两个表
-                        # 1. 先插入stock_time_code表
-                        inserted_time_code = 0
-                        for values in insert_data:
-                            cursor.execute(sql_time_code, values)
-                            inserted_time_code += cursor.rowcount
-                        
-                        # 2. 再插入stock_code_time表 - 使用完全相同的数据
-                        inserted_code_time = 0
-                        for values in insert_data:
-                            cursor.execute(sql_code_time, values)
-                            inserted_code_time += cursor.rowcount
-                        
+                            cursor.execute(sql, values)
+                            
                         # 提交事务
                         conn.commit()
                         
-                        logger.info(f"成功插入股票 {symbol} 数据: stock_time_code表 {inserted_time_code} 条, stock_code_time表 {inserted_code_time} 条")
+                        # 对stock_code_time表执行相同的操作
+                        sql = f"""
+                        REPLACE INTO stock_code_time ({column_names})
+                        VALUES ({placeholders})
+                        """
                         
-                        # 3. 检查两个表的记录数是否一致
-                        if inserted_time_code != inserted_code_time:
-                            logger.warning(f"股票 {symbol} 插入记录数不一致: stock_time_code {inserted_time_code}, stock_code_time {inserted_code_time}")
+                        for _, row in df.iterrows():
+                            values = [row[col] for col in columns]
+                            cursor.execute(sql, values)
                             
-                            # 尝试同步两个表的差异
-                            self.sync_tables_differences()
+                        # 提交事务
+                        conn.commit()
                         
-                    logger.info(f"成功保存股票 {symbol} 的数据，总计 {len(df_new)} 条新记录")
+                    logger.info(f"成功保存股票 {symbol} 的数据，总计 {len(df)} 条记录")
                     return True
                     
                 except Exception as e:
@@ -855,33 +796,18 @@ class MarketDataUpdater:
         if symbols is None:
             symbols = self.db_manager.get_existing_stocks()
             
-        # 记录更新模式    
-        if force_update:
-            logger.info(f"开始强制更新 {len(symbols)} 只股票的数据")
-        else:
-            logger.info(f"开始增量更新 {len(symbols)} 只股票的数据")
-            
         report = {
             'total': len(symbols),
             'updated': 0,
             'skipped': 0,
             'failed': 0,
-            'details': {},
-            'new_records_count': 0  # 新增一个统计，记录实际插入的新记录数
+            'details': {}
         }
-        
-        # 获取当前日期，用于跳过当天已更新的股票
-        today = datetime.now().date()
         
         for symbol in symbols:
             try:
                 # 检查是否需要更新
                 last_update = self.get_last_update_time(symbol)
-                
-                # 记录当前处理的股票和最后更新时间
-                logger.info(f"处理股票 {symbol}，最后更新时间: {last_update}")
-                
-                # 判断是否需要跳过
                 if not force_update and last_update:
                     # 确保last_update是datetime对象
                     if isinstance(last_update, str):
@@ -891,82 +817,16 @@ class MarketDataUpdater:
                     
                     # 计算时间差
                     time_diff = datetime.now() - last_update
-                    
-                    # 详细记录时间差
-                    logger.info(f"股票 {symbol} 的数据已更新 {time_diff.days} 天 {time_diff.seconds//3600} 小时前")
-                    
-                    # 如果最后更新是今天，并且已经过了交易时间，则跳过
-                    if last_update.date() == today and self.is_market_closed():
-                        logger.info(f"跳过股票 {symbol}，因为它在今天已更新且已过交易时间")
-                        report['skipped'] += 1
-                        report['details'][symbol] = 'skipped (updated today after market close)'
-                        continue
-                    
-                    # 如果最后更新在24小时内，则跳过
                     if time_diff.days < 1:
-                        logger.info(f"跳过股票 {symbol}，因为它在过去24小时内已更新")
                         report['skipped'] += 1
                         report['details'][symbol] = 'skipped (up to date)'
                         continue
                         
                 # 更新数据
-                before_update = datetime.now()
                 success = self._update_single_stock(symbol)
-                after_update = datetime.now()
-                update_time = (after_update - before_update).total_seconds()
-                
                 if success:
                     report['updated'] += 1
-                    # 查询实际插入了多少条新记录
-                    conn = pymysql.connect(
-                        host=self.db_manager.config['host'],
-                        port=self.db_manager.config['port'],
-                        user=self.db_manager.config['user'],
-                        password=self.db_manager.config['password'],
-                        database=self.db_manager.config['database']
-                    )
-                    
-                    try:
-                        with conn.cursor() as cursor:
-                            # 查询在更新期间插入的记录数
-                            latest_update = self.get_last_update_time(symbol)
-                            if latest_update and last_update:
-                                if isinstance(latest_update, date) and not isinstance(latest_update, datetime):
-                                    latest_update = datetime.combine(latest_update, datetime.min.time())
-                                if isinstance(last_update, date) and not isinstance(last_update, datetime):
-                                    last_update = datetime.combine(last_update, datetime.min.time())
-                                    
-                                # 将日期转换为字符串格式
-                                if isinstance(latest_update, datetime):
-                                    latest_update_str = latest_update.strftime('%Y-%m-%d')
-                                else:
-                                    latest_update_str = str(latest_update)
-                                    
-                                if isinstance(last_update, datetime):
-                                    last_update_str = last_update.strftime('%Y-%m-%d')
-                                else:
-                                    last_update_str = str(last_update)
-                                
-                                # 计算新记录数
-                                if latest_update_str > last_update_str:
-                                    cursor.execute(
-                                        "SELECT COUNT(*) FROM stock_time_code WHERE Code = %s AND Date > %s AND Date <= %s",
-                                        (symbol, last_update_str, latest_update_str)
-                                    )
-                                    new_records = cursor.fetchone()[0]
-                                    report['new_records_count'] += new_records
-                                    logger.info(f"股票 {symbol} 成功插入 {new_records} 条新记录，更新耗时 {update_time:.2f} 秒")
-                                    report['details'][symbol] = f'updated with {new_records} new records'
-                                else:
-                                    logger.info(f"股票 {symbol} 没有新记录插入，最后更新日期未变")
-                                    report['details'][symbol] = 'updated (no new records)'
-                            else:
-                                logger.info(f"股票 {symbol} 更新成功，但无法确定新增记录数")
-                                report['details'][symbol] = 'updated'
-                    finally:
-                        conn.close()
-                        
-                    # 更新内存中的最后更新时间
+                    report['details'][symbol] = 'updated'
                     self._last_update_times[symbol] = datetime.now()
                 else:
                     report['failed'] += 1
@@ -977,9 +837,6 @@ class MarketDataUpdater:
                 report['failed'] += 1
                 report['details'][symbol] = f'error: {str(e)}'
                 
-        # 记录最终结果
-        logger.info(f"更新完成: 总计 {report['total']} 只股票, 更新 {report['updated']} 只, 跳过 {report['skipped']} 只, 失败 {report['failed']} 只, 共新增 {report['new_records_count']} 条记录")
-        
         return report
         
     def _update_single_stock(self, symbol: str) -> bool:
@@ -987,34 +844,8 @@ class MarketDataUpdater:
         try:
             # 获取最新数据
             end_date = datetime.now()
-            
-            # 获取最后更新日期
-            last_update = self.get_last_update_time(symbol)
-            
-            # 详细记录最后更新日期信息
-            logger.info(f"股票 {symbol} 的最后更新日期为: {last_update}")
-            
-            # 根据最后更新日期决定数据获取范围
-            if last_update:
-                # 确保last_update是datetime对象
-                if isinstance(last_update, str):
-                    last_update = pd.to_datetime(last_update)
-                elif isinstance(last_update, date) and not isinstance(last_update, datetime):
-                    last_update = datetime.combine(last_update, datetime.min.time())
-                
-                # 从最后更新日期的下一天开始获取数据
-                start_date = last_update + timedelta(days=1)
-                logger.info(f"将获取股票 {symbol} 从 {start_date.strftime('%Y-%m-%d')} 到 {end_date.strftime('%Y-%m-%d')} 的数据")
-                
-                # 修复日期判断逻辑：只有当开始日期严格大于结束日期时才跳过
-                # 原来的逻辑 start_date.date() >= end_date.date() 有问题
-                if start_date.date() > end_date.date():
-                    logger.info(f"股票 {symbol} 数据已是最新，无需更新")
-                    return True
-            else:
-                # 新股票则获取历史数据
-                start_date = end_date - timedelta(days=120)
-                logger.info(f"股票 {symbol} 没有历史数据，将获取从 {start_date.strftime('%Y-%m-%d')} 到 {end_date.strftime('%Y-%m-%d')} 的数据")
+            # 直接获取120天的历史数据，避免数据不足的警告
+            start_date = end_date - timedelta(days=120)
             
             # 从Yahoo Finance获取数据
             ticker = yf.Ticker(symbol)
@@ -1030,34 +861,11 @@ class MarketDataUpdater:
                 logger.warning(f"未获取到股票 {symbol} 的新数据")
                 return False
                 
-            # 记录获取到的数据行数
-            logger.info(f"从Yahoo获取到股票 {symbol} 的数据共 {len(df)} 条记录")
-            
             # 处理数据
             df = self._process_data(df, symbol)
             
-            # 如果有最后更新日期，验证是否真的获取了新数据
-            if last_update and not df.empty:
-                # 确保last_update是字符串格式
-                if isinstance(last_update, datetime) or isinstance(last_update, date):
-                    last_update_str = last_update.strftime('%Y-%m-%d')
-                else:
-                    last_update_str = str(last_update)
-                
-                # 记录新数据的日期范围
-                if not df.empty:
-                    min_date = df['Date'].min()
-                    max_date = df['Date'].max()
-                    logger.info(f"获取到的新数据日期范围: 从 {min_date} 到 {max_date}")
-            
             # 保存到数据库
-            result = self.db_manager.save_stock_data(symbol, df)
-            
-            # 记录保存结果
-            if result:
-                logger.info(f"成功保存股票 {symbol} 的新数据，共 {len(df)} 条记录")
-            
-            return result
+            return self.db_manager.save_stock_data(symbol, df)
             
         except Exception as e:
             logger.error(f"更新股票 {symbol} 数据时出错: {str(e)}")
@@ -1066,13 +874,6 @@ class MarketDataUpdater:
     def _process_data(self, df: pd.DataFrame, symbol: str) -> pd.DataFrame:
         """处理股票数据"""
         try:
-            if df.empty:
-                logger.warning(f"股票 {symbol} 数据为空，无法处理")
-                return pd.DataFrame()
-                
-            # 记录原始数据行数
-            original_rows = len(df)
-                
             # 重置索引，将日期变为列
             df = df.reset_index()
             
@@ -1094,30 +895,6 @@ class MarketDataUpdater:
             # 按日期排序
             df = df.sort_values('Date')
             
-            # 检查数据质量
-            # 1. 删除任何具有NaN价格的行
-            nan_prices = df[df['Close'].isna()]
-            if not nan_prices.empty:
-                logger.warning(f"股票 {symbol} 有 {len(nan_prices)} 条记录价格为NaN，将被删除")
-                df = df.dropna(subset=['Close'])
-                
-            # 2. 验证最高价和最低价的一致性
-            invalid_prices = df[(df['High'] < df['Low']) | (df['High'] < df['Close']) | (df['Low'] > df['Close'])]
-            if not invalid_prices.empty:
-                logger.warning(f"股票 {symbol} 有 {len(invalid_prices)} 条记录价格不一致，将进行修正")
-                # 修正价格
-                for idx in invalid_prices.index:
-                    high = max(df.loc[idx, 'High'], df.loc[idx, 'Close'], df.loc[idx, 'Low'])
-                    low = min(df.loc[idx, 'High'], df.loc[idx, 'Close'], df.loc[idx, 'Low'])
-                    df.loc[idx, 'High'] = high
-                    df.loc[idx, 'Low'] = low
-            
-            # 记录处理后的数据行数
-            processed_rows = len(df)
-            if processed_rows != original_rows:
-                logger.warning(f"股票 {symbol} 数据处理过程中移除了 {original_rows - processed_rows} 条无效记录")
-            
-            logger.info(f"股票 {symbol} 数据处理完成，共 {processed_rows} 条有效记录")
             return df
             
         except Exception as e:
@@ -1125,136 +902,9 @@ class MarketDataUpdater:
             return pd.DataFrame()
 
 
-def test_update_logic():
-    """测试数据更新逻辑，用于诊断固定返回83条记录的问题"""
-    logger.info("开始测试数据更新逻辑...")
-    
-    try:
-        # 创建市场数据更新器
-        updater = MarketDataUpdater(DB_CONFIG, PROXIES)
-        
-        # 选择一只典型的股票进行测试 - SPY是常用的ETF，更新频率高
-        test_symbol = "SPY"
-        
-        # 查询该股票的历史记录数量
-        conn = pymysql.connect(
-            host=DB_CONFIG['host'],
-            port=DB_CONFIG['port'],
-            user=DB_CONFIG['user'],
-            password=DB_CONFIG['password'],
-            database=DB_CONFIG['database']
-        )
-        
-        try:
-            with conn.cursor() as cursor:
-                # 查询该股票的总记录数
-                cursor.execute(
-                    "SELECT COUNT(*) FROM stock_time_code WHERE Code = %s",
-                    (test_symbol,)
-                )
-                record_count = cursor.fetchone()[0]
-                logger.info(f"测试前，股票 {test_symbol} 在数据库中有 {record_count} 条历史记录")
-                
-                # 查询最早和最晚的日期
-                cursor.execute(
-                    "SELECT MIN(Date), MAX(Date) FROM stock_time_code WHERE Code = %s",
-                    (test_symbol,)
-                )
-                min_date, max_date = cursor.fetchone()
-                logger.info(f"测试前，股票 {test_symbol} 的数据范围: 从 {min_date} 到 {max_date}")
-                
-                # 先检查是否有最新交易日的数据（当天或前一个交易日）
-                # 这样我们可以验证当已有最新数据时是否会正确跳过
-                today = datetime.now().date()
-                yesterday = today - timedelta(days=1)
-                today_str = today.strftime('%Y-%m-%d')
-                yesterday_str = yesterday.strftime('%Y-%m-%d')
-                
-                cursor.execute(
-                    "SELECT COUNT(*) FROM stock_time_code WHERE Code = %s AND (Date = %s OR Date = %s)",
-                    (test_symbol, today_str, yesterday_str)
-                )
-                recent_count = cursor.fetchone()[0]
-                logger.info(f"测试前，股票 {test_symbol} 在最近两天有 {recent_count} 条记录")
-                
-        finally:
-            conn.close()
-        
-        # 1. 先进行一次常规更新，看是否会跳过或只更新新数据
-        logger.info(f"对股票 {test_symbol} 执行常规更新，预期：如果已有最新数据则跳过，否则只更新新数据...")
-        update_result = updater.update_stock_data([test_symbol], force_update=False)
-        logger.info(f"常规更新结果: {update_result}")
-        
-        # 2. 然后进行强制更新测试
-        logger.info(f"对股票 {test_symbol} 执行强制更新，预期：应始终更新数据...")
-        force_update_result = updater.update_stock_data([test_symbol], force_update=True)
-        logger.info(f"强制更新结果: {force_update_result}")
-        
-        # 3. 再次查询记录数量，看是否有变化
-        conn = pymysql.connect(
-            host=DB_CONFIG['host'],
-            port=DB_CONFIG['port'],
-            user=DB_CONFIG['user'],
-            password=DB_CONFIG['password'],
-            database=DB_CONFIG['database']
-        )
-        
-        try:
-            with conn.cursor() as cursor:
-                # 查询更新后的总记录数
-                cursor.execute(
-                    "SELECT COUNT(*) FROM stock_time_code WHERE Code = %s",
-                    (test_symbol,)
-                )
-                new_record_count = cursor.fetchone()[0]
-                logger.info(f"测试后，股票 {test_symbol} 在数据库中有 {new_record_count} 条记录")
-                
-                # 如果记录数增加，检查新增的是哪些日期
-                if new_record_count > record_count:
-                    added_records = new_record_count - record_count
-                    logger.info(f"共新增了 {added_records} 条记录")
-                    
-                    # 查询最新的日期
-                    cursor.execute(
-                        "SELECT MAX(Date) FROM stock_time_code WHERE Code = %s",
-                        (test_symbol,)
-                    )
-                    new_max_date = cursor.fetchone()[0]
-                    logger.info(f"更新后，股票 {test_symbol} 的最新数据日期为 {new_max_date}")
-                    
-                    # 查询最近10天的记录，看看具体更新了哪些日期
-                    ten_days_ago = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
-                    cursor.execute(
-                        "SELECT Date, Close FROM stock_time_code WHERE Code = %s AND Date >= %s ORDER BY Date",
-                        (test_symbol, ten_days_ago)
-                    )
-                    recent_data = cursor.fetchall()
-                    logger.info(f"最近10天的记录: {recent_data}")
-                else:
-                    logger.info("没有新增记录，验证跳过逻辑正常工作")
-                
-        finally:
-            conn.close()
-        
-        # 4. 等待3秒后再次尝试常规更新，应该会跳过
-        logger.info("等待3秒后再次对股票 SPY 执行常规更新，预期：应该会跳过...")
-        time.sleep(3)
-        skip_update_result = updater.update_stock_data([test_symbol], force_update=False)
-        logger.info(f"再次常规更新结果: {skip_update_result}")
-        
-        logger.info("测试数据更新逻辑完成")
-        
-    except Exception as e:
-        logger.error(f"测试数据更新逻辑时出错: {str(e)}")
-        raise
-
-
 def main():
     """主函数"""
     try:
-        # 测试更新逻辑 - 添加这一行
-        test_update_logic()
-        
         # 创建市场数据更新器
         updater = MarketDataUpdater(DB_CONFIG, PROXIES)
         
