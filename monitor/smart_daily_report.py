@@ -46,23 +46,27 @@ class SmartDailyReportGenerator:
             watch_targets: 观察目标股票（准备买入的股票）
         """
         # 用户持仓股票列表 + 观察股票
-        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF']
+        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'EOG', 'MSFT', 'PHM', 'CF']
         self.auto_update_data = auto_update_data
         self.data_source_type = None
         
-        # 用户持仓信息
+        # 用户持仓信息 (更新日期: 2025-06-15, 基于精确金额数据)
         self.portfolio = portfolio or {
-            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.16, 'investment': 6058.27},
-            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 22.12, 'investment': 5798.36},  # 注意：GOOG和GOOGL基本等价
-            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 7.07, 'investment': 2071.92},
-            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.95, 'investment': 5553.72},
-            'TSLA': {'cost': 254.096, 'shares': 8, 'weight': 8.72, 'investment': 2032.77},
-            'ADBE': {'cost': 346.896, 'shares': 5, 'weight': 7.67, 'investment': 1734.48}
+            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},   # $21,903.42 × 21.86%
+            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83}, # $21,903.42 × 21.53%
+            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},    # $21,903.42 × 6.97%
+            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24}, # $21,903.42 × 20.92%
+            'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},   # $21,903.42 × 4.74%
+            'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}      # $21,903.42 × 2.20%
         }
         
-        # 投资组合总价值计算
-        self.total_stock_investment = 23249.52  # 总股票投资金额
-        self.portfolio_allocation = 88.04  # 股票占总投资组合的比例
+        # 投资组合总价值计算 (基于美元货币基金精确金额$3,262.53)
+        self.total_portfolio_value = 27884.87  # 总资产价值 (重新计算)
+        self.total_stock_investment = 21903.42  # 总股票投资金额 (78.55% × $27,884.87)
+        self.portfolio_allocation = 78.55  # 股票占总投资组合的比例 (实际数据)
+        self.cash_allocation = 9.75  # 现金占比 ($2,718.77)
+        self.money_fund_allocation = 11.70  # 美元货币型基金占比
+        self.money_fund_value = 3262.53  # 美元货币型基金精确金额
         
         # 观察目标股票（准备买入的股票）
         self.watch_targets = watch_targets or {
@@ -73,12 +77,12 @@ class SmartDailyReportGenerator:
                 'target_buy_below': 420.0,  # 建议买入价格下方
                 'reason': '准备再次买入，关注买入时机'
             },
-            'EOG': {
-                'previous_buy': None,  # 从未购买过
-                'previous_sell': None,
-                'previous_gain': None,
-                'target_buy_below': 110.00,  # 基于50日均线支撑位($111.91)下方2%
-                'reason': '能源板块龙头，技术面强势，关注50日均线支撑买入机会，当前价格$125.28，等待回调至$110以下'
+            'ADBE': {
+                'previous_buy': 346.896,  # 刚刚卖出
+                'previous_sell': 398.2,
+                'previous_gain': 14.8,  # 约14.8%收益
+                'target_buy_below': 380.0,  # 建议回调后再次买入
+                'reason': '刚刚获利了结，等待回调至$380以下再次买入机会'
             },
             'PHM': {
                 'previous_buy': None,  # 从未购买过
