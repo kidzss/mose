@@ -3,9 +3,22 @@ import numpy as np
 from alpha_vantage.timeseries import TimeSeries
 import datetime as dt
 from datetime import datetime
+import os
+import json
 
-# Alpha Vantage API Key
-API_KEY = "OICCCQG9R742HYZ1"
+# 从配置文件读取 Alpha Vantage API Key
+def load_api_key():
+    """从配置文件加载API密钥"""
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'monitor', 'configs', 'alpha_vantage_config.json')
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+            return config.get('api_key', '')
+    except:
+        # 如果配置文件不存在，尝试从环境变量获取
+        return os.getenv('ALPHA_VANTAGE_API_KEY', 'demo')
+
+API_KEY = load_api_key()
 
 # 设置 Alpha Vantage 数据接口
 ts = TimeSeries(key=API_KEY, output_format='pandas')

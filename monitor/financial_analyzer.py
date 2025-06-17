@@ -218,68 +218,101 @@ class FinancialAnalyzer:
         }
     
     def analyze_growth(self, data: Dict) -> Dict:
-        """分析成长性"""
+        """分析成长性指标"""
         growth_score = 0
         details = {}
         
-        # 收入增长率
+        # EPS增长率分析
+        eps_growth = data.get('earningsQuarterlyGrowth')  # 季度EPS增长
+        eps_growth_yoy = data.get('earningsGrowth')       # 年度EPS增长
+        
+        if eps_growth_yoy:
+            if eps_growth_yoy >= self.benchmarks['revenue_growth']['excellent']:
+                eps_score = 100
+                eps_level = "优秀"
+            elif eps_growth_yoy >= self.benchmarks['revenue_growth']['good']:
+                eps_score = 80
+                eps_level = "良好"
+            elif eps_growth_yoy >= self.benchmarks['revenue_growth']['fair']:
+                eps_score = 60
+                eps_level = "一般"
+            elif eps_growth_yoy >= 0:
+                eps_score = 40
+                eps_level = "较低"
+            else:
+                eps_score = 20
+                eps_level = "负增长"
+            
+            details['eps_growth'] = {
+                'value': eps_growth_yoy,
+                'score': eps_score,
+                'level': eps_level,
+                'comment': f"EPS增长率 {eps_growth_yoy:.2%}，成长性{eps_level}"
+            }
+            growth_score += eps_score * 0.4
+        
+        # 营收增长率分析
         revenue_growth = data.get('revenueGrowth')
         if revenue_growth:
             if revenue_growth >= self.benchmarks['revenue_growth']['excellent']:
-                rg_score = 100
-                rg_level = "优秀"
+                rev_score = 100
+                rev_level = "优秀"
             elif revenue_growth >= self.benchmarks['revenue_growth']['good']:
-                rg_score = 80
-                rg_level = "良好"
+                rev_score = 80
+                rev_level = "良好"
             elif revenue_growth >= self.benchmarks['revenue_growth']['fair']:
-                rg_score = 60
-                rg_level = "一般"
+                rev_score = 60
+                rev_level = "一般"
             elif revenue_growth >= 0:
-                rg_score = 40
-                rg_level = "较低"
+                rev_score = 40
+                rev_level = "较低"
             else:
-                rg_score = 20
-                rg_level = "负增长"
+                rev_score = 20
+                rev_level = "负增长"
             
             details['revenue_growth'] = {
                 'value': revenue_growth,
-                'score': rg_score,
-                'level': rg_level,
-                'comment': f"收入增长率 {revenue_growth:.2%}，业务扩张{rg_level}"
+                'score': rev_score,
+                'level': rev_level,
+                'comment': f"营收增长率 {revenue_growth:.2%}，业务增长{rev_level}"
             }
-            growth_score += rg_score * 0.5
+            growth_score += rev_score * 0.3
         
-        # 盈利增长率
-        earnings_growth = data.get('earningsGrowth')
-        if earnings_growth:
-            if earnings_growth >= 0.15:
-                eg_score = 100
-                eg_level = "优秀"
-            elif earnings_growth >= 0.10:
-                eg_score = 80
-                eg_level = "良好"
-            elif earnings_growth >= 0.05:
-                eg_score = 60
-                eg_level = "一般"
-            elif earnings_growth >= 0:
-                eg_score = 40
-                eg_level = "较低"
-            else:
-                eg_score = 20
-                eg_level = "负增长"
+        # 自由现金流分析 (新增)
+        free_cash_flow = data.get('freeCashflow')
+        operating_cash_flow = data.get('operatingCashflow')
+        
+        if free_cash_flow and operating_cash_flow:
+            fcf_ratio = free_cash_flow / operating_cash_flow if operating_cash_flow != 0 else 0
             
-            details['earnings_growth'] = {
-                'value': earnings_growth,
-                'score': eg_score,
-                'level': eg_level,
-                'comment': f"盈利增长率 {earnings_growth:.2%}，利润增长{eg_level}"
+            if fcf_ratio >= 0.8:
+                fcf_score = 100
+                fcf_level = "优秀"
+            elif fcf_ratio >= 0.6:
+                fcf_score = 80
+                fcf_level = "良好"
+            elif fcf_ratio >= 0.4:
+                fcf_score = 60
+                fcf_level = "一般"
+            elif fcf_ratio >= 0.2:
+                fcf_score = 40
+                fcf_level = "较低"
+            else:
+                fcf_score = 20
+                fcf_level = "很低"
+            
+            details['free_cash_flow'] = {
+                'value': fcf_ratio,
+                'score': fcf_score,
+                'level': fcf_level,
+                'comment': f"自由现金流转换率 {fcf_ratio:.2%}，现金产生能力{fcf_level}"
             }
-            growth_score += eg_score * 0.5
-        
+            growth_score += fcf_score * 0.3
+
         return {
-            'score': growth_score / 100 if growth_score > 0 else 0.5,
+            'score': growth_score / 100 if growth_score > 0 else 0.3,
             'details': details,
-            'summary': self._get_level_summary(growth_score / 100 if growth_score > 0 else 0.5)
+            'summary': self._get_level_summary(growth_score / 100 if growth_score > 0 else 0.3)
         }
     
     def analyze_financial_health(self, data: Dict) -> Dict:
@@ -460,13 +493,27 @@ class FinancialAnalyzer:
             health = self.analyze_financial_health(data)
             sentiment = self.analyze_analyst_sentiment(data)
             
+            # 新增：行业对比分析
+            industry_comparison = self.analyze_industry_comparison(symbol, data)
+            
+            # 调整综合得分权重，加入行业对比因子
+            adjusted_weights = {
+                'valuation': 0.20,      # 估值指标权重略降
+                'profitability': 0.20,  # 盈利能力权重略降
+                'growth': 0.25,         # 成长性权重增加
+                'financial_health': 0.15, # 财务健康度权重略降
+                'analyst_sentiment': 0.10,  # 分析师情绪
+                'industry_comparison': 0.10  # 新增行业对比权重
+            }
+            
             # 计算综合得分
             total_score = (
-                valuation['score'] * self.weights['valuation'] +
-                profitability['score'] * self.weights['profitability'] +
-                growth['score'] * self.weights['growth'] +
-                health['score'] * self.weights['financial_health'] +
-                sentiment['score'] * self.weights['analyst_sentiment']
+                valuation['score'] * adjusted_weights['valuation'] +
+                profitability['score'] * adjusted_weights['profitability'] +
+                growth['score'] * adjusted_weights['growth'] +
+                health['score'] * adjusted_weights['financial_health'] +
+                sentiment['score'] * adjusted_weights['analyst_sentiment'] +
+                industry_comparison['industry_adjusted_score'] * adjusted_weights['industry_comparison']
             )
             
             # 基本信息
@@ -482,6 +529,9 @@ class FinancialAnalyzer:
             # 生成投资建议
             investment_advice = self._generate_investment_advice(total_score, valuation, profitability, growth, health, sentiment)
             
+            # 新增：生成预警信息（第二个专家建议）
+            warning_alerts = self._generate_warning_alerts(symbol, data, total_score)
+            
             return {
                 'symbol': symbol,
                 'basic_info': basic_info,
@@ -493,9 +543,11 @@ class FinancialAnalyzer:
                     'profitability': profitability,
                     'growth': growth,
                     'financial_health': health,
-                    'analyst_sentiment': sentiment
+                    'analyst_sentiment': sentiment,
+                    'industry_comparison': industry_comparison  # 新增行业对比维度
                 },
-                'investment_advice': investment_advice
+                'investment_advice': investment_advice,
+                'warning_alerts': warning_alerts  # 新增预警信息
             }
             
         except Exception as e:
@@ -567,3 +619,301 @@ class FinancialAnalyzer:
             advice['action_items'].append('寻找更好的投资机会')
         
         return advice
+    
+    def analyze_industry_comparison(self, symbol: str, data: Dict) -> Dict:
+        """行业对比分析 - 第三个专家建议的实现"""
+        try:
+            sector = data.get('sector', 'Unknown')
+            industry = data.get('industry', 'Unknown')
+            
+            # 行业基准值（根据不同行业调整）
+            industry_benchmarks = self._get_industry_benchmarks(sector)
+            
+            comparison_result = {
+                'sector': sector,
+                'industry': industry,
+                'industry_adjusted_score': 0,
+                'relative_metrics': {},
+                'industry_ranking': {}
+            }
+            
+            # 获取股票的关键指标
+            current_pe = data.get('trailingPE', 0)
+            current_roe = data.get('returnOnEquity', 0)
+            current_pb = data.get('priceToBook', 0)
+            current_debt_ratio = data.get('debtToEquity', 0)
+            
+            # 与行业基准对比
+            industry_score = 0
+            
+            # PE行业对比
+            if current_pe > 0:
+                industry_pe_benchmark = industry_benchmarks['pe_ratio']['good']
+                if current_pe <= industry_pe_benchmark * 0.8:
+                    pe_industry_score = 100
+                    pe_relative = "行业内低估值"
+                elif current_pe <= industry_pe_benchmark:
+                    pe_industry_score = 80
+                    pe_relative = "行业内合理估值"
+                elif current_pe <= industry_pe_benchmark * 1.3:
+                    pe_industry_score = 60
+                    pe_relative = "行业内略高估值"
+                else:
+                    pe_industry_score = 40
+                    pe_relative = "行业内高估值"
+                
+                comparison_result['relative_metrics']['pe_comparison'] = {
+                    'value': current_pe,
+                    'industry_benchmark': industry_pe_benchmark,
+                    'relative_position': pe_relative,
+                    'score': pe_industry_score
+                }
+                industry_score += pe_industry_score * 0.3
+            
+            # ROE行业对比
+            if current_roe > 0:
+                industry_roe_benchmark = industry_benchmarks['roe']['good']
+                if current_roe >= industry_roe_benchmark * 1.3:
+                    roe_industry_score = 100
+                    roe_relative = "行业内优秀盈利"
+                elif current_roe >= industry_roe_benchmark:
+                    roe_industry_score = 80
+                    roe_relative = "行业内良好盈利"
+                elif current_roe >= industry_roe_benchmark * 0.7:
+                    roe_industry_score = 60
+                    roe_relative = "行业内平均盈利"
+                else:
+                    roe_industry_score = 40
+                    roe_relative = "行业内较低盈利"
+                
+                comparison_result['relative_metrics']['roe_comparison'] = {
+                    'value': current_roe,
+                    'industry_benchmark': industry_roe_benchmark,
+                    'relative_position': roe_relative,
+                    'score': roe_industry_score
+                }
+                industry_score += roe_industry_score * 0.3
+            
+            # PB行业对比
+            try:
+                current_pb = data.get('priceToBook', data.get('pb_ratio', 0))
+                if current_pb and current_pb > 0:
+                    industry_pb_benchmark = industry_benchmarks['pb_ratio']['good']
+                    if current_pb <= industry_pb_benchmark * 0.7:
+                        pb_industry_score = 100
+                        pb_relative = "行业内低账面价值"
+                    elif current_pb <= industry_pb_benchmark:
+                        pb_industry_score = 80
+                        pb_relative = "行业内合理账面价值"
+                    elif current_pb <= industry_pb_benchmark * 1.5:
+                        pb_industry_score = 60
+                        pb_relative = "行业内略高账面价值"
+                    else:
+                        pb_industry_score = 40
+                        pb_relative = "行业内高账面价值"
+                    
+                    comparison_result['relative_metrics']['pb_comparison'] = {
+                        'value': current_pb,
+                        'industry_benchmark': industry_pb_benchmark,
+                        'relative_position': pb_relative,
+                        'score': pb_industry_score
+                    }
+                    industry_score += pb_industry_score * 0.2
+                else:
+                    # PB数据缺失，给予中性评分
+                    industry_score += 60 * 0.2
+            except Exception as pb_error:
+                logger.warning(f"PB行业对比计算失败 {symbol}: {pb_error}")
+                industry_score += 60 * 0.2  # 给予中性评分
+            
+            # 债务水平行业对比
+            if current_debt_ratio > 0:
+                industry_debt_benchmark = industry_benchmarks['debt_to_equity']['good']
+                if current_debt_ratio <= industry_debt_benchmark * 0.5:
+                    debt_industry_score = 100
+                    debt_relative = "行业内低债务"
+                elif current_debt_ratio <= industry_debt_benchmark:
+                    debt_industry_score = 80
+                    debt_relative = "行业内适度债务"
+                elif current_debt_ratio <= industry_debt_benchmark * 1.5:
+                    debt_industry_score = 60
+                    debt_relative = "行业内较高债务"
+                else:
+                    debt_industry_score = 40
+                    debt_relative = "行业内高债务"
+                
+                comparison_result['relative_metrics']['debt_comparison'] = {
+                    'value': current_debt_ratio,
+                    'industry_benchmark': industry_debt_benchmark,
+                    'relative_position': debt_relative,
+                    'score': debt_industry_score
+                }
+                industry_score += debt_industry_score * 0.2
+            
+            comparison_result['industry_adjusted_score'] = industry_score / 100
+            comparison_result['summary'] = self._get_industry_summary(industry_score / 100)
+            
+            return comparison_result
+            
+        except Exception as e:
+            logger.error(f"行业对比分析失败 {symbol}: {e}")
+            return {
+                'sector': 'Unknown',
+                'industry': 'Unknown',
+                'industry_adjusted_score': 0.5,
+                'relative_metrics': {},
+                'summary': '无法进行行业对比'
+            }
+    
+    def _get_industry_benchmarks(self, sector: str) -> Dict:
+        """根据行业获取基准值"""
+        # 不同行业的基准值
+        industry_specific_benchmarks = {
+            'Technology': {
+                'pe_ratio': {'excellent': 25, 'good': 40, 'fair': 60, 'poor': 80},
+                'roe': {'excellent': 0.25, 'good': 0.20, 'fair': 0.15, 'poor': 0.10},
+                'pb_ratio': {'excellent': 5.0, 'good': 10.0, 'fair': 20.0, 'poor': 30.0},
+                'debt_to_equity': {'excellent': 0.1, 'good': 0.2, 'fair': 0.4, 'poor': 0.8}
+            },
+            'Communication Services': {
+                'pe_ratio': {'excellent': 15, 'good': 25, 'fair': 35, 'poor': 45},
+                'roe': {'excellent': 0.30, 'good': 0.25, 'fair': 0.20, 'poor': 0.15},
+                'pb_ratio': {'excellent': 3.0, 'good': 6.0, 'fair': 10.0, 'poor': 15.0},
+                'debt_to_equity': {'excellent': 0.05, 'good': 0.15, 'fair': 0.30, 'poor': 0.50}
+            },
+            'Financial Services': {
+                'pe_ratio': {'excellent': 10, 'good': 15, 'fair': 20, 'poor': 25},
+                'roe': {'excellent': 0.15, 'good': 0.12, 'fair': 0.08, 'poor': 0.05},
+                'pb_ratio': {'excellent': 0.8, 'good': 1.2, 'fair': 1.8, 'poor': 2.5},
+                'debt_to_equity': {'excellent': 2.0, 'good': 4.0, 'fair': 6.0, 'poor': 8.0}
+            },
+            'Healthcare': {
+                'pe_ratio': {'excellent': 15, 'good': 25, 'fair': 35, 'poor': 45},
+                'roe': {'excellent': 0.18, 'good': 0.15, 'fair': 0.10, 'poor': 0.06},
+                'pb_ratio': {'excellent': 1.5, 'good': 3.0, 'fair': 5.0, 'poor': 7.0},
+                'debt_to_equity': {'excellent': 0.3, 'good': 0.6, 'fair': 1.0, 'poor': 1.5}
+            },
+            'Energy': {
+                'pe_ratio': {'excellent': 8, 'good': 12, 'fair': 18, 'poor': 25},
+                'roe': {'excellent': 0.15, 'good': 0.10, 'fair': 0.06, 'poor': 0.03},
+                'pb_ratio': {'excellent': 0.8, 'good': 1.5, 'fair': 2.5, 'poor': 4.0},
+                'debt_to_equity': {'excellent': 0.4, 'good': 0.8, 'fair': 1.5, 'poor': 2.5}
+            },
+            'Consumer Cyclical': {
+                'pe_ratio': {'excellent': 12, 'good': 18, 'fair': 25, 'poor': 35},
+                'roe': {'excellent': 0.18, 'good': 0.12, 'fair': 0.08, 'poor': 0.04},
+                'pb_ratio': {'excellent': 1.2, 'good': 2.5, 'fair': 4.0, 'poor': 6.0},
+                'debt_to_equity': {'excellent': 0.3, 'good': 0.6, 'fair': 1.2, 'poor': 2.0}
+            },
+            'Consumer Defensive': {
+                'pe_ratio': {'excellent': 15, 'good': 20, 'fair': 28, 'poor': 35},
+                'roe': {'excellent': 0.20, 'good': 0.15, 'fair': 0.10, 'poor': 0.06},
+                'pb_ratio': {'excellent': 2.0, 'good': 3.5, 'fair': 5.0, 'poor': 7.0},
+                'debt_to_equity': {'excellent': 0.4, 'good': 0.8, 'fair': 1.5, 'poor': 2.5}
+            }
+        }
+        
+        # 如果找不到特定行业，使用默认基准
+        return industry_specific_benchmarks.get(sector, self.benchmarks)
+    
+    def _get_industry_summary(self, score: float) -> str:
+        """生成行业对比总结"""
+        if score >= 0.75:
+            return "行业内表现优秀"
+        elif score >= 0.60:
+            return "行业内表现良好"
+        elif score >= 0.45:
+            return "行业内表现平均"
+        elif score >= 0.30:
+            return "行业内表现较差"
+        else:
+            return "行业内表现落后"
+    
+    def _generate_warning_alerts(self, symbol: str, data: Dict, total_score: float) -> Dict:
+        """生成预警提示（第二个专家建议的实现）"""
+        alerts = {
+            'valuation_alerts': [],
+            'fundamental_alerts': [],
+            'risk_alerts': [],
+            'alert_level': 'low'  # low, medium, high
+        }
+        
+        try:
+            # 估值预警
+            pe_ratio = data.get('trailingPE', 0)
+            if pe_ratio > 0:
+                # 获取历史PE均值（简化处理，使用行业基准作为历史均值）
+                sector = data.get('sector', 'Unknown')
+                industry_benchmarks = self._get_industry_benchmarks(sector)
+                historical_pe_avg = industry_benchmarks['pe_ratio']['good']
+                
+                if pe_ratio > historical_pe_avg * 1.5:
+                    alerts['valuation_alerts'].append({
+                        'type': 'PE_OVERVALUATION',
+                        'message': f'PE比率 {pe_ratio:.2f} 超过历史平均的150%，估值过高预警',
+                        'severity': 'high',
+                        'current_value': pe_ratio,
+                        'benchmark': historical_pe_avg * 1.5
+                    })
+                    alerts['alert_level'] = 'high'
+            
+            # 基本面恶化预警
+            roe = data.get('returnOnEquity', 0)
+            profit_margin = data.get('profitMargins', 0)
+            
+            if roe < 0.05 and profit_margin < 0.02:  # ROE低于5%且利润率低于2%
+                alerts['fundamental_alerts'].append({
+                    'type': 'FUNDAMENTAL_DETERIORATION',
+                    'message': f'基本面恶化：ROE {roe:.2%}，利润率 {profit_margin:.2%}，基本面恶化提示',
+                    'severity': 'high',
+                    'roe': roe,
+                    'profit_margin': profit_margin
+                })
+                if alerts['alert_level'] != 'high':
+                    alerts['alert_level'] = 'medium'
+            
+            # 波动风险预警
+            beta = data.get('beta', 1.0)
+            debt_to_equity = data.get('debtToEquity', 0) / 100  # 转换为比率
+            
+            # 模拟VIX检查（实际应该从外部数据获取）
+            simulated_vix = 20  # 默认VIX值，实际使用时应该获取真实VIX
+            
+            if simulated_vix > 30 and beta > 1.5:
+                alerts['risk_alerts'].append({
+                    'type': 'VOLATILITY_RISK',
+                    'message': f'波动风险预警：VIX {simulated_vix}，Beta {beta:.2f}，市场波动风险较高',
+                    'severity': 'medium',
+                    'vix': simulated_vix,
+                    'beta': beta
+                })
+                if alerts['alert_level'] == 'low':
+                    alerts['alert_level'] = 'medium'
+            
+            # 债务风险预警
+            if debt_to_equity > 2.0:  # 债务权益比超过200%
+                alerts['risk_alerts'].append({
+                    'type': 'DEBT_RISK',
+                    'message': f'债务风险预警：债务权益比 {debt_to_equity:.2f}，财务杠杆过高',
+                    'severity': 'medium',
+                    'debt_to_equity': debt_to_equity
+                })
+                if alerts['alert_level'] == 'low':
+                    alerts['alert_level'] = 'medium'
+            
+            # 综合评分下降预警
+            if total_score < 0.4:
+                alerts['fundamental_alerts'].append({
+                    'type': 'SCORE_DECLINE',
+                    'message': f'综合评分 {total_score:.2f} 偏低，整体投资价值下降',
+                    'severity': 'medium',
+                    'score': total_score
+                })
+                if alerts['alert_level'] == 'low':
+                    alerts['alert_level'] = 'medium'
+            
+            return alerts
+            
+        except Exception as e:
+            logger.error(f"生成预警信息失败 {symbol}: {e}")
+            return alerts

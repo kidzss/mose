@@ -41,7 +41,12 @@ class AlphaVantageClient:
             try:
                 with open(config_path, 'r', encoding='utf-8') as f:
                     config = json.load(f)
-                    return config.get('api_key', '')
+                    api_key = config.get('api_key', '')
+                    
+                    # 检查是否为有效的API密钥
+                    if api_key and api_key not in ['', 'demo', '请将此处替换为您的真实API密钥']:
+                        return api_key
+                    
             except Exception as e:
                 print(f"读取Alpha Vantage配置失败: {e}")
         

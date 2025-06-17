@@ -176,6 +176,20 @@ class SmartDailyReportGenerator:
                 logger.error(f"财务分析模块初始化失败: {e}")
                 self.financial_analyzer = None
         
+        # 初始化增强分析器（新功能）
+        self.enhanced_analyzer = None
+        try:
+            from monitor.enhanced_stock_analyzer import EnhancedStockAnalyzer
+            self.enhanced_analyzer = EnhancedStockAnalyzer()
+            if self.enhanced_analyzer.is_available():
+                logger.info("增强分析器初始化成功")
+            else:
+                logger.warning("增强分析器无可用功能模块")
+                self.enhanced_analyzer = None
+        except Exception as e:
+            logger.warning(f"增强分析器初始化失败: {e}")
+            self.enhanced_analyzer = None
+        
         # 设置中文字体支持
         self._setup_chinese_font()
         
@@ -611,6 +625,36 @@ class SmartDailyReportGenerator:
                         logger.warning(f"{symbol} 财务数据不可用")
                 except Exception as e:
                     logger.error(f"{symbol} 财务分析失败: {e}")
+            
+            # 增强分析（新功能集成）
+            if self.enhanced_analyzer:
+                try:
+                    enhanced_analysis = self.enhanced_analyzer.analyze_stock_comprehensive(symbol, current_price)
+                    if enhanced_analysis and not enhanced_analysis.get('error'):
+                        result['enhanced_analysis'] = enhanced_analysis
+                        
+                        # 记录增强分析的关键信息
+                        if 'overall_score' in enhanced_analysis:
+                            logger.info(f"{symbol} 增强分析完成 - 总体评分: {enhanced_analysis['overall_score']:.3f}, 评级: {enhanced_analysis.get('overall_rating', 'N/A')}")
+                        
+                        # 将增强分析的建议合并到主要结果中
+                        enhanced_recommendations = enhanced_analysis.get('recommendations', [])
+                        if enhanced_recommendations:
+                            if 'enhanced_recommendations' not in result:
+                                result['enhanced_recommendations'] = []
+                            result['enhanced_recommendations'].extend(enhanced_recommendations)
+                        
+                        # 将警告信息合并
+                        enhanced_warnings = enhanced_analysis.get('warnings', [])
+                        if enhanced_warnings:
+                            if 'enhanced_warnings' not in result:
+                                result['enhanced_warnings'] = []
+                            result['enhanced_warnings'].extend(enhanced_warnings)
+                            
+                    else:
+                        logger.warning(f"{symbol} 增强分析数据不可用")
+                except Exception as e:
+                    logger.error(f"{symbol} 增强分析失败: {e}")
             
             # 生成图表
             chart_path = self._create_chart(symbol, data, env_result)
@@ -1302,6 +1346,178 @@ class SmartDailyReportGenerator:
                 
                 html += """
                         </div>
+                    </div>"""
+            
+            # 添加增强分析显示（新功能）
+            if 'enhanced_analysis' in result:
+                enhanced = result['enhanced_analysis']
+                enhanced_features = enhanced.get('enhanced_features', {})
+                
+                # 根据总体评分确定背景色
+                overall_score = enhanced.get('overall_score', 0)
+                if overall_score >= 0.8:
+                    enhanced_class = "portfolio-profit"  # 绿色
+                elif overall_score >= 0.6:
+                    enhanced_class = "timing-good"  # 蓝色  
+                elif overall_score >= 0.4:
+                    enhanced_class = "timing-neutral"  # 黄色
+                else:
+                    enhanced_class = "portfolio-loss"  # 红色
+                
+                html += f"""
+                    <div class="buy-timing-info {enhanced_class}">
+                        <h4>🔧 智能增强分析 <span style="font-size: 0.8em; color: #666;">(New!)</span></h4>
+                        <div class="timing-rating">综合评级: {enhanced.get('overall_rating', 'N/A')} ({overall_score:.3f}/1.0)</div>"""
+                
+                # 显示成长性和行业比较评分
+                growth_score = enhanced.get('growth_score', 0)
+                industry_score = enhanced.get('industry_score', 0)
+                
+                # 获取行业表现信息（从正确的数据结构中提取）
+                financial_analysis = enhanced_features.get('financial_analysis', {})
+                dimensions = financial_analysis.get('dimensions', {})
+                industry_comparison = dimensions.get('industry_comparison', {})
+                
+                # 从行业比较数据中获取行业表现信息
+                industry_performance = industry_comparison.get('summary', 'N/A')
+                industry_score = industry_comparison.get('industry_adjusted_score', 0)
+                
+                # 如果没有获取到行业表现信息，尝试从其他字段获取
+                if industry_performance == 'N/A':
+                    enhanced_warnings = result.get('enhanced_warnings', [])
+                    enhanced_recommendations = result.get('enhanced_recommendations', [])
+                    for item in enhanced_warnings + enhanced_recommendations:
+                        if '行业' in item:
+                            if '优秀' in item or '领先' in item:
+                                industry_performance = '行业内优秀'
+                            elif '良好' in item:
+                                industry_performance = '行业内良好' 
+                            elif '平均' in item:
+                                industry_performance = '行业内平均'
+                            elif '较差' in item or '落后' in item:
+                                industry_performance = '行业内较差'
+                            break
+                    
+                    # 如果仍然无法获取，基于数字评分生成描述
+                    if industry_performance == 'N/A':
+                        if industry_score > 0.7:
+                            industry_performance = '行业内表现优秀'
+                        elif industry_score > 0.5:
+                            industry_performance = '行业内表现平均'
+                        elif industry_score > 0.3:
+                            industry_performance = '行业内表现较差'
+                        elif industry_score > 0:
+                            industry_performance = '行业内表现落后'
+                        else:
+                            industry_performance = '暂无行业对比数据'
+                
+                html += f"""
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
+                            <div>
+                                <strong>📈 成长性分析:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.1em; font-weight: bold;">评分: {growth_score:.3f}</span>
+                                    <div style="margin-top: 3px;">"""
+                
+                if growth_score > 0.8:
+                    html += '<span style="color: #28a745;">🚀 成长性优秀</span>'
+                elif growth_score > 0.6:
+                    html += '<span style="color: #007bff;">📊 成长性良好</span>'
+                elif growth_score > 0.4:
+                    html += '<span style="color: #ffc107;">📈 成长性一般</span>'
+                else:
+                    html += '<span style="color: #dc3545;">📉 成长性较弱</span>'
+                
+                html += f"""
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>🏆 行业比较:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.1em; font-weight: bold;">{industry_performance}</span>
+                                    <div style="margin-top: 3px;">"""
+                
+                # 基于行业表现文本设置颜色和图标
+                if '优秀' in industry_performance or '领先' in industry_performance:
+                    html += '<span style="color: #28a745;">🏆 同行业中表现突出</span>'
+                elif '良好' in industry_performance:
+                    html += '<span style="color: #007bff;">📊 同行业中表现良好</span>'
+                elif '平均' in industry_performance:
+                    html += '<span style="color: #ffc107;">⚖️ 同行业中表现平均</span>'
+                elif '较差' in industry_performance or '落后' in industry_performance:
+                    html += '<span style="color: #dc3545;">📉 同行业中表现落后</span>'
+                else:
+                    html += '<span style="color: #6c757d;">❓ 行业对比数据不足</span>'
+                
+                html += """
+                                    </div>
+                                </div>
+                            </div>
+                        </div>"""
+                
+                # 显示增强功能详情
+                if enhanced_features:
+                    html += """
+                        <div style="margin: 15px 0;">
+                            <strong>🔍 增强功能详情:</strong>
+                            <div style="margin: 8px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">"""
+                    
+                    if 'financial_analysis' in enhanced_features:
+                        fa_data = enhanced_features['financial_analysis']
+                        warnings = fa_data.get('warnings', [])
+                        warning_count = len(warnings)
+                        
+                        html += f"""
+                                <div style="padding: 8px; background: rgba(255,255,255,0.5); border-radius: 5px;">
+                                    <strong>💼 财务深度分析</strong><br>
+                                    <small>包含行业基准对比</small>
+                                    {f'<br><span style="color: #dc3545;">⚠️ {warning_count}个风险警告</span>' if warning_count > 0 else '<br><span style="color: #28a745;">✅ 无重大风险</span>'}
+                                </div>"""
+                    
+                    if 'exit_strategy' in enhanced_features:
+                        exit_data = enhanced_features['exit_strategy']
+                        should_exit = exit_data.get('should_exit', False)
+                        exit_reason = exit_data.get('exit_reason', 'N/A')
+                        
+                        html += f"""
+                                <div style="padding: 8px; background: rgba(255,255,255,0.5); border-radius: 5px;">
+                                    <strong>🔄 智能退出策略</strong><br>
+                                    <small>动态止损止盈分析</small>
+                                    {'<br><span style="color: #dc3545;">🚨 建议退出</span>' if should_exit else '<br><span style="color: #28a745;">✅ 持有信号</span>'}
+                                </div>"""
+                    
+                    html += """
+                            </div>
+                        </div>"""
+                
+                # 显示增强建议
+                enhanced_recommendations = result.get('enhanced_recommendations', [])
+                if enhanced_recommendations:
+                    html += """
+                        <div style="margin: 15px 0;">
+                            <strong>💡 智能投资建议:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for rec in enhanced_recommendations[:4]:  # 最多显示4个建议
+                        html += f"<li>{rec}</li>"
+                    
+                    html += "</ul></div>"
+                
+                # 显示增强警告
+                enhanced_warnings = result.get('enhanced_warnings', [])
+                if enhanced_warnings:
+                    html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 0 5px 5px 0;">
+                            <strong>⚠️ 风险提醒:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for warning in enhanced_warnings[:3]:  # 最多显示3个警告
+                        html += f"<li>{warning}</li>"
+                    
+                    html += "</ul></div>"
+                
+                html += """
                     </div>"""
             
             # 添加图表显示

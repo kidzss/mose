@@ -58,6 +58,18 @@ class PersonalInvestorAutomation:
             'min_score': 60,               # 最低评分
         }
         
+        # 初始化增强分析器（Phase 2新功能）
+        self.enhanced_analyzer = None
+        try:
+            from monitor.enhanced_stock_analyzer import EnhancedStockAnalyzer
+            from monitor.enhanced_stock_screener import EnhancedStockScreener
+            self.enhanced_analyzer = EnhancedStockAnalyzer()
+            self.enhanced_screener = EnhancedStockScreener()
+            logger.info("✅ 增强分析器和筛选器集成成功")
+        except Exception as e:
+            logger.warning(f"增强分析器初始化失败: {e}")
+            self.enhanced_screener = None
+        
         # 加载个人配置
         self._load_personal_config()
         
@@ -149,17 +161,94 @@ class PersonalInvestorAutomation:
                 min_score = 60
                 min_quality = 0.7
             
-            # 执行筛选
-            results = self.screener.screen_stocks_professional(
-                min_score=min_score,
-                max_results=self.config['max_results']
-            )
+            # Phase 2: 使用增强筛选器（集成专家建议）
+            if self.enhanced_screener:
+                logger.info("🚀 使用增强筛选器进行智能选股...")
+                
+                # 获取候选股票池
+                watchlist = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF', 
+                           'AAPL', 'META', 'NFLX', 'CRM', 'ORCL']
+                
+                # 转换评分标准：0-100 -> 0-1
+                enhanced_min_score = min_score / 100.0
+                
+                # 使用增强筛选器
+                enhanced_results = self.enhanced_screener.screen_stocks(
+                    watchlist, 
+                    min_score=enhanced_min_score
+                )
+                
+                # 转换为兼容格式
+                high_quality_results = []
+                for result in enhanced_results[:self.config['max_results']]:
+                    stock_data = {
+                        'symbol': result['symbol'],
+                        'current_price': result['current_price'],
+                        'enhanced_score': result['enhanced_score'],
+                        'traditional_score': result['traditional_score'],
+                        'growth_score': result['growth_score'], 
+                        'industry_score': result['industry_score'],
+                        'price_targets': result['price_targets'],
+                        'enhanced_analysis': {
+                            'recommendations': result['recommendations'],
+                            'warnings': result['warnings']
+                        },
+                        'quality_factor': result['enhanced_score']  # 兼容性
+                    }
+                    high_quality_results.append(stock_data)
+                
+                logger.info(f"🎯 增强筛选完成，推荐 {len(high_quality_results)} 只股票")
+                
+            else:
+                # 回退到传统筛选
+                logger.info("📊 使用传统筛选器...")
+                results = self.screener.screen_stocks_professional(
+                    min_score=min_score,
+                    max_results=self.config['max_results']
+                )
+                
+                # 过滤高质量股票
+                high_quality_results = [
+                    stock for stock in results 
+                    if stock['quality_factor'] >= min_quality
+                ]
             
-            # 过滤高质量股票
-            high_quality_results = [
-                stock for stock in results 
-                if stock['quality_factor'] >= min_quality
-            ]
+            # 应用额外的增强分析（如果可用）
+            if self.enhanced_analyzer and high_quality_results and not self.enhanced_screener:
+                logger.info("🔍 开始应用增强分析过滤...")
+                enhanced_results = []
+                
+                for stock in high_quality_results:
+                    try:
+                        # 获取增强分析
+                        enhanced_analysis = self.enhanced_analyzer.analyze_stock_enhanced(
+                            stock['symbol'], 
+                            current_price=stock.get('current_price')
+                        )
+                        
+                        if enhanced_analysis:
+                            # 添加增强分析结果到股票数据
+                            stock['enhanced_analysis'] = enhanced_analysis
+                            
+                            # 应用风险过滤：排除高风险警告的股票
+                            warnings = enhanced_analysis.get('warnings', [])
+                            high_risk_warnings = [w for w in warnings if '高风险' in w or 'High Risk' in w]
+                            
+                            if not high_risk_warnings:
+                                enhanced_results.append(stock)
+                                logger.info(f"✅ {stock['symbol']} 通过增强分析过滤")
+                            else:
+                                logger.warning(f"⚠️ {stock['symbol']} 被过滤：{high_risk_warnings[0]}")
+                        else:
+                            # 如果无法获取增强分析，保留原始推荐
+                            enhanced_results.append(stock)
+                            
+                    except Exception as e:
+                        logger.warning(f"{stock['symbol']} 增强分析失败: {e}")
+                        enhanced_results.append(stock)  # 失败时保留
+                
+                high_quality_results = enhanced_results
+                logger.info(f"📊 增强分析完成，最终推荐 {len(high_quality_results)} 只股票")
             
             if high_quality_results:
                 # 生成个性化投资建议
@@ -397,12 +486,33 @@ class PersonalInvestorAutomation:
                     <th>质量因子</th>
                     <th>夏普比率</th>
                     <th>当前价格</th>
+                    <th>建议买入</th>
+                    <th>目标卖出</th>
+                    <th>止损价格</th>
+                    <th>增强评分</th>
+                    <th>成长性</th>
+                    <th>行业表现</th>
                     <th>投资建议</th>
                 </tr>
         """
         
         for i, stock in enumerate(results[:10], 1):
             quality_class = "high-quality" if stock['quality_factor'] > 0.8 else ""
+            
+            # 获取价格目标信息
+            price_targets = stock.get('price_targets', {})
+            buy_price = price_targets.get('buy_price', 'N/A')
+            sell_price = price_targets.get('sell_price', 'N/A')
+            stop_loss = price_targets.get('stop_loss', 'N/A')
+            
+            # 获取增强分析信息
+            enhanced_analysis = stock.get('enhanced_analysis', {})
+            enhanced_score = stock.get('enhanced_score', enhanced_analysis.get('overall_score', 0)) * 100
+            growth_score = stock.get('growth_score', 0) * 100
+            
+            # 获取行业表现信息
+            industry_performance = self._get_industry_performance(stock)
+            
             html_content += f"""
                 <tr class="{quality_class}">
                     <td>{i}</td>
@@ -411,7 +521,13 @@ class PersonalInvestorAutomation:
                     <td>{stock['quality_factor']:.3f}</td>
                     <td>{stock['sharpe_ratio']:.2f}</td>
                     <td>${stock['current_price']:.2f}</td>
-                    <td>{self._get_investment_advice(stock)}</td>
+                    <td>${buy_price}</td>
+                    <td>${sell_price}</td>
+                    <td>${stop_loss}</td>
+                    <td>{enhanced_score:.1f}</td>
+                    <td>{growth_score:.1f}</td>
+                    <td>{industry_performance}</td>
+                    <td>{self._get_enhanced_investment_advice(stock)}</td>
                 </tr>
             """
         
@@ -421,10 +537,14 @@ class PersonalInvestorAutomation:
             <div class="investment-tips">
                 <h3>💡 个人投资建议</h3>
                 <ul>
+                    <li><strong>🆕 智能价格指导</strong>: 基于增强评分和专家建议计算的买卖点</li>
+                    <li><strong>建议买入价格</strong>: 考虑了风险和成长性的合理买入点</li>
+                    <li><strong>目标卖出价格</strong>: 基于成长潜力和行业地位的目标价位</li>
+                    <li><strong>止损价格</strong>: 风险控制价位，跌破建议考虑止损</li>
                     <li><strong>分批建仓</strong>: 建议分3-4次买入，每次25%仓位</li>
-                    <li><strong>止损设置</strong>: 单只股票亏损超过15%时考虑减仓</li>
-                    <li><strong>持有期限</strong>: 建议至少持有1-2年，给价值回归时间</li>
-                    <li><strong>定期检查</strong>: 每月检查一次持仓，但不要频繁交易</li>
+                    <li><strong>🆕 行业比较</strong>: 显示在同行业中的相对表现水平</li>
+                    <li><strong>🆕 成长性分析</strong>: 评估了EPS增长率和自由现金流质量</li>
+                    <li><strong>🆕 专家建议集成</strong>: FCF打分、成长性跟踪、预警提示全面集成</li>
                 </ul>
             </div>
             
@@ -503,6 +623,76 @@ class PersonalInvestorAutomation:
             return "谨慎推荐，小仓位试仓"
         else:
             return "观望，等待更好机会"
+    
+    def _get_industry_performance(self, stock):
+        """获取行业表现信息"""
+        try:
+            # 优先从增强分析中获取
+            enhanced_analysis = stock.get('enhanced_analysis', {})
+            financial_analysis = enhanced_analysis.get('enhanced_features', {}).get('financial_analysis', {})
+            
+            # 尝试从dimensions中获取行业比较信息
+            dimensions = financial_analysis.get('dimensions', {})
+            industry_comparison = dimensions.get('industry_comparison', {})
+            industry_performance = industry_comparison.get('summary', 'N/A')
+            
+            # 如果没有获取到，尝试从其他字段获取
+            if industry_performance == 'N/A':
+                industry_performance = financial_analysis.get('industry_summary', 'N/A')
+            
+            # 如果还是没有，尝试从警告和建议中提取
+            if industry_performance == 'N/A':
+                warnings = enhanced_analysis.get('warnings', [])
+                recommendations = enhanced_analysis.get('recommendations', [])
+                for item in warnings + recommendations:
+                    if '行业' in item:
+                        if '优秀' in item:
+                            industry_performance = '行业内优秀'
+                        elif '良好' in item:
+                            industry_performance = '行业内良好' 
+                        elif '平均' in item:
+                            industry_performance = '行业内平均'
+                        elif '较差' in item or '落后' in item:
+                            industry_performance = '行业内较差'
+                        break
+            
+            return industry_performance if industry_performance != 'N/A' else '数据不可用'
+            
+        except Exception as e:
+            return '数据获取失败'
+    
+    def _get_enhanced_investment_advice(self, stock):
+        """获取增强版投资建议（Phase 2新功能）"""
+        quality = stock['quality_factor']
+        score = stock['multifactor_score']
+        
+        # 获取增强分析信息
+        enhanced_analysis = stock.get('enhanced_analysis', {})
+        enhanced_score = enhanced_analysis.get('overall_score', 0)
+        warnings = enhanced_analysis.get('warnings', [])
+        recommendations = enhanced_analysis.get('recommendations', [])
+        
+        # 有警告信息的情况
+        if warnings:
+            return f"谨慎：{warnings[0][:20]}..."
+        
+        # 基于增强评分的建议
+        if enhanced_score > 0.8 and quality > 0.8 and score > 70:
+            advice = "🟢 强烈推荐"
+            if recommendations:
+                advice += f"，{recommendations[0][:15]}..."
+            return advice
+        elif enhanced_score > 0.7 and quality > 0.7 and score > 60:
+            advice = "🔵 推荐买入"
+            if recommendations:
+                advice += f"，{recommendations[0][:15]}..."
+            return advice
+        elif enhanced_score > 0.6 and quality > 0.6 and score > 55:
+            return "🟡 小仓位试仓"
+        elif enhanced_score > 0.4:
+            return "🟠 观望为主"
+        else:
+            return "🔴 暂时回避"
     
     def setup_schedule(self):
         """设置定时任务"""

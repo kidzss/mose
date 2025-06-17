@@ -1,0 +1,9 @@
+{
+  "api_key": "RVL2DJ86MVIKC3N9",
+  "call_interval": 12,
+  "cache_enabled": true,
+  "cache_duration_hours": 24,
+  "max_retries": 3,
+  "timeout_seconds": 30,
+  "note": "免费版API限制：每分钟5次调用，每天500次调用"
+} 
