@@ -30,6 +30,7 @@ class FinancialAnalyzer:
         self.benchmarks = {
             'pe_ratio': {'excellent': 15, 'good': 20, 'fair': 25, 'poor': 30},
             'peg_ratio': {'excellent': 1.0, 'good': 1.5, 'fair': 2.0, 'poor': 2.5},
+            'pb_ratio': {'excellent': 1.5, 'good': 3.0, 'fair': 5.0, 'poor': 7.0},
             'debt_to_equity': {'excellent': 0.3, 'good': 0.6, 'fair': 1.0, 'poor': 1.5},
             'roe': {'excellent': 0.15, 'good': 0.12, 'fair': 0.08, 'poor': 0.05},
             'profit_margin': {'excellent': 0.15, 'good': 0.10, 'fair': 0.05, 'poor': 0.02},
@@ -698,6 +699,9 @@ class FinancialAnalyzer:
             try:
                 current_pb = data.get('priceToBook', data.get('pb_ratio', 0))
                 if current_pb and current_pb > 0:
+                    # 确保行业基准存在pb_ratio字段
+                    if 'pb_ratio' not in industry_benchmarks:
+                        industry_benchmarks['pb_ratio'] = {'excellent': 1.5, 'good': 3.0, 'fair': 5.0, 'poor': 7.0}
                     industry_pb_benchmark = industry_benchmarks['pb_ratio']['good']
                     if current_pb <= industry_pb_benchmark * 0.7:
                         pb_industry_score = 100

@@ -175,6 +175,31 @@ class PortfolioAnalysisScheduler:
             logger.error(f"每周持股分析失败: {e}")
             return False
     
+    def _check_and_run_monthly_analysis(self):
+        """检查是否是每月第一个周日，如果是则运行月度分析"""
+        try:
+            today = datetime.now()
+            
+            # 检查是否是每月第一个周日
+            # 获取本月第一天
+            first_day_of_month = today.replace(day=1)
+            
+            # 找到本月第一个周日
+            days_until_sunday = (6 - first_day_of_month.weekday()) % 7
+            first_sunday = first_day_of_month + timedelta(days=days_until_sunday)
+            
+            # 如果今天是本月第一个周日，则运行月度分析
+            if today.date() == first_sunday.date():
+                logger.info("📅 今天是本月第一个周日，运行月度分析")
+                return self.run_monthly_analysis()
+            else:
+                logger.info("📅 今天不是本月第一个周日，跳过月度分析")
+                return False
+                
+        except Exception as e:
+            logger.error(f"检查月度分析时间失败: {e}")
+            return False
+    
     def run_monthly_analysis(self):
         """运行每月持股组合优化分析"""
         try:
@@ -318,7 +343,8 @@ class PortfolioAnalysisScheduler:
             
             # 每月组合优化 - 每月第一个周日20:00
             if self.config['monthly_enabled']:
-                schedule.every().month.at(self.config['monthly_time']).do(self.run_monthly_analysis)
+                # schedule库不支持month，改为每周日检查是否是月初第一个周日
+                schedule.every().sunday.at(self.config['monthly_time']).do(self._check_and_run_monthly_analysis)
             
             logger.info("✅ 持股分析定时任务设置完成")
             

@@ -1,33 +1,29 @@
 ﻿@echo off
 chcp 65001 >nul
-cd /d "%~dp0"
+echo ========================================
+echo 🚀 个人投资自动化系统启动器
+echo ========================================
 echo.
-echo ==========================================
-echo 🚀 Personal Investor Automation System
-echo ==========================================
+
+echo 📋 正在激活conda环境 (openbb)...
+call conda activate openbb
+if %errorlevel% neq 0 (
+    echo ❌ conda环境激活失败！
+    echo 请确保已安装conda并配置了openbb环境
+    pause
+    exit /b 1
+)
+
+echo ✅ conda环境激活成功
 echo.
-echo 📊 System Features:
-echo    ✓ Weekly stock screening
-echo    ✓ Monthly portfolio analysis  
-echo    ✓ Quarterly strategy adjustment
-echo    ✓ Automatic market data updates
-echo    ✓ Personalized investment emails
-echo.
-echo ⏰ Schedule:
-echo    - Weekly screening: Sunday 20:00
-echo    - Monthly analysis: First Sunday 20:00
-echo    - Quarterly adjustment: First Sunday 20:00
-echo.
-echo 📧 Email will be sent to: kidzss@gmail.com
-echo 🎯 Risk preference: Moderate risk
-echo 💰 Max position: 20%%
-echo.
-echo 🛑 Press Ctrl+C to stop service
-echo ==========================================
+
+echo 📊 启动个人投资自动化系统...
+echo 💡 系统将自动筛选股票并发送投资建议邮件
 echo.
 
 python personal_investor_automation.py
 
 echo.
-echo 👋 Automation service stopped
+echo 📈 个人投资自动化系统运行完成
+echo ========================================
 pause 
