@@ -82,7 +82,7 @@ class SmartDailyReportGenerator:
                     'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
                     'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
                     'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
-                    'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
+                    'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
                     'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
                 }
         else:
@@ -1378,9 +1378,13 @@ class SmartDailyReportGenerator:
                 dimensions = financial_analysis.get('dimensions', {})
                 industry_comparison = dimensions.get('industry_comparison', {})
                 
+                # 修复数据提取逻辑 - 从正确的数据结构中获取评分
+                growth_data = dimensions.get('growth', {})
+                actual_growth_score = growth_data.get('score', growth_score)  # 优先使用dimensions中的数据
+                actual_industry_score = industry_comparison.get('industry_adjusted_score', industry_score)
+                
                 # 从行业比较数据中获取行业表现信息
                 industry_performance = industry_comparison.get('summary', 'N/A')
-                industry_score = industry_comparison.get('industry_adjusted_score', 0)
                 
                 # 如果没有获取到行业表现信息，尝试从其他字段获取
                 if industry_performance == 'N/A':
@@ -1400,13 +1404,15 @@ class SmartDailyReportGenerator:
                     
                     # 如果仍然无法获取，基于数字评分生成描述
                     if industry_performance == 'N/A':
-                        if industry_score > 0.7:
+                        if actual_industry_score > 0.7:
                             industry_performance = '行业内表现优秀'
-                        elif industry_score > 0.5:
+                        elif actual_industry_score > 0.5:
+                            industry_performance = '行业内表现良好'
+                        elif actual_industry_score > 0.3:
                             industry_performance = '行业内表现平均'
-                        elif industry_score > 0.3:
+                        elif actual_industry_score > 0.1:
                             industry_performance = '行业内表现较差'
-                        elif industry_score > 0:
+                        elif actual_industry_score > 0:
                             industry_performance = '行业内表现落后'
                         else:
                             industry_performance = '暂无行业对比数据'
@@ -1416,17 +1422,22 @@ class SmartDailyReportGenerator:
                             <div>
                                 <strong>📈 成长性分析:</strong>
                                 <div style="margin: 5px 0;">
-                                    <span style="font-size: 1.1em; font-weight: bold;">评分: {growth_score:.3f}</span>
+                                    <span style="font-size: 1.1em; font-weight: bold;">评分: {actual_growth_score:.3f}</span>
                                     <div style="margin-top: 3px;">"""
                 
-                if growth_score > 0.8:
+                # 使用实际的成长性评分进行判断
+                if actual_growth_score > 0.8:
                     html += '<span style="color: #28a745;">🚀 成长性优秀</span>'
-                elif growth_score > 0.6:
+                elif actual_growth_score > 0.6:
                     html += '<span style="color: #007bff;">📊 成长性良好</span>'
-                elif growth_score > 0.4:
+                elif actual_growth_score > 0.4:
                     html += '<span style="color: #ffc107;">📈 成长性一般</span>'
+                elif actual_growth_score > 0.2:
+                    html += '<span style="color: #fd7e14;">📉 成长性较弱</span>'
+                elif actual_growth_score > 0:
+                    html += '<span style="color: #dc3545;">⚠️ 成长性偏弱</span>'
                 else:
-                    html += '<span style="color: #dc3545;">📉 成长性较弱</span>'
+                    html += '<span style="color: #6c757d;">❓ 成长性数据不足</span>'
                 
                 html += f"""
                                     </div>

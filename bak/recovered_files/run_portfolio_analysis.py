@@ -72,7 +72,7 @@ def show_portfolio_summary():
         'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 22.12, 'investment': 5798.36},
         'PFE': {'cost': 25.899, 'shares': 80, 'weight': 7.07, 'investment': 2071.92},
         'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.95, 'investment': 5553.72},
-        'TSLA': {'cost': 254.096, 'shares': 8, 'weight': 8.72, 'investment': 2032.77},
+        'TSLA': {'cost': 179.841, 'shares': 8, 'weight': 8.72, 'investment': 2032.77},
         'ADBE': {'cost': 346.896, 'shares': 5, 'weight': 7.67, 'investment': 1734.48}
     }
     

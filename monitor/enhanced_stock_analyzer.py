@@ -162,21 +162,55 @@ class EnhancedStockAnalyzer:
                 elif rating == 'Poor':
                     recommendations.append("❌ 财务状况较差，建议避免")
                 
-                # 成长性建议
-                growth_score = financial.get('growth_score', 0)
-                if growth_score > 0.8:
-                    recommendations.append("🚀 成长性优秀，具有较大上涨潜力")
-                elif growth_score > 0.6:
-                    recommendations.append("📊 成长性良好，值得关注")
-                elif growth_score < 0.4:
-                    recommendations.append("📉 成长性较弱，注意风险")
+                # 修复成长性建议逻辑 - 从正确的数据结构中获取
+                dimensions = financial.get('dimensions', {})
+                growth_data = dimensions.get('growth', {})
+                actual_growth_score = growth_data.get('score', 0)
                 
-                # 行业比较建议
-                industry_score = financial.get('industry_score', 0)
-                if industry_score > 0.7:
-                    recommendations.append("🏆 在同行业中表现优秀")
-                elif industry_score < 0.4:
-                    recommendations.append("⚠️ 在同行业中表现落后")
+                # 使用实际的成长性评分而不是错误的字段
+                if actual_growth_score > 0.8:
+                    recommendations.append("🚀 成长性优秀，具有较大上涨潜力")
+                elif actual_growth_score > 0.6:
+                    recommendations.append("📊 成长性良好，值得关注")
+                elif actual_growth_score > 0.4:
+                    recommendations.append("📈 成长性一般，持续观察")
+                elif actual_growth_score > 0.2:
+                    recommendations.append("📉 成长性较弱，注意风险")
+                else:
+                    # 只有在评分极低时才给出负面建议
+                    if actual_growth_score > 0:
+                        recommendations.append("⚠️ 成长性偏弱，建议谨慎")
+                
+                # 修复行业比较建议逻辑 - 从正确的数据结构中获取
+                industry_data = dimensions.get('industry_comparison', {})
+                actual_industry_score = industry_data.get('industry_adjusted_score', 0)
+                industry_summary = industry_data.get('summary', 'N/A')
+                
+                # 优先使用文字描述，如果没有则使用数字评分
+                if industry_summary != 'N/A':
+                    if '优秀' in industry_summary or '领先' in industry_summary:
+                        recommendations.append("🏆 在同行业中表现优秀")
+                    elif '良好' in industry_summary:
+                        recommendations.append("📊 在同行业中表现良好")
+                    elif '平均' in industry_summary:
+                        recommendations.append("⚖️ 在同行业中表现平均")
+                    elif '较差' in industry_summary:
+                        recommendations.append("📉 在同行业中表现较差")
+                    elif '落后' in industry_summary:
+                        recommendations.append("⚠️ 在同行业中表现落后")
+                else:
+                    # 使用数字评分判断
+                    if actual_industry_score > 0.7:
+                        recommendations.append("🏆 在同行业中表现优秀")
+                    elif actual_industry_score > 0.5:
+                        recommendations.append("📊 在同行业中表现良好")
+                    elif actual_industry_score > 0.3:
+                        recommendations.append("⚖️ 在同行业中表现平均")
+                    elif actual_industry_score > 0.1:
+                        recommendations.append("📉 在同行业中表现较差")
+                    elif actual_industry_score > 0:
+                        recommendations.append("⚠️ 在同行业中表现落后")
+                    # 如果评分为0，不添加行业比较建议（可能是数据缺失）
             
             # 基于退出策略的建议
             if 'exit_strategy' in analysis_result.get('enhanced_features', {}):
@@ -198,6 +232,10 @@ class EnhancedStockAnalyzer:
             
         except Exception as e:
             logger.error(f"生成综合建议失败: {e}")
+            # 添加调试信息
+            logger.error(f"分析结果结构: {analysis_result.keys()}")
+            if 'enhanced_features' in analysis_result:
+                logger.error(f"增强功能键: {analysis_result['enhanced_features'].keys()}")
     
     def is_available(self) -> bool:
         """检查增强功能是否可用"""

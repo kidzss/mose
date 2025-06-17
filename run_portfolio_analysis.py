@@ -82,7 +82,7 @@ def show_portfolio_summary():
             'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
             'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
             'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
-            'TSLA': {'cost': 254.096, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
+            'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
             'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
         }
         watchlist = ['MSFT', 'ADBE', 'PHM', 'CF']

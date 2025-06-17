@@ -120,8 +120,19 @@ class PersonalInvestorAutomation:
         try:
             logger.info("📊 开始更新市场数据...")
             
-            # 获取需要更新的股票列表
-            watchlist = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF']
+                        # 获取需要更新的股票列表 - 从数据库获取全量股票
+            try:
+                from data.data_interface import DataInterface
+                db_interface = DataInterface()
+                watchlist = db_interface.get_available_symbols()
+                logger.info(f"📊 准备更新 {len(watchlist)} 只股票的数据")
+                # 为了避免更新时间过长，只更新前100只最活跃的股票
+                if len(watchlist) > 100:
+                    watchlist = watchlist[:100]
+                    logger.info(f"📊 为提高效率，仅更新前 {len(watchlist)} 只股票")
+            except Exception as e:
+                logger.warning(f"无法获取数据库股票池，使用默认股票池: {e}")
+                watchlist = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF']
             
             # 更新股票数据
             updated_count = 0
@@ -165,9 +176,16 @@ class PersonalInvestorAutomation:
             if self.enhanced_screener:
                 logger.info("🚀 使用增强筛选器进行智能选股...")
                 
-                # 获取候选股票池
-                watchlist = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF', 
-                           'AAPL', 'META', 'NFLX', 'CRM', 'ORCL']
+                # 获取候选股票池 - 从MySQL数据库获取全量股票
+                try:
+                    from data.data_interface import DataInterface
+                    db_interface = DataInterface()
+                    watchlist = db_interface.get_available_symbols()
+                    logger.info(f"📊 从数据库获取到 {len(watchlist)} 只股票进行筛选")
+                except Exception as e:
+                    logger.warning(f"无法获取数据库股票池，使用默认股票池: {e}")
+                    watchlist = ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'ADBE', 'MSFT', 'EOG', 'PHM', 'CF', 
+                               'AAPL', 'META', 'NFLX', 'CRM', 'ORCL']
                 
                 # 转换评分标准：0-100 -> 0-1
                 enhanced_min_score = min_score / 100.0
@@ -181,6 +199,9 @@ class PersonalInvestorAutomation:
                 # 转换为兼容格式
                 high_quality_results = []
                 for result in enhanced_results[:self.config['max_results']]:
+                    # 计算简化的夏普比率 (基于增强评分)
+                    sharpe_ratio = result['enhanced_score'] * 2.0  # 简化计算，范围0-2
+                    
                     stock_data = {
                         'symbol': result['symbol'],
                         'current_price': result['current_price'],
@@ -193,7 +214,8 @@ class PersonalInvestorAutomation:
                             'recommendations': result['recommendations'],
                             'warnings': result['warnings']
                         },
-                        'quality_factor': result['enhanced_score']  # 兼容性
+                        'quality_factor': result['enhanced_score'],  # 兼容性
+                        'sharpe_ratio': sharpe_ratio  # 添加夏普比率
                     }
                     high_quality_results.append(stock_data)
                 
@@ -517,9 +539,9 @@ class PersonalInvestorAutomation:
                 <tr class="{quality_class}">
                     <td>{i}</td>
                     <td><strong>{stock['symbol']}</strong></td>
-                    <td>{stock['multifactor_score']:.1f}</td>
+                    <td>{stock.get('multifactor_score', stock.get('enhanced_score', 0) * 100):.1f}</td>
                     <td>{stock['quality_factor']:.3f}</td>
-                    <td>{stock['sharpe_ratio']:.2f}</td>
+                    <td>{stock.get('sharpe_ratio', 0.0):.2f}</td>
                     <td>${stock['current_price']:.2f}</td>
                     <td>${buy_price}</td>
                     <td>${sell_price}</td>
@@ -613,7 +635,7 @@ class PersonalInvestorAutomation:
     def _get_investment_advice(self, stock):
         """获取投资建议"""
         quality = stock['quality_factor']
-        score = stock['multifactor_score']
+        score = stock.get('multifactor_score', stock.get('enhanced_score', 0) * 100)
         
         if quality > 0.8 and score > 70:
             return "强烈推荐，可考虑重仓"
@@ -664,7 +686,7 @@ class PersonalInvestorAutomation:
     def _get_enhanced_investment_advice(self, stock):
         """获取增强版投资建议（Phase 2新功能）"""
         quality = stock['quality_factor']
-        score = stock['multifactor_score']
+        score = stock.get('multifactor_score', stock.get('enhanced_score', 0) * 100)
         
         # 获取增强分析信息
         enhanced_analysis = stock.get('enhanced_analysis', {})
