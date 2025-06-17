@@ -25,6 +25,22 @@ from data.data_interface import DataInterface
 from data.data_updater import MarketDataUpdater
 from config.trading_config import default_config
 
+# 添加宏观分析模块
+try:
+    from analysis.portfolio_macro_integration import PortfolioMacroIntegration
+    MACRO_ANALYSIS_AVAILABLE = True
+except ImportError:
+    MACRO_ANALYSIS_AVAILABLE = False
+    logger.warning("宏观分析模块不可用，将跳过宏观分析部分")
+
+# 添加财务分析模块
+try:
+    from monitor.financial_analyzer import FinancialAnalyzer
+    FINANCIAL_ANALYSIS_AVAILABLE = True
+except ImportError:
+    FINANCIAL_ANALYSIS_AVAILABLE = False
+    logger.warning("财务分析模块不可用，将跳过财务分析部分")
+
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
@@ -140,6 +156,26 @@ class SmartDailyReportGenerator:
         self.signal_evaluator = SignalQualityEvaluator()
         self.alert_system = AdvancedAlertSystem()
         
+        # 初始化宏观分析器
+        self.macro_integration = None
+        if MACRO_ANALYSIS_AVAILABLE:
+            try:
+                self.macro_integration = PortfolioMacroIntegration()
+                logger.info("宏观分析模块初始化成功")
+            except Exception as e:
+                logger.error(f"宏观分析模块初始化失败: {e}")
+                self.macro_integration = None
+        
+        # 初始化财务分析器
+        self.financial_analyzer = None
+        if FINANCIAL_ANALYSIS_AVAILABLE:
+            try:
+                self.financial_analyzer = FinancialAnalyzer()
+                logger.info("财务分析模块初始化成功")
+            except Exception as e:
+                logger.error(f"财务分析模块初始化失败: {e}")
+                self.financial_analyzer = None
+        
         # 设置中文字体支持
         self._setup_chinese_font()
         
@@ -168,20 +204,71 @@ class SmartDailyReportGenerator:
             logger.info("🔄 切换到Yahoo Finance数据源...")
             
             try:
-                # 回退到Yahoo Finance
-                self.data_interface = DataInterface(default_source='yahoo')
+                # 回退到Yahoo Finance - 使用简单的初始化方式
+                from data.data_interface import YahooFinanceDataSource
+                yahoo_source = YahooFinanceDataSource()
+                
+                # 创建一个简单的数据接口包装器
+                self.data_interface = yahoo_source
                 self.data_updater = None  # Yahoo Finance不需要数据更新器
                 self.auto_update_data = False  # 禁用自动更新
                 self.data_source_type = "Yahoo Finance"
                 logger.info("✅ Yahoo Finance数据源连接成功")
                 
             except Exception as e2:
-                logger.error(f"Yahoo Finance连接也失败: {e2}")
+                logger.error(f"Yahoo Finance连接失败: {e2}")
                 logger.info("🔄 使用模拟数据模式...")
-                self.data_interface = None
+                self._init_mock_data_interface()
                 self.data_updater = None
                 self.auto_update_data = False
                 self.data_source_type = "模拟数据"
+    
+    def _init_mock_data_interface(self):
+        """初始化模拟数据接口"""
+        class MockDataInterface:
+            def get_historical_data(self, symbol, start_date, end_date, timeframe='daily'):
+                """返回模拟的历史数据"""
+                import numpy as np
+                
+                # 生成日期范围
+                dates = pd.date_range(start=start_date, end=end_date, freq='D')
+                dates = dates[dates.weekday < 5]  # 只保留工作日
+                
+                if len(dates) == 0:
+                    return pd.DataFrame()
+                
+                # 生成模拟价格数据
+                np.random.seed(hash(symbol) % 1000)  # 为每个股票使用固定种子
+                base_price = {"AMD": 126.50, "GOOGL": 176.80, "NVDA": 144.60, 
+                             "PFE": 28.50, "TSLA": 250.00, "EOG": 125.00,
+                             "MSFT": 430.00, "ADBE": 395.00, "PHM": 101.50, "CF": 99.90}.get(symbol, 100.0)
+                
+                prices = []
+                current_price = base_price
+                
+                for i in range(len(dates)):
+                    # 随机波动 -2% 到 +2%
+                    change = np.random.normal(0, 0.02)
+                    current_price *= (1 + change)
+                    prices.append(current_price)
+                
+                prices = np.array(prices)
+                
+                # 创建OHLCV数据
+                data = pd.DataFrame({
+                    'date': dates,
+                    'open': prices * (1 + np.random.normal(0, 0.005, len(prices))),
+                    'high': prices * (1 + np.abs(np.random.normal(0, 0.01, len(prices)))),
+                    'low': prices * (1 - np.abs(np.random.normal(0, 0.01, len(prices)))),
+                    'close': prices,
+                    'volume': np.random.randint(1000000, 10000000, len(prices)),
+                    'adj_close': prices * (1 + np.random.normal(0, 0.001, len(prices)))
+                })
+                
+                data.set_index('date', inplace=True)
+                return data
+        
+        self.data_interface = MockDataInterface()
     
     def _setup_chinese_font(self):
         """设置中文字体支持"""
@@ -262,7 +349,13 @@ class SmartDailyReportGenerator:
                 # 如果索引不是DatetimeIndex，尝试获取最大日期
                 latest_date = pd.to_datetime(data.index).max()
             
-            days_old = (datetime.now().date() - latest_date.date()).days
+            # 安全地获取日期 - 处理不同的日期类型
+            if hasattr(latest_date, 'date'):
+                latest_date_obj = latest_date.date()
+            else:
+                latest_date_obj = latest_date
+            
+            days_old = (datetime.now().date() - latest_date_obj).days
             
             if days_old > 7:
                 logger.warning(f"{symbol} 数据较旧（{days_old}天前），可能需要更新")
@@ -321,12 +414,22 @@ class SmartDailyReportGenerator:
     
     def _check_data_quality(self, symbol: str, data: pd.DataFrame) -> Dict[str, any]:
         """检查数据质量"""
+        # 安全地获取日期 - 处理不同的日期类型
+        def safe_get_date(dt_obj):
+            if hasattr(dt_obj, 'date'):
+                return dt_obj.date()
+            else:
+                return dt_obj
+        
+        first_date = safe_get_date(data.index[0])
+        last_date = safe_get_date(data.index[-1])
+        
         quality_info = {
             'symbol': symbol,
             'total_records': len(data),
-            'date_range': f"{data.index[0].date()} 到 {data.index[-1].date()}",
-            'latest_date': data.index[-1].date(),
-            'days_old': (datetime.now().date() - data.index[-1].date()).days,
+            'date_range': f"{first_date} 到 {last_date}",
+            'latest_date': last_date,
+            'days_old': (datetime.now().date() - last_date).days,
             'missing_data_pct': data.isnull().sum().sum() / (len(data) * len(data.columns)) * 100,
             'has_sufficient_data': len(data) >= 60
         }
@@ -379,8 +482,10 @@ class SmartDailyReportGenerator:
             
             # 计算当前市值和盈亏
             current_value = current_price * shares
-            pnl_amount = current_value - investment_amount
-            pnl_percent = (pnl_amount / investment_amount) * 100
+            # 正确的盈亏计算：当前市值 - 成本（成本价 * 股数）
+            cost_basis = cost_price * shares
+            pnl_amount = current_value - cost_basis
+            pnl_percent = (pnl_amount / cost_basis) * 100 if cost_basis > 0 else 0
             
             result['portfolio'] = {
                 'cost_price': cost_price,
@@ -495,6 +600,18 @@ class SmartDailyReportGenerator:
             result['signal_quality'] = signal_eval['quality_score']
             result['signal_strength'] = signal_eval['strength'].value
             
+            # 财务分析
+            if self.financial_analyzer:
+                try:
+                    financial_analysis = self.financial_analyzer.analyze_stock(symbol)
+                    if financial_analysis:
+                        result['financial_analysis'] = financial_analysis
+                        logger.info(f"{symbol} 财务分析完成 - 综合评分: {financial_analysis['total_score']:.2f}, 等级: {financial_analysis['overall_rating']}")
+                    else:
+                        logger.warning(f"{symbol} 财务数据不可用")
+                except Exception as e:
+                    logger.error(f"{symbol} 财务分析失败: {e}")
+            
             # 生成图表
             chart_path = self._create_chart(symbol, data, env_result)
             result['chart_path'] = chart_path
@@ -589,7 +706,120 @@ class SmartDailyReportGenerator:
             logger.error(f"生成 {symbol} 图表失败: {e}")
             return ""
     
-    def _generate_html_report(self, analysis_results: List[Dict]) -> str:
+    def _generate_macro_analysis_html(self, macro_analysis: Optional[Dict]) -> str:
+        """生成宏观分析HTML部分"""
+        if not macro_analysis:
+            return ""
+            
+        try:
+            executive_summary = macro_analysis.get('executive_summary', {})
+            macro_score = executive_summary.get('macro_score', 0)
+            macro_recommendation = executive_summary.get('macro_recommendation', '暂无建议')
+            portfolio_risk_level = executive_summary.get('portfolio_risk_level', 'medium')
+            key_concerns = executive_summary.get('key_concerns', [])
+            
+            # 详细分析数据
+            detailed_analysis = macro_analysis.get('detailed_analysis', {})
+            sector_impact = detailed_analysis.get('sector_impact', {})
+            portfolio_impact = detailed_analysis.get('portfolio_impact', {})
+            
+            # 行动计划
+            action_plan = macro_analysis.get('action_plan', {})
+            priority_1 = action_plan.get('priority_1', [])
+            priority_2 = action_plan.get('priority_2', [])
+            monitoring = action_plan.get('monitoring', [])
+            
+            # 确定风险等级的颜色
+            risk_colors = {
+                'low': '#28a745',
+                'medium': '#ffc107', 
+                'high': '#dc3545'
+            }
+            risk_color = risk_colors.get(portfolio_risk_level, '#6c757d')
+            
+            # 生成行业影响表格
+            sector_rows = ""
+            for sector, score in sector_impact.items():
+                score_color = '#28a745' if score > 0.6 else '#ffc107' if score > 0.4 else '#dc3545'
+                sector_rows += f"""
+                <tr>
+                    <td>{sector}</td>
+                    <td style="color: {score_color}; font-weight: bold;">{score:.2f}</td>
+                    <td>{'有利' if score > 0.6 else '中性' if score > 0.4 else '不利'}</td>
+                </tr>
+                """
+            
+            # 生成立即行动项目列表
+            action_items = ""
+            for i, action in enumerate(priority_1[:5], 1):  # 只显示前5项
+                action_items += f"<li>{action}</li>"
+                
+            # 生成监控要点列表
+            monitoring_items = ""
+            for item in monitoring[:3]:  # 只显示前3项
+                monitoring_items += f"<li>{item}</li>"
+            
+            return f"""
+                <div class="data-status" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);">
+                    <h3 style="margin-top: 0;">🌍 宏观环境分析</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 0.9em; margin-bottom: 5px;">宏观得分</div>
+                            <div style="font-size: 1.8em; font-weight: bold;">{macro_score:.2f}/1.0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 0.9em; margin-bottom: 5px;">风险等级</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: {risk_color};">{portfolio_risk_level.upper()}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 0.9em; margin-bottom: 5px;">重点关注</div>
+                            <div style="font-size: 1.1em; font-weight: bold;">{len(key_concerns)} 只股票</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">💡 {macro_recommendation}</p>
+                    {f'<p style="margin-top: 10px;"><strong>🚨 重点关注:</strong> {", ".join(key_concerns)}</p>' if key_concerns else ''}
+                </div>
+                
+                <div class="summary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3 style="margin-top: 0;">📊 行业影响分析</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.1);">
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.3);">行业</th>
+                                <th style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">影响得分</th>
+                                <th style="padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">环境评估</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sector_rows}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="summary" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333;">
+                    <h3 style="margin-top: 0; color: #d35400;">⚡ 行动建议</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="color: #c0392b; margin-bottom: 10px;">🎯 立即行动 ({len(priority_1)} 项)</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                {action_items}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #8e44ad; margin-bottom: 10px;">👁️ 重点监控</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                {monitoring_items}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            """
+            
+        except Exception as e:
+            logger.error(f"生成宏观分析HTML失败: {e}")
+            return f'<div class="data-status" style="background: #f8d7da; color: #721c24;"><p>宏观分析数据加载失败: {e}</p></div>'
+
+    def _generate_html_report(self, analysis_results: List[Dict], macro_analysis: Optional[Dict] = None) -> str:
         """生成HTML格式报告"""
         # 过滤有效结果
         valid_results = [r for r in analysis_results if r is not None]
@@ -817,6 +1047,8 @@ class SmartDailyReportGenerator:
                     <p>• 数据源: {self.data_source_type}</p>
                 </div>
                 
+                {self._generate_macro_analysis_html(macro_analysis)}
+                
                 <div class="summary">
                     <h2 style="margin-top: 0;">🎯 今日市场概览</h2>
                     <p>基于高级市场环境分类器和动态策略选择器的智能分析</p>
@@ -954,6 +1186,124 @@ class SmartDailyReportGenerator:
                         </p>
                     </div>"""
             
+            # 添加财务分析
+            if 'financial_analysis' in result:
+                financial = result['financial_analysis']
+                
+                # 根据综合评分确定背景色
+                total_score = financial['total_score']
+                if total_score >= 0.8:
+                    financial_class = "portfolio-profit"  # 绿色
+                elif total_score >= 0.6:
+                    financial_class = "timing-good"  # 蓝色
+                elif total_score >= 0.4:
+                    financial_class = "timing-neutral"  # 黄色
+                else:
+                    financial_class = "portfolio-loss"  # 红色
+                
+                basic_info = financial['basic_info']
+                advice = financial['investment_advice']
+                dimensions = financial['dimensions']
+                
+                html += f"""
+                    <div class="buy-timing-info {financial_class}">
+                        <h4>💼 财务基本面分析</h4>
+                        <div class="timing-rating">综合评级: {financial['overall_rating']} ({total_score:.2f}/1.0)</div>
+                        
+                        <div class="previous-trade">
+                            <strong>🏢 公司信息:</strong><br>
+                            {basic_info['company_name']} | {basic_info['sector']} - {basic_info['industry']}<br>
+                            市值: ${basic_info['market_cap']/1000000:.0f}M | 当前价格: ${basic_info['current_price']:.2f}
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
+                            <div>
+                                <strong>📈 估值指标 ({dimensions['valuation']['summary']}):</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for key, detail in dimensions['valuation']['details'].items():
+                    html += f"<li>{detail['comment']}</li>"
+                
+                html += f"""
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>💰 盈利能力 ({dimensions['profitability']['summary']}):</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for key, detail in dimensions['profitability']['details'].items():
+                    html += f"<li>{detail['comment']}</li>"
+                
+                html += f"""
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>🚀 成长性 ({dimensions['growth']['summary']}):</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for key, detail in dimensions['growth']['details'].items():
+                    html += f"<li>{detail['comment']}</li>"
+                
+                html += f"""
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>🏦 财务健康 ({dimensions['financial_health']['summary']}):</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for key, detail in dimensions['financial_health']['details'].items():
+                    html += f"<li>{detail['comment']}</li>"
+                
+                html += f"""
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <strong>📊 分析师观点 ({dimensions['analyst_sentiment']['summary']}):</strong>
+                            <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for key, detail in dimensions['analyst_sentiment']['details'].items():
+                    html += f"<li>{detail['comment']}</li>"
+                
+                html += f"""
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 5px;">
+                            <strong>🎯 投资建议: {advice['recommendation']} (信心度: {advice['confidence']}%)</strong>"""
+                
+                if advice['key_strengths']:
+                    html += f"""
+                            <div style="margin-top: 8px;">
+                                <strong>✅ 主要优势:</strong>
+                                <ul style="margin: 3px 0; padding-left: 20px;">"""
+                    for strength in advice['key_strengths']:
+                        html += f"<li>{strength}</li>"
+                    html += "</ul></div>"
+                
+                if advice['key_concerns']:
+                    html += f"""
+                            <div style="margin-top: 8px;">
+                                <strong>⚠️ 主要担忧:</strong>
+                                <ul style="margin: 3px 0; padding-left: 20px;">"""
+                    for concern in advice['key_concerns']:
+                        html += f"<li>{concern}</li>"
+                    html += "</ul></div>"
+                
+                if advice['action_items']:
+                    html += f"""
+                            <div style="margin-top: 8px;">
+                                <strong>📋 行动建议:</strong>
+                                <ul style="margin: 3px 0; padding-left: 20px;">"""
+                    for action in advice['action_items']:
+                        html += f"<li>{action}</li>"
+                    html += "</ul></div>"
+                
+                html += """
+                        </div>
+                    </div>"""
+            
             # 添加图表显示
             if result.get('chart_path') and os.path.exists(result['chart_path']):
                 base64_image = self._image_to_base64(result['chart_path'])
@@ -982,12 +1332,35 @@ class SmartDailyReportGenerator:
         
         return html
     
+    def _get_macro_analysis(self) -> Optional[Dict]:
+        """获取宏观分析结果"""
+        if not self.macro_integration:
+            return None
+            
+        try:
+            logger.info("开始宏观因子分析...")
+            macro_report = self.macro_integration.generate_macro_report()
+            
+            if 'error' in macro_report:
+                logger.error(f"宏观分析失败: {macro_report['error']}")
+                return None
+                
+            logger.info("宏观分析完成")
+            return macro_report
+            
+        except Exception as e:
+            logger.error(f"获取宏观分析失败: {e}")
+            return None
+
     def generate_report(self) -> str:
         """生成完整的日报"""
         logger.info("开始生成智能日报...")
         
         # 更新市场数据
         self._update_market_data(self.watchlist)
+        
+        # 获取宏观分析结果
+        macro_analysis = self._get_macro_analysis()
         
         # 分析所有关注股票
         results = []
@@ -999,8 +1372,8 @@ class SmartDailyReportGenerator:
                 logger.error(f"分析 {symbol} 失败: {e}")
                 results.append(None)
         
-        # 生成HTML报告
-        html_content = self._generate_html_report(results)
+        # 生成HTML报告（包含宏观分析）
+        html_content = self._generate_html_report(results, macro_analysis)
         
         # 保存报告文件
         # 使用统一路径配置生成报告文件名

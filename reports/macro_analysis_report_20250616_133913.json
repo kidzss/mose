@@ -1,0 +1,39 @@
+{
+  "report_date": "2025-06-16 13:39:13",
+  "executive_summary": {
+    "macro_score": 0.6933333333333334,
+    "macro_recommendation": "宏观环境中性，保持谨慎乐观",
+    "portfolio_risk_level": "medium",
+    "key_concerns": [],
+    "immediate_actions_count": 1
+  },
+  "detailed_analysis": {
+    "macro_analysis": {
+      "macro_score": 0.6933333333333334,
+      "components": {
+        "interest_rate": {
+          "yield_curve_slope": 0.20399999618530273,
+          "curve_shape": "normal",
+          "curve_score": 0.6,
+          "rate_trend": -0.005139612062328713,
+          "rate_trend_score": 0.5
+        },
+        "market_sentiment": {
+          "vix_level": 19.270000457763672,
+          "vix_vs_ma20": 0.03026092093600985,
+          "vix_sentiment": "normal",
+          "vix_score": 0.7,
+          "market_momentum": 0.0006921483991972732,
+          "market_volatility": 0.008156879245638992,
+          "tech_vs_market": 0.7454172717968066
+        },
+        "dollar_strength": {
+          "dxy_level": 98.08100128173828,
+          "dxy_vs_ma50": -0.017069015416447453,
+          "dxy_vs_ma200": -0.055864503815395095,
+          "dollar_trend": "weak",
+          "dollar_score": 0.8
+        }
+      },
+      "recommendation": "宏观环境中性，保持谨慎乐观",
+      "last_update": 

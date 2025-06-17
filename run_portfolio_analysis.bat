@@ -7,14 +7,11 @@ echo Portfolio Analysis Report Generator
 echo ==========================================
 echo.
 echo Functions:
-echo    - Analyze current portfolio performance
-echo    - Generate profit/loss statistics
-echo    - Technical indicators and market sentiment
-echo    - Send email report automatically
-echo.
-echo Stocks to analyze:
-echo    - Holdings: AMD, GOOGL, PFE, NVDA, TSLA, ADBE
-echo    - Watchlist: MSFT, EOG, PHM, CF
+echo    - Update latest market data automatically
+echo    - Analyze current portfolio performance with macro analysis
+echo    - Generate comprehensive technical indicators analysis
+echo    - Smart market environment assessment
+echo    - Send intelligent email report automatically
 echo.
 echo Email to: kidzss@gmail.com
 echo Run time: %date% %time%
@@ -24,6 +21,19 @@ echo Starting portfolio analysis...
 echo ==========================================
 echo.
 
+echo [1/2] 📊 Updating market data...
+echo -----------------------------------------------
+python data/data_updater.py
+if %ERRORLEVEL% NEQ 0 (
+    echo ⚠️  Warning: Data update encountered issues, but will continue with analysis
+    echo    - May use existing data
+    echo    - Check network connectivity
+    echo    - Verify data source accessibility
+    echo.
+)
+
+echo [2/2] 📈 Running portfolio analysis...
+echo -----------------------------------------------
 python run_portfolio_analysis.py
 
 echo.

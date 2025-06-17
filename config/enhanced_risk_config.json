@@ -1,0 +1,84 @@
+{
+    "risk_management": {
+        "position_limits": {
+            "max_single_position": 0.18,
+            "max_sector_exposure": 0.30,
+            "min_diversification": 6,
+            "correlation_threshold": 0.65
+        },
+        "current_violations": {
+            "technology_overweight": {
+                "current": 0.6431,
+                "limit": 0.30,
+                "severity": "critical",
+                "action_required": "immediate_rebalancing"
+            },
+            "individual_positions": {
+                "AMD": {"current": 0.2186, "limit": 0.18, "excess": 0.0386},
+                "GOOGL": {"current": 0.2153, "limit": 0.18, "excess": 0.0353},
+                "NVDA": {"current": 0.2092, "limit": 0.18, "excess": 0.0292}
+            }
+        },
+        "rebalancing_plan": {
+            "target_allocation": {
+                "Technology": 0.28,
+                "Healthcare": 0.15,
+                "Energy": 0.12,
+                "Automotive": 0.10,
+                "Financial": 0.10,
+                "Materials": 0.08,
+                "Consumer": 0.07,
+                "Real Estate": 0.05,
+                "Cash": 0.05
+            },
+            "suggested_actions": [
+                {
+                    "action": "reduce",
+                    "symbols": ["AMD", "GOOGL", "NVDA"],
+                    "target_weights": [0.16, 0.16, 0.16],
+                    "rationale": "降低科技股集中度风险"
+                },
+                {
+                    "action": "add",
+                    "symbols": ["JPM", "XOM", "JNJ"],
+                    "target_weights": [0.10, 0.08, 0.07],
+                    "rationale": "增加行业分散化"
+                }
+            ]
+        }
+    },
+    "macro_integration": {
+        "enabled": true,
+        "update_frequency": "daily",
+        "weight_adjustment": {
+            "max_macro_impact": 0.15,
+            "sectors": {
+                "Technology": {
+                    "interest_rate_sensitivity": -0.8,
+                    "sentiment_sensitivity": 1.2
+                },
+                "Financial": {
+                    "interest_rate_sensitivity": 0.6,
+                    "dollar_sensitivity": -0.4
+                },
+                "Energy": {
+                    "dollar_sensitivity": -0.7,
+                    "inflation_sensitivity": 0.5
+                }
+            }
+        }
+    },
+    "monitoring": {
+        "alert_thresholds": {
+            "single_position_breach": 0.20,
+            "sector_concentration": 0.35,
+            "correlation_spike": 0.75,
+            "volatility_surge": 0.30
+        },
+        "rebalancing_triggers": {
+            "weight_drift": 0.05,
+            "risk_score_drop": 0.60,
+            "macro_score_change": 0.20
+        }
+    }
+} 

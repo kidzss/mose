@@ -1,0 +1,155 @@
+{
+  "report_date": "2025-06-16 13:40:25",
+  "executive_summary": {
+    "macro_score": 0.6933333333333334,
+    "macro_recommendation": "宏观环境中性，保持谨慎乐观",
+    "portfolio_risk_level": "low",
+    "key_concerns": [],
+    "immediate_actions_count": 1
+  },
+  "detailed_analysis": {
+    "macro_analysis": {
+      "macro_score": 0.6933333333333334,
+      "components": {
+        "interest_rate": {
+          "yield_curve_slope": 0.20399999618530273,
+          "curve_shape": "normal",
+          "curve_score": 0.6,
+          "rate_trend": -0.005139612062328713,
+          "rate_trend_score": 0.5
+        },
+        "market_sentiment": {
+          "vix_level": 19.350000381469727,
+          "vix_vs_ma20": 0.03431688005562594,
+          "vix_sentiment": "normal",
+          "vix_score": 0.7,
+          "market_momentum": 0.0006871234780420121,
+          "market_volatility": 0.008151817898148754,
+          "tech_vs_market": 0.752660969407817
+        },
+        "dollar_strength": {
+          "dxy_level": 98.0780029296875,
+          "dxy_vs_ma50": -0.01709847308384671,
+          "dxy_vs_ma200": -0.05589322994418966,
+          "dollar_trend": "weak",
+          "dollar_score": 0.8
+        }
+      },
+      "recommendation": "宏观环境中性，保持谨慎乐观",
+      "last_update": "2025-06-16T13:40:25.959137"
+    },
+    "sector_impact": {
+      "Technology": 0.5599999999999999,
+      "Financial": 0.5,
+      "Energy": 0.38,
+      "Healthcare": 0.6
+    },
+    "portfolio_impact": {
+      "individual_impacts": {
+        "AMD": {
+          "sector": "Technology",
+          "current_weight": 0.2186,
+          "investment_amount": 4788.89,
+          "sector_score": 0.5599999999999999,
+          "macro_adjustment": 0.74,
+          "impact_score": 0.6499999999999999,
+          "impact_level": "neutral",
+          "impact_description": "宏观环境对该持仓中性",
+          "risk_level": "medium"
+        },
+        "GOOGL": {
+          "sector": "Technology",
+          "current_weight": 0.21530000000000002,
+          "investment_amount": 4715.83,
+          "sector_score": 0.5599999999999999,
+          "macro_adjustment": 0.74,
+          "impact_score": 0.6499999999999999,
+          "impact_level": "neutral",
+          "impact_description": "宏观环境对该持仓中性",
+          "risk_level": "medium"
+        },
+        "NVDA": {
+          "sector": "Technology",
+          "current_weight": 0.20920000000000002,
+          "investment_amount": 4582.24,
+          "sector_score": 0.5599999999999999,
+          "macro_adjustment": 0.74,
+          "impact_score": 0.6499999999999999,
+          "impact_level": "neutral",
+          "impact_description": "宏观环境对该持仓中性",
+          "risk_level": "medium"
+        },
+        "PFE": {
+          "sector": "Healthcare",
+          "current_weight": 0.0697,
+          "investment_amount": 1526.65,
+          "sector_score": 0.6,
+          "macro_adjustment": 0.5,
+          "impact_score": 0.55,
+          "impact_level": "neutral",
+          "impact_description": "宏观环境对该持仓中性",
+          "risk_level": "low"
+        },
+        "TSLA": {
+          "sector": "Automotive",
+          "current_weight": 0.047400000000000005,
+          "investment_amount": 1038.22,
+          "sector_score": 0.5,
+          "macro_adjustment": 0.5,
+          "impact_score": 0.5,
+          "impact_level": "neutral",
+          "impact_description": "宏观环境对该持仓中性",
+          "risk_level": "low"
+        },
+        "EOG": {
+          "sector": "Energy",
+          "current_weight": 0.022000000000000002,
+          "investment_amount": 481.88,
+          "sector_score": 0.38,
+          "macro_adjustment": 0.29,
+          "impact_score": 0.33499999999999996,
+          "impact_level": "negative",
+          "impact_description": "宏观环境对该持仓不利",
+          "risk_level": "medium"
+        }
+      },
+      "portfolio_macro_score": {
+        "overall_score": 0.6231398619278956,
+        "risk_level": "low",
+        "vulnerability_factors": [
+          "科技股集中度过高"
+        ],
+        "macro_resilience": "moderate"
+      },
+      "high_risk_positions": [],
+      "vulnerable_sectors": [
+        "Energy"
+      ]
+    },
+    "adjustment_recommendations": {
+      "immediate_actions": [
+        "减少Energy行业配置，该行业受宏观环境负面影响较大"
+      ],
+      "medium_term_actions": [],
+      "monitoring_points": [
+        "关注美联储政策变化对利率环境的影响",
+        "监控VIX指数变化，警惕市场情绪恶化",
+        "跟踪美元指数走势对不同行业的影响"
+      ],
+      "risk_mitigation": []
+    },
+    "analysis_timestamp": "2025-06-16T13:40:25.996780"
+  },
+  "action_plan": {
+    "priority_1": [
+      "减少Energy行业配置，该行业受宏观环境负面影响较大"
+    ],
+    "priority_2": [],
+    "monitoring": [
+      "关注美联储政策变化对利率环境的影响",
+      "监控VIX指数变化，警惕市场情绪恶化",
+      "跟踪美元指数走势对不同行业的影响"
+    ],
+    "risk_management": []
+  }
+}

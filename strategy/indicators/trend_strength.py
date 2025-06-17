@@ -71,8 +71,8 @@ def aroon(high: pd.Series, low: pd.Series, period: int = 25) -> Dict[str, pd.Ser
     返回:
         包含Aroon上升、下降和振荡器的字典
     """
-    aroon_up = pd.Series(0, index=high.index)
-    aroon_down = pd.Series(0, index=low.index)
+    aroon_up = pd.Series(0.0, index=high.index, dtype='float64')
+    aroon_down = pd.Series(0.0, index=low.index, dtype='float64')
     
     for i in range(period, len(high)):
         # 计算最高价出现的位置
@@ -84,8 +84,8 @@ def aroon(high: pd.Series, low: pd.Series, period: int = 25) -> Dict[str, pd.Ser
         low_idx = low_window.argmin()
         
         # 计算Aroon上升和下降
-        aroon_up.iloc[i] = ((period - high_idx) / period) * 100
-        aroon_down.iloc[i] = ((period - low_idx) / period) * 100
+        aroon_up.iloc[i] = float(((period - high_idx) / period) * 100)
+        aroon_down.iloc[i] = float(((period - low_idx) / period) * 100)
     
     # 计算Aroon振荡器
     aroon_osc = aroon_up - aroon_down
