@@ -77,9 +77,9 @@ class MacroFactorAnalyzer:
             # 收益率曲线分析
             if ('TNX' in macro_data and 'FVX' in macro_data and 'IRX' in macro_data and 
                 not macro_data['TNX'].empty and not macro_data['FVX'].empty and not macro_data['IRX'].empty):
-                tnx = float(macro_data['TNX']['Close'].iloc[-1])  # 10年期
-                fvx = float(macro_data['FVX']['Close'].iloc[-1])  # 5年期
-                irx = float(macro_data['IRX']['Close'].iloc[-1])  # 3个月
+                tnx = macro_data['TNX']['Close'].iloc[-1].item()  # 10年期
+                fvx = macro_data['FVX']['Close'].iloc[-1].item()  # 5年期
+                irx = macro_data['IRX']['Close'].iloc[-1].item()  # 3个月
                 
                 # 收益率曲线斜率
                 yield_curve_slope = tnx - irx
@@ -98,8 +98,8 @@ class MacroFactorAnalyzer:
                 
                 # 利率趋势
                 if len(macro_data['TNX']) >= 20:
-                    tnx_change = (float(macro_data['TNX']['Close'].iloc[-1]) / 
-                                float(macro_data['TNX']['Close'].iloc[-20]) - 1)
+                    tnx_change = (macro_data['TNX']['Close'].iloc[-1].item() / 
+                                macro_data['TNX']['Close'].iloc[-20].item() - 1)
                 else:
                     tnx_change = 0
                 analysis['rate_trend'] = tnx_change
@@ -124,8 +124,8 @@ class MacroFactorAnalyzer:
             
             # VIX恐慌指数分析
             if 'VIX' in macro_data and not macro_data['VIX'].empty:
-                vix_current = float(macro_data['VIX']['Close'].iloc[-1])
-                vix_ma20 = float(macro_data['VIX']['Close'].rolling(20).mean().iloc[-1])
+                vix_current = macro_data['VIX']['Close'].iloc[-1].item()
+                vix_ma20 = macro_data['VIX']['Close'].rolling(20).mean().iloc[-1].item()
                 
                 analysis['vix_level'] = vix_current
                 analysis['vix_vs_ma20'] = vix_current / vix_ma20 - 1
@@ -150,16 +150,16 @@ class MacroFactorAnalyzer:
                 spy_returns = spy_data['Close'].pct_change()
                 
                 # 市场动量
-                analysis['market_momentum'] = float(spy_returns.rolling(20).mean().iloc[-1])
+                analysis['market_momentum'] = spy_returns.rolling(20).mean().iloc[-1].item()
                 
                 # 市场波动率
-                analysis['market_volatility'] = float(spy_returns.rolling(20).std().iloc[-1])
+                analysis['market_volatility'] = spy_returns.rolling(20).std().iloc[-1].item()
                 
                 # 相对强弱分析
                 if 'QQQ' in macro_data and not macro_data['QQQ'].empty:
                     qqq_returns = macro_data['QQQ']['Close'].pct_change()
-                    spy_mean = float(spy_returns.rolling(20).mean().iloc[-1])
-                    qqq_mean = float(qqq_returns.rolling(20).mean().iloc[-1])
+                    spy_mean = spy_returns.rolling(20).mean().iloc[-1].item()
+                    qqq_mean = qqq_returns.rolling(20).mean().iloc[-1].item()
                     if spy_mean != 0:
                         analysis['tech_vs_market'] = (qqq_mean / spy_mean - 1)
                     else:
@@ -178,9 +178,9 @@ class MacroFactorAnalyzer:
             
             if 'DXY' in macro_data and not macro_data['DXY'].empty:
                 dxy_data = macro_data['DXY']['Close']
-                dxy_current = float(dxy_data.iloc[-1])
-                dxy_ma50 = float(dxy_data.rolling(50).mean().iloc[-1])
-                dxy_ma200 = float(dxy_data.rolling(200).mean().iloc[-1])
+                dxy_current = dxy_data.iloc[-1].item()
+                dxy_ma50 = dxy_data.rolling(50).mean().iloc[-1].item()
+                dxy_ma200 = dxy_data.rolling(200).mean().iloc[-1].item()
                 
                 analysis['dxy_level'] = dxy_current
                 analysis['dxy_vs_ma50'] = dxy_current / dxy_ma50 - 1
