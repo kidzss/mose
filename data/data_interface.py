@@ -451,13 +451,22 @@ class YahooFinanceDataSource(RealTimeDataSource):
                            end_date: dt.datetime, timeframe: str = 'daily') -> pd.DataFrame:
         """获取历史数据"""
         try:
+            # 将timeframe转换为yfinance支持的格式
+            yf_timeframe = timeframe
+            if timeframe == 'daily':
+                yf_timeframe = '1d'
+            elif timeframe == 'weekly':
+                yf_timeframe = '1wk'
+            elif timeframe == 'monthly':
+                yf_timeframe = '1mo'
+            
             # 获取股票数据
             stock = self.yf.Ticker(symbol)
             # 获取历史数据
             df = stock.history(
                 start=start_date.strftime('%Y-%m-%d'),
                 end=end_date.strftime('%Y-%m-%d'),
-                interval=timeframe
+                interval=yf_timeframe
             )
             if not df.empty:
                 # 标准化列名

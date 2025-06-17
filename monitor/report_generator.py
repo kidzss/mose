@@ -1,10 +1,21 @@
 import pandas as pd
 import numpy as np
+import sys
+import os
 from datetime import datetime
 from typing import Dict, List
 import yfinance as yf
 from jinja2 import Template
 import logging
+
+# 添加路径以导入宏观分析模块
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'analysis'))
+try:
+    from analysis.portfolio_macro_integration import PortfolioMacroIntegration
+    MACRO_ANALYSIS_AVAILABLE = True
+except ImportError:
+    MACRO_ANALYSIS_AVAILABLE = False
+    logging.warning("宏观分析模块不可用，将跳过宏观分析部分")
 
 class ReportGenerator:
     """投资组合报告生成器"""
@@ -13,6 +24,16 @@ class ReportGenerator:
         """初始化报告生成器"""
         self.config = config or {}
         self.logger = logging.getLogger(__name__)
+        
+        # 初始化宏观分析器
+        self.macro_integration = None
+        if MACRO_ANALYSIS_AVAILABLE:
+            try:
+                self.macro_integration = PortfolioMacroIntegration()
+                self.logger.info("宏观分析模块初始化成功")
+            except Exception as e:
+                self.logger.error(f"宏观分析模块初始化失败: {e}")
+                self.macro_integration = None
         self.report_template = Template("""
         <html>
         <head>
@@ -37,6 +58,24 @@ class ReportGenerator:
                     margin: 20px 0;
                 }
                 .market-summary { margin: 20px 0; }
+                .macro-analysis { 
+                    background-color: #f8f9fa; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    margin: 20px 0; 
+                    border-left: 4px solid #007bff;
+                }
+                .macro-score { margin-bottom: 15px; }
+                .macro-components { margin: 15px 0; }
+                .sector-impact { margin: 15px 0; }
+                .sector-impact p { margin: 5px 0; }
+                .recommendations div { 
+                    font-size: 0.9em; 
+                    margin: 2px 0; 
+                    padding: 2px 5px;
+                    background-color: #fff3cd;
+                    border-radius: 3px;
+                }
             </style>
         </head>
         <body>
@@ -62,6 +101,60 @@ class ReportGenerator:
                     {{ '{:+.2f}%'.format(relative_return * 100) }}</span></p>
             </div>
 
+            {% if macro_analysis %}
+            <div class="macro-analysis">
+                <h3>🌍 宏观环境分析</h3>
+                <div class="macro-score">
+                    <p><strong>宏观得分:</strong> 
+                        <span class="{{ 'profit' if macro_analysis.macro_score >= 0.6 else 'loss' if macro_analysis.macro_score < 0.4 else '' }}">
+                            {{ "{:.2f}".format(macro_analysis.macro_score) }}/1.00 ({{ "{:.0f}".format(macro_analysis.macro_score * 100) }}分)
+                        </span>
+                    </p>
+                    <p><strong>环境建议:</strong> {{ macro_analysis.recommendation }}</p>
+                </div>
+                
+                {% if macro_analysis.components %}
+                <div class="macro-components">
+                    <h4>📊 关键宏观指标</h4>
+                    {% if macro_analysis.components.interest_rate %}
+                    <p><strong>💹 利率环境:</strong> {{ macro_analysis.components.interest_rate.description }} 
+                       (得分: {{ "{:.1f}".format(macro_analysis.components.interest_rate.curve_score) }})</p>
+                    {% endif %}
+                    
+                    {% if macro_analysis.components.market_sentiment %}
+                    <p><strong>📈 市场情绪:</strong> VIX {{ "{:.1f}".format(macro_analysis.components.market_sentiment.vix_level) }}, 
+                       投资者情绪{{ macro_analysis.components.market_sentiment.sentiment_desc }}</p>
+                    {% endif %}
+                    
+                    {% if macro_analysis.components.dollar_strength %}
+                    <p><strong>💵 美元强度:</strong> DXY {{ "{:.1f}".format(macro_analysis.components.dollar_strength.dxy_level) }}, 
+                       {{ macro_analysis.components.dollar_strength.trend_desc }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if macro_analysis.sector_impact %}
+                <div class="sector-impact">
+                    <h4>🏭 行业影响评估</h4>
+                    {% for sector, score in macro_analysis.sector_impact.items() %}
+                    <p><strong>{{ sector }}:</strong> 
+                        <span class="{{ 'profit' if score >= 0.6 else 'loss' if score < 0.4 else '' }}">
+                            {{ "{:.2f}".format(score) }}分
+                        </span>
+                        {% if score >= 0.6 %}
+                        - 宏观环境有利，可考虑增加配置
+                        {% elif score < 0.4 %}
+                        - 宏观环境不利，建议减少配置
+                        {% else %}
+                        - 宏观环境中性，维持现有配置
+                        {% endif %}
+                    </p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <h3>持仓明细</h3>
             <table class="position-table">
                 <tr>
@@ -73,6 +166,10 @@ class ReportGenerator:
                     <th>仓位占比</th>
                     <th>今日收益</th>
                     <th>累计收益</th>
+                    {% if macro_analysis %}
+                    <th>宏观影响</th>
+                    <th>操作建议</th>
+                    {% endif %}
                 </tr>
                 {% for position in positions %}
                 <tr>
@@ -86,6 +183,24 @@ class ReportGenerator:
                         {{ '{:+.2f}%'.format(position.daily_return * 100) }}</td>
                     <td class="{{ 'profit' if position.total_return >= 0 else 'loss' }}">
                         {{ '{:+.2f}%'.format(position.total_return * 100) }}</td>
+                    {% if macro_analysis and position.macro_impact %}
+                    <td class="{{ 'profit' if position.macro_impact.impact_score >= 0.6 else 'loss' if position.macro_impact.impact_score < 0.4 else '' }}">
+                        {{ "{:.2f}".format(position.macro_impact.impact_score) }}
+                        {% if position.macro_impact.impact_level == 'positive' %}🟢
+                        {% elif position.macro_impact.impact_level == 'negative' %}🔴
+                        {% else %}🟡{% endif %}
+                    </td>
+                    <td class="recommendations">
+                        {% if position.macro_impact.recommendations %}
+                            {% for rec in position.macro_impact.recommendations[:2] %}
+                                <div>{{ rec }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    {% elif macro_analysis %}
+                    <td>-</td>
+                    <td>-</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
@@ -201,6 +316,101 @@ class ReportGenerator:
                 'volatility': 0.0,
                 'var_95': 0.0
             }
+    
+    def _get_macro_analysis(self) -> Dict:
+        """获取宏观分析数据"""
+        if not self.macro_integration:
+            return None
+        
+        try:
+            self.logger.info("开始获取宏观分析数据...")
+            macro_report = self.macro_integration.generate_macro_report()
+            
+            if 'error' in macro_report:
+                self.logger.error(f"宏观分析失败: {macro_report['error']}")
+                return None
+            
+            # 提取需要的数据
+            detailed_analysis = macro_report.get('detailed_analysis', {})
+            macro_analysis_data = detailed_analysis.get('macro_analysis', {})
+            sector_impact = detailed_analysis.get('sector_impact', {})
+            portfolio_impact = detailed_analysis.get('portfolio_impact', {})
+            
+            # 构建简化的宏观分析数据结构
+            macro_data = {
+                'macro_score': macro_analysis_data.get('macro_score', 0),
+                'recommendation': macro_analysis_data.get('recommendation', ''),
+                'components': {},
+                'sector_impact': sector_impact,
+                'individual_impacts': portfolio_impact.get('individual_impacts', {})
+            }
+            
+            # 处理宏观组件数据
+            components = macro_analysis_data.get('components', {})
+            
+            # 利率环境
+            if 'interest_rate' in components:
+                rate_data = components['interest_rate']
+                curve_shape = rate_data.get('curve_shape', 'unknown')
+                
+                # 生成描述
+                if curve_shape == 'normal':
+                    description = "收益率曲线正常，利率环境稳定"
+                elif curve_shape == 'inverted':
+                    description = "收益率曲线倒挂，经济可能面临衰退风险"
+                else:
+                    description = "收益率曲线平坦，经济增长动力不足"
+                
+                macro_data['components']['interest_rate'] = {
+                    'description': description,
+                    'curve_score': rate_data.get('curve_score', 0),
+                    'curve_shape': curve_shape
+                }
+            
+            # 市场情绪
+            if 'market_sentiment' in components:
+                sentiment_data = components['market_sentiment']
+                vix_level = sentiment_data.get('vix_level', 0)
+                vix_sentiment = sentiment_data.get('vix_sentiment', 'unknown')
+                
+                if vix_sentiment == 'low':
+                    sentiment_desc = "乐观，投资者风险偏好较高"
+                elif vix_sentiment == 'normal':
+                    sentiment_desc = "正常，投资者相对理性"
+                else:
+                    sentiment_desc = "恐慌，投资者风险规避"
+                
+                macro_data['components']['market_sentiment'] = {
+                    'vix_level': vix_level,
+                    'sentiment_desc': sentiment_desc,
+                    'vix_sentiment': vix_sentiment
+                }
+            
+            # 美元强度
+            if 'dollar_strength' in components:
+                dollar_data = components['dollar_strength']
+                dollar_trend = dollar_data.get('dollar_trend', 'unknown')
+                dxy_level = dollar_data.get('dxy_level', 0)
+                
+                if dollar_trend == 'strong':
+                    trend_desc = "美元走强，对新兴市场和大宗商品不利"
+                elif dollar_trend == 'weak':
+                    trend_desc = "美元走弱，有利于风险资产和新兴市场"
+                else:
+                    trend_desc = "美元震荡，对市场影响中性"
+                
+                macro_data['components']['dollar_strength'] = {
+                    'dxy_level': dxy_level,
+                    'trend_desc': trend_desc,
+                    'dollar_trend': dollar_trend
+                }
+            
+            self.logger.info("宏观分析数据获取成功")
+            return macro_data
+            
+        except Exception as e:
+            self.logger.error(f"获取宏观分析数据失败: {e}")
+            return None
 
     def _generate_market_analysis(self) -> Dict:
         """生成市场分析"""
@@ -333,6 +543,10 @@ class ReportGenerator:
             # 获取市场数据
             sp500_return, nasdaq_return = self._calculate_market_returns()
             
+            # 获取宏观分析数据
+            macro_analysis = self._get_macro_analysis()
+            self.logger.info(f"宏观分析数据获取: {'成功' if macro_analysis else '失败或跳过'}")
+            
             # 计算风险指标
             risk_metrics = self._calculate_risk_metrics(portfolio_monitor)
             
@@ -356,6 +570,41 @@ class ReportGenerator:
                         daily_return = (hist_data['Close'].iloc[-1] / hist_data['Close'].iloc[-2]) - 1
                         daily_returns.append(daily_return * position['weight'])
                     
+                    # 获取宏观影响数据
+                    macro_impact = None
+                    if macro_analysis and symbol in macro_analysis.get('individual_impacts', {}):
+                        individual_impact = macro_analysis['individual_impacts'][symbol]
+                        
+                        # 生成简化的操作建议
+                        recommendations = []
+                        impact_score = individual_impact.get('impact_score', 0.5)
+                        impact_level = individual_impact.get('impact_level', 'neutral')
+                        
+                        # 基于宏观影响生成建议
+                        if impact_level == 'positive':
+                            recommendations.append("宏观环境有利，可考虑逢低加仓")
+                        elif impact_level == 'negative':
+                            recommendations.append("宏观环境不利，建议降低仓位")
+                        elif impact_level == 'very_negative':
+                            recommendations.append("宏观环境恶劣，强烈建议减仓")
+                        
+                        # 基于收益率生成建议
+                        total_return = (current_price - cost_basis) / cost_basis
+                        if total_return > 0.15:
+                            recommendations.append("盈利丰厚，建议部分止盈")
+                        elif total_return < -0.08:
+                            recommendations.append("亏损较大，需重点关注")
+                        
+                        # 基于仓位权重生成建议
+                        if position['weight'] > 0.25:
+                            recommendations.append("仓位过重，建议分散投资")
+                        
+                        macro_impact = {
+                            'impact_score': impact_score,
+                            'impact_level': impact_level,
+                            'recommendations': recommendations
+                        }
+                    
                     positions.append({
                         'symbol': symbol,
                         'current_price': current_price,
@@ -364,7 +613,8 @@ class ReportGenerator:
                         'market_value': market_value,
                         'weight': position['weight'],
                         'daily_return': daily_return,
-                        'total_return': (current_price - cost_basis) / cost_basis
+                        'total_return': (current_price - cost_basis) / cost_basis,
+                        'macro_impact': macro_impact
                     })
             
             # 生成分析
@@ -382,6 +632,9 @@ class ReportGenerator:
                 total_value=total_value,
                 daily_return=portfolio_daily_return,
                 total_return=portfolio_total_return,
+                sp500_return=sp500_return,
+                nasdaq_return=nasdaq_return,
+                relative_return=portfolio_daily_return - sp500_return,
                 positions=positions,
                 portfolio_beta=risk_metrics['beta'],
                 sharpe_ratio=risk_metrics['sharpe'],
@@ -389,9 +642,11 @@ class ReportGenerator:
                 volatility=risk_metrics['volatility'],
                 var_95=risk_metrics['var_95'],
                 alerts=portfolio_monitor.check_alerts(),
+                recommendations=strategy_recommendations,
                 market_analysis=market_analysis,
                 position_analysis=position_analysis,
-                strategy_recommendations=strategy_recommendations
+                strategy_recommendations=strategy_recommendations,
+                macro_analysis=macro_analysis
             )
             
             return report

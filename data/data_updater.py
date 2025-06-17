@@ -10,12 +10,14 @@ from requests.exceptions import RequestException
 import concurrent.futures
 from tqdm import tqdm
 import sys
-from config.trading_config import default_config
 import pymysql
 from typing import List, Dict, Any
 
 # 添加项目根目录到Python路径
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+# 现在导入配置
+from config.trading_config import default_config
 
 # 配置日志
 logging.basicConfig(
@@ -546,13 +548,13 @@ class MarketDataUpdater:
     def load_stock_lists(self):
         """加载SP500和Nasdaq100的股票列表"""
         # 读取SP500股票列表
-        sp500_df = pd.read_csv('stock_pool/sp500_stocks.csv')
+        sp500_df = pd.read_csv('data/stock_pool/sp500_stocks.csv')
         sp500_symbols = sp500_df['Code'].tolist()
 
-        nasdaq100_df = pd.read_csv('stock_pool/nasdaq100_stocks.csv')
+        nasdaq100_df = pd.read_csv('data/stock_pool/nasdaq100_stocks.csv')
         nasdaq100_symbols = nasdaq100_df['Code'].tolist()
 
-        etf_stocks_df = pd.read_csv('stock_pool/uss_etf_stocks.csv')
+        etf_stocks_df = pd.read_csv('data/stock_pool/uss_etf_stocks.csv')
         etf_symbols = etf_stocks_df['Code'].tolist()
 
         # 添加Nasdaq100股票
@@ -842,10 +844,20 @@ class MarketDataUpdater:
     def _update_single_stock(self, symbol: str) -> bool:
         """更新单个股票的数据"""
         try:
-            # 获取最新数据
+            # 获取数据库中该股票的最新日期
+            last_date = self.db_manager.get_last_update_date(symbol)
+            
+            # 设置开始日期
+            if last_date:
+                # 如果有历史数据，从最后一天开始更新（包含最后一天以防数据不完整）
+                start_date = last_date - timedelta(days=1)
+                logger.info(f"股票 {symbol} 从 {start_date.strftime('%Y-%m-%d')} 开始增量更新")
+            else:
+                # 如果没有历史数据，从2020年开始获取数据进行初始化
+                start_date = datetime(2020, 1, 1)
+                logger.info(f"股票 {symbol} 进行初始化，从2020年开始获取历史数据")
+            
             end_date = datetime.now()
-            # 直接获取120天的历史数据，避免数据不足的警告
-            start_date = end_date - timedelta(days=120)
             
             # 从Yahoo Finance获取数据
             ticker = yf.Ticker(symbol)
@@ -860,6 +872,17 @@ class MarketDataUpdater:
             if df.empty:
                 logger.warning(f"未获取到股票 {symbol} 的新数据")
                 return False
+            
+            # 如果是增量更新，过滤掉已存在的数据
+            if last_date:
+                # 只保留比最新日期更新的数据，或者当天的数据（允许更新当天数据）
+                last_date_obj = last_date.date() if isinstance(last_date, datetime) else last_date
+                df = df[df.index.date >= last_date_obj]
+                if df.empty:
+                    logger.info(f"股票 {symbol} 数据已是最新，无需更新")
+                    return True
+                    
+            logger.info(f"股票 {symbol} 获取到 {len(df)} 条新数据")
                 
             # 处理数据
             df = self._process_data(df, symbol)
@@ -908,8 +931,12 @@ def main():
         # 创建市场数据更新器
         updater = MarketDataUpdater(DB_CONFIG, PROXIES)
         
-        # 加载股票列表并更新数据
-        updater.update_stock_data()
+        # 重新加载完整的股票列表
+        stock_symbols = updater.load_stock_lists()
+        logger.info(f"从股票列表文件加载了 {len(stock_symbols)} 只股票")
+        
+        # 使用完整股票列表更新数据
+        updater.update_stock_data(symbols=stock_symbols)
         
         logger.info("股票数据处理完成 - 两个表已同步更新")
 
