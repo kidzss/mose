@@ -1,31 +1,37 @@
 {
     "meta": {
-        "last_updated": "2025-06-16",
-        "total_assets": 27884.87,
+        "last_updated": "2025-06-17",
+        "total_assets": 27722.97,
         "currency": "USD",
-        "description": "最新精确的投资组合配置 - 基于用户提供的精确数据"
+        "description": "更新配置 - 卖出EOG并根据实际数据调整投资组合"
     },
     "portfolio": {
-        "total_value": 27884.87,
+        "total_value": 27722.97,
         "stock_allocation": {
-            "total_amount": 21903.42,
-            "percentage": 78.55
+            "total_amount": 21121.29,
+            "percentage": 76.18,
+            "note": "仅包含美股，港股小米单独记录"
         },
         "cash_allocation": {
-            "amount": 2718.77,
-            "percentage": 9.75
+            "amount": 609.91,
+            "percentage": 2.20
         },
         "money_fund_allocation": {
-            "amount": 3262.53,
-            "percentage": 11.70,
+            "amount": 5983.65,
+            "percentage": 21.59,
             "description": "美元货币型基金"
+        },
+        "hk_stock_allocation": {
+            "total_amount": 97.03,
+            "percentage": 0.35,
+            "description": "港股小米集团，不参与自动分析"
         }
     },
     "positions": {
         "AMD": {
             "shares": 48,
             "cost_basis": 126.214,
-            "weight": 21.86,
+            "weight": 21.93,
             "investment_amount": 4788.89,
             "sector": "Technology",
             "stop_loss_threshold": 0.08
@@ -33,7 +39,7 @@
         "GOOGL": {
             "shares": 34,
             "cost_basis": 170.540,
-            "weight": 21.53,
+            "weight": 21.44,
             "investment_amount": 4715.83,
             "sector": "Technology", 
             "stop_loss_threshold": 0.12
@@ -41,7 +47,7 @@
         "NVDA": {
             "shares": 40,
             "cost_basis": 138.843,
-            "weight": 20.92,
+            "weight": 20.91,
             "investment_amount": 4582.24,
             "sector": "Technology",
             "stop_loss_threshold": 0.08
@@ -49,7 +55,7 @@
         "PFE": {
             "shares": 80,
             "cost_basis": 25.899,
-            "weight": 6.97,
+            "weight": 6.90,
             "investment_amount": 1526.65,
             "sector": "Healthcare",
             "stop_loss_threshold": 0.10
@@ -57,18 +63,24 @@
         "TSLA": {
             "shares": 4,
             "cost_basis": 179.841,
-            "weight": 4.74,
+            "weight": 4.65,
             "investment_amount": 1038.22,
             "sector": "Automotive",
             "stop_loss_threshold": 0.15
         },
-        "EOG": {
-            "shares": 5,
-            "cost_basis": 122.119,
-            "weight": 2.20,
-            "investment_amount": 481.88,
-            "sector": "Energy",
-            "stop_loss_threshold": 0.10
+        "9999.HK": {
+            "shares": 14,
+            "cost_basis": 10.539,
+            "weight": 0.35,
+            "investment_amount": 97.03,
+            "sector": "Technology",
+            "currency": "HKD",
+            "current_price_hkd": 53.8,
+            "cost_basis_hkd": 10.539,
+            "stop_loss_threshold": 0.12,
+            "description": "小米集团-W",
+            "excluded_from_analysis": true,
+            "exclusion_reason": "港股数据获取困难，避免影响自动分析系统"
         }
     },
     "watchlist": {
@@ -97,6 +109,15 @@
         "CF": {
             "target_buy_price": 84.0,
             "reason": "化肥龙头，周期回暖，等待回调至布林带下轨支撑位附近买入"
+        },
+        "EOG": {
+            "target_buy_price": 110.0,
+            "previous_transactions": {
+                "last_buy": 122.119,
+                "last_sell": 123.20,
+                "profit_percentage": 0.89
+            },
+            "reason": "能源股，因宏观环境不利卖出观望，等待更好入场时机或能源行业转好"
         }
     },
     "monitoring_config": {

@@ -76,16 +76,15 @@ def show_portfolio_summary():
         print("✅ 已从统一配置文件加载最新持仓信息")
     except Exception as e:
         logger.warning(f"加载统一配置失败，使用默认配置: {e}")
-        # 保留最新的持仓信息作为后备
+        # 保留最新的持仓信息作为后备 (排除港股小米，避免数据获取问题)
         portfolio = {
-            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},
-            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
-            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
-            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
-            'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
-            'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
+            'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.93, 'investment': 4788.89},
+            'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.44, 'investment': 4715.83},
+            'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.90, 'investment': 1526.65},
+            'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.91, 'investment': 4582.24},
+            'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.65, 'investment': 1038.22}
         }
-        watchlist = ['MSFT', 'ADBE', 'PHM', 'CF']
+        watchlist = ['MSFT', 'ADBE', 'PHM', 'CF', 'EOG']
     
     total_investment = sum(p['investment'] for p in portfolio.values())
     

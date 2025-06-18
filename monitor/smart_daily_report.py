@@ -61,8 +61,8 @@ class SmartDailyReportGenerator:
             portfolio: 用户持仓信息
             watch_targets: 观察目标股票（准备买入的股票）
         """
-        # 用户持仓股票列表 + 观察股票
-        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'EOG', 'MSFT', 'PHM', 'CF']
+        # 用户持仓股票列表 + 观察股票 (排除港股小米，避免数据获取问题)
+        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'MSFT', 'PHM', 'CF', 'EOG']
         self.auto_update_data = auto_update_data
         self.data_source_type = None
         
@@ -76,14 +76,13 @@ class SmartDailyReportGenerator:
                 logger.info("✅ 从统一配置文件成功加载持仓信息")
             except Exception as e:
                 logger.warning(f"加载统一配置失败，使用默认配置: {e}")
-                # 保留原有默认配置作为后备
+                # 保留原有默认配置作为后备 (排除港股小米，避免数据获取问题)
                 self.portfolio = {
-                    'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.86, 'investment': 4788.89},
-                    'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.53, 'investment': 4715.83},
-                    'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.97, 'investment': 1526.65},
-                    'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.92, 'investment': 4582.24},
-                    'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.74, 'investment': 1038.22},
-                    'EOG': {'cost': 122.119, 'shares': 5, 'weight': 2.20, 'investment': 481.88}
+                    'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.93, 'investment': 4788.89},
+                    'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.44, 'investment': 4715.83},
+                    'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.90, 'investment': 1526.65},
+                    'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.91, 'investment': 4582.24},
+                    'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.65, 'investment': 1038.22}
                 }
         else:
             self.portfolio = portfolio
@@ -99,21 +98,21 @@ class SmartDailyReportGenerator:
                 self.money_fund_allocation = portfolio_summary.get('money_fund_allocation', {}).get('percentage', 11.70)
                 self.money_fund_value = portfolio_summary.get('money_fund_allocation', {}).get('amount', 3262.53)
             else:
-                # 使用默认值
-                self.total_portfolio_value = 27884.87
-                self.total_stock_investment = 21903.42
-                self.portfolio_allocation = 78.55
-                self.cash_allocation = 9.75
-                self.money_fund_allocation = 11.70
-                self.money_fund_value = 3262.53
+                # 使用默认值 (美股部分，排除港股小米)
+                self.total_portfolio_value = 27722.97
+                self.total_stock_investment = 21121.29
+                self.portfolio_allocation = 76.18
+                self.cash_allocation = 2.20
+                self.money_fund_allocation = 21.59
+                self.money_fund_value = 5983.65
         except Exception as e:
             logger.warning(f"获取投资组合价值配置失败，使用默认值: {e}")
-            self.total_portfolio_value = 27884.87
-            self.total_stock_investment = 21903.42
-            self.portfolio_allocation = 78.55
-            self.cash_allocation = 9.75
-            self.money_fund_allocation = 11.70
-            self.money_fund_value = 3262.53
+            self.total_portfolio_value = 27722.97
+            self.total_stock_investment = 21121.29
+            self.portfolio_allocation = 76.18
+            self.cash_allocation = 2.20
+            self.money_fund_allocation = 21.59
+            self.money_fund_value = 5983.65
         
         # 观察目标股票（准备买入的股票）
         self.watch_targets = watch_targets or {
@@ -144,6 +143,13 @@ class SmartDailyReportGenerator:
                 'previous_gain': None,
                 'target_buy_below': 84.00,  # 基于布林带下轨支撑位($85.69)下方2%
                 'reason': '化肥龙头，周期回暖，当前价格$99.93，等待回调至布林带下轨支撑位附近买入'
+            },
+            'EOG': {
+                'previous_buy': 122.119,  # 之前买入价格
+                'previous_sell': 123.20,  # 刚刚卖出价格
+                'previous_gain': 0.89,    # 约0.89%收益
+                'target_buy_below': 110.00,  # 等待更好价位
+                'reason': '能源股，因宏观环境不利卖出观望，等待更好入场时机或能源行业转好'
             }
         }
         

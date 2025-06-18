@@ -44,7 +44,8 @@ class EnhancedDailyAnalysis:
             'TSLA': 'Tesla(特斯拉)',
             'PFE': 'Pfizer(辉瑞制药)',
             'EOG': 'EOG Resources(EOG能源)',
-            'TMDX': 'TransMedics(移植医疗)'
+            'TMDX': 'TransMedics(移植医疗)',
+            '9999.HK': '小米集团-W'
         }
         
         # 行业中文名称
