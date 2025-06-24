@@ -210,7 +210,7 @@ class RightSideTradingSystem:
         return trend_days
     
     def _check_entry_signals(self, data: pd.DataFrame) -> Dict:
-        """检查右侧交易入场信号（改进版）"""
+        """检查右侧交易入场信号（改进版 - 增加质量过滤）"""
         current = data.iloc[-1]
         
         signals = {
@@ -219,14 +219,19 @@ class RightSideTradingSystem:
             "wait_signals": []
         }
         
-        # 买入信号检查
+        # 获取左侧风险警告
+        risk_warnings = self._check_left_side_risks(data)
+        has_volume_risk = any("无量上涨" in warning for warning in risk_warnings)
+        has_trend_risk = any("反弹陷阱" in warning for warning in risk_warnings)
+        
+        # 买入信号检查（增加质量过滤）
         if self._check_breakout_signal(data):
             signals["buy_signals"].append("🚀 突破信号：价格突破关键阻力位且有成交量配合")
         
-        if self._check_trend_continuation_signal(data):
+        if self._check_trend_continuation_signal(data) and not has_volume_risk:
             signals["buy_signals"].append("📈 趋势延续：上升趋势确认，可考虑加仓")
         
-        if self._check_pullback_signal(data):
+        if self._check_pullback_signal(data) and not has_volume_risk and not has_trend_risk:
             signals["buy_signals"].append("🔄 回调买入：健康回调至支撑位，趋势仍完好")
         
         # 卖出信号检查
@@ -235,6 +240,11 @@ class RightSideTradingSystem:
         
         if self._check_trend_reversal_signal(data):
             signals["sell_signals"].append("🔄 趋势反转：多重信号显示趋势可能反转")
+        
+        # 如果有严重风险警告，优先显示等待信号
+        if has_volume_risk and signals["buy_signals"]:
+            signals["wait_signals"].append("⚠️ 成交量不足：建议等待成交量确认后再考虑买入")
+            signals["buy_signals"] = []  # 清除买入信号
         
         # 新增：积极信号检查
         if not signals["buy_signals"] and not signals["sell_signals"]:
@@ -281,7 +291,7 @@ class RightSideTradingSystem:
         return conditions_met >= 2
     
     def _check_pullback_signal(self, data: pd.DataFrame) -> bool:
-        """检查回调买入信号（放宽条件）"""
+        """检查回调买入信号（增加成交量检查）"""
         current = data.iloc[-1]
         recent = data.tail(10)
         
@@ -295,7 +305,13 @@ class RightSideTradingSystem:
         # RSI不过度超卖或超买
         rsi_reasonable = 25 < current['RSI'] < 75  # 放宽RSI范围
         
-        return overall_uptrend and pullback_reasonable and rsi_reasonable
+        # 成交量支撑检查 - 右侧交易核心原则
+        volume_support = current['Volume_Ratio'] >= 0.9  # 至少不能过度萎缩
+        
+        # 避免与左侧风险警告冲突
+        no_volume_concern = not (current['Close'] > data.iloc[-2]['Close'] and current['Volume_Ratio'] < 0.8)
+        
+        return overall_uptrend and pullback_reasonable and rsi_reasonable and volume_support and no_volume_concern
     
     def _check_breakdown_signal(self, data: pd.DataFrame) -> bool:
         """检查跌破信号（降低成交量要求）"""
