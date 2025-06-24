@@ -15,7 +15,7 @@ class RightSideTradingSystem:
     
     def __init__(self):
         self.trend_confirmation_days = 3  # 趋势确认天数
-        self.volume_confirmation_factor = 1.2  # 成交量确认倍数
+        self.volume_confirmation_factor = 1.1  # 降低成交量确认倍数 1.2 -> 1.1
         self.momentum_threshold = 0.02  # 动量阈值
         self.ma_periods = [5, 10, 20, 50]  # 均线周期
         
@@ -210,7 +210,7 @@ class RightSideTradingSystem:
         return trend_days
     
     def _check_entry_signals(self, data: pd.DataFrame) -> Dict:
-        """检查右侧交易入场信号"""
+        """检查右侧交易入场信号（改进版）"""
         current = data.iloc[-1]
         
         signals = {
@@ -236,9 +236,14 @@ class RightSideTradingSystem:
         if self._check_trend_reversal_signal(data):
             signals["sell_signals"].append("🔄 趋势反转：多重信号显示趋势可能反转")
         
-        # 等待信号
+        # 新增：积极信号检查
         if not signals["buy_signals"] and not signals["sell_signals"]:
-            signals["wait_signals"].append("⏳ 趋势不明确，建议等待更清晰的信号")
+            # 检查是否有潜在机会
+            potential_signals = self._check_potential_opportunities(data)
+            if potential_signals:
+                signals["wait_signals"].extend(potential_signals)
+            else:
+                signals["wait_signals"].append("⏳ 趋势不明确，建议等待更清晰的信号")
         
         return signals
     
@@ -247,64 +252,65 @@ class RightSideTradingSystem:
         current = data.iloc[-1]
         prev_5d = data.tail(5)
         
-        # 价格突破20日高点
-        price_breakout = current['Close'] > prev_5d['High'].max()
+        # 价格突破5日高点（降低要求）
+        price_breakout = current['Close'] > prev_5d['High'].max() * 0.995  # 允许0.5%的容差
         
-        # 成交量放大
+        # 成交量放大（降低要求）
         volume_surge = current['Volume_Ratio'] > self.volume_confirmation_factor
         
-        # 均线支撑
+        # 均线支撑（保持）
         ma_support = current['Close'] > current['MA_10']
         
         return price_breakout and volume_surge and ma_support
     
     def _check_trend_continuation_signal(self, data: pd.DataFrame) -> bool:
-        """检查趋势延续信号"""
+        """检查趋势延续信号（放宽条件）"""
         current = data.iloc[-1]
         
-        # 均线多头排列
-        ma_bullish = (current['MA_5'] > current['MA_10'] > 
-                     current['MA_20'] > current['MA_50'])
+        # 放宽均线多头排列要求：只要求MA5>MA20即可
+        ma_trend_positive = current['MA_5'] > current['MA_20']
         
-        # 价格在均线上方
+        # 价格在短期均线上方
         price_above_ma = current['Close'] > current['MA_5']
         
-        # MACD金叉
-        macd_bullish = current['MACD'] > current['MACD_Signal']
+        # MACD金叉或MACD线向上
+        macd_positive = current['MACD'] > current['MACD_Signal'] or current['MACD'] > data.iloc[-2]['MACD']
         
-        return ma_bullish and price_above_ma and macd_bullish
+        # 至少满足2个条件
+        conditions_met = sum([ma_trend_positive, price_above_ma, macd_positive])
+        return conditions_met >= 2
     
     def _check_pullback_signal(self, data: pd.DataFrame) -> bool:
-        """检查回调买入信号"""
+        """检查回调买入信号（放宽条件）"""
         current = data.iloc[-1]
         recent = data.tail(10)
         
-        # 整体趋势向上
-        overall_uptrend = current['MA_20'] > data.iloc[-10]['MA_20']
+        # 中长期趋势向上（放宽要求）
+        overall_uptrend = current['MA_20'] >= data.iloc[-10]['MA_20'] * 0.99  # 允许小幅下降
         
-        # 短期回调至支撑位
-        pullback_to_support = (current['Close'] <= current['MA_10'] and 
-                              current['Close'] > current['MA_20'])
+        # 价格在合理回调区间（放宽范围）
+        pullback_reasonable = (current['Close'] <= current['MA_5'] * 1.02 and 
+                              current['Close'] > current['MA_20'] * 0.95)
         
-        # RSI不过度超卖
-        rsi_healthy = 35 < current['RSI'] < 65
+        # RSI不过度超卖或超买
+        rsi_reasonable = 25 < current['RSI'] < 75  # 放宽RSI范围
         
-        return overall_uptrend and pullback_to_support and rsi_healthy
+        return overall_uptrend and pullback_reasonable and rsi_reasonable
     
     def _check_breakdown_signal(self, data: pd.DataFrame) -> bool:
-        """检查跌破信号"""
+        """检查跌破信号（降低成交量要求）"""
         current = data.iloc[-1]
         
         # 跌破关键支撑
-        breakdown = current['Close'] < current['MA_20']
+        breakdown = current['Close'] < current['MA_20'] * 0.98  # 明确跌破2%
         
-        # 成交量放大
-        volume_surge = current['Volume_Ratio'] > 1.5
+        # 成交量放大（降低要求）
+        volume_surge = current['Volume_Ratio'] > 1.2  # 从1.5降低到1.2
         
         return breakdown and volume_surge
     
     def _check_trend_reversal_signal(self, data: pd.DataFrame) -> bool:
-        """检查趋势反转信号"""
+        """检查趋势反转信号（放宽条件）"""
         current = data.iloc[-1]
         
         # MACD死叉
@@ -312,12 +318,43 @@ class RightSideTradingSystem:
                        data.iloc[-2]['MACD'] >= data.iloc[-2]['MACD_Signal'])
         
         # RSI超买后回落
-        rsi_overbought = current['RSI'] > 70
+        rsi_overbought_decline = current['RSI'] > 75 and current['RSI'] < data.iloc[-2]['RSI']
         
-        # 价格跌破短期均线
-        price_breakdown = current['Close'] < current['MA_5']
+        # 价格跌破短期均线且有成交量
+        price_volume_breakdown = (current['Close'] < current['MA_5'] and 
+                                 current['Volume_Ratio'] > 1.1)
         
-        return macd_bearish or (rsi_overbought and price_breakdown)
+        return macd_bearish or rsi_overbought_decline or price_volume_breakdown
+    
+    def _check_potential_opportunities(self, data: pd.DataFrame) -> List[str]:
+        """检查潜在机会"""
+        current = data.iloc[-1]
+        opportunities = []
+        
+        # 接近突破
+        prev_5d = data.tail(5)
+        near_breakout = current['Close'] > prev_5d['High'].max() * 0.98
+        if near_breakout and current['Volume_Ratio'] > 0.9:
+            opportunities.append("🟡 接近突破：价格接近高点，关注成交量放大")
+        
+        # 均线收敛
+        ma_convergence = abs(current['MA_5'] - current['MA_20']) / current['MA_20'] < 0.02
+        if ma_convergence and current['RSI'] > 45:
+            opportunities.append("🟡 均线收敛：短期可能选择方向")
+        
+        # RSI从超卖反弹
+        rsi_recovery = current['RSI'] > 35 and data.iloc[-3]['RSI'] < 30
+        if rsi_recovery and current['Close'] > current['MA_5']:
+            opportunities.append("🟡 RSI反弹：从超卖区域反弹，可关注")
+        
+        # MACD即将金叉
+        macd_approaching_cross = (current['MACD'] < current['MACD_Signal'] and 
+                                 current['MACD'] > data.iloc[-2]['MACD'] and
+                                 abs(current['MACD'] - current['MACD_Signal']) < 0.5)
+        if macd_approaching_cross:
+            opportunities.append("🟡 MACD改善：MACD线向上，可能即将金叉")
+        
+        return opportunities
     
     def _check_left_side_risks(self, data: pd.DataFrame) -> List[str]:
         """检查左侧交易风险警告"""
