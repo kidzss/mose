@@ -456,7 +456,7 @@ def generate_smart_recommendations(analysis_result: Dict, portfolio_context: Dic
   "portfolio_config": {
     "positions": {
       "AMD": {"cost": 126.214, "shares": 48, "weight": 21.86},
-      "GOOGL": {"cost": 170.54, "shares": 34, "weight": 21.53}
+      "GOOG": {"cost": 170.54, "shares": 34, "weight": 21.53}
     },
     "watch_list": ["MSFT", "ADBE", "PHM", "CF"],
     "total_portfolio_value": 27884.87
@@ -573,8 +573,8 @@ $ python run_daily_analysis.py
 ✅ 启动分析引擎...
 
 📊 开始分析持仓股票:
-   • AMD: 48股, 成本$126.214
-   • GOOGL: 34股, 成本$170.54
+   • AMD: 40股, 成本$126.214
+   • GOOG: 30股, 成本$170.54
    • PFE: 80股, 成本$25.899
    • NVDA: 40股, 成本$138.843
    • TSLA: 4股, 成本$179.841

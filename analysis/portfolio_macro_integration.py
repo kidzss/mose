@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 import logging
-from macro_factor_analyzer import MacroFactorAnalyzer
+from analysis.macro_factor_analyzer import MacroFactorAnalyzer
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -288,16 +288,45 @@ class PortfolioMacroIntegration:
                     "宏观环境有利，可适当增加权益配置"
                 )
             
-            # 基于行业影响生成建议
-            for sector, score in sector_impact.items():
-                if score < 0.4:
-                    recommendations['immediate_actions'].append(
-                        f"减少{sector}行业配置，该行业受宏观环境负面影响较大"
-                    )
-                elif score > 0.7:
-                    recommendations['medium_term_actions'].append(
-                        f"可考虑增加{sector}行业配置，宏观环境对该行业有利"
-                    )
+            # 使用通胀分析器的动态结果生成行业建议
+            try:
+                from analysis.inflation_sector_analyzer import InflationSectorAnalyzer
+                inflation_analyzer = InflationSectorAnalyzer()
+                inflation_report = inflation_analyzer.generate_inflation_sector_report()
+                
+                # 基于通胀分析生成行业建议
+                if 'sector_analysis' in inflation_report:
+                    for sector_name, sector_data in inflation_report['sector_analysis'].items():
+                        suggestion = sector_data.get('investment_suggestion', '')
+                        if '减少' in suggestion or '降低' in suggestion:
+                            recommendations['immediate_actions'].append(
+                                f"基于通胀分析：{suggestion}"
+                            )
+                        elif '增加' in suggestion or '加大' in suggestion:
+                            recommendations['medium_term_actions'].append(
+                                f"基于通胀分析：{suggestion}"
+                            )
+                
+                # 添加通胀相关的投资建议
+                if 'investment_recommendations' in inflation_report:
+                    for rec in inflation_report['investment_recommendations'][:3]:  # 取前3条
+                        if '立即' in rec or '紧急' in rec:
+                            recommendations['immediate_actions'].append(rec)
+                        else:
+                            recommendations['medium_term_actions'].append(rec)
+                            
+            except Exception as e:
+                logger.warning(f"获取通胀分析建议失败，使用基础建议: {e}")
+                # 降级处理：基于传统sector_impact生成建议
+                for sector, score in sector_impact.items():
+                    if score < 0.4:
+                        recommendations['immediate_actions'].append(
+                            f"重点关注{sector}行业，宏观环境对该行业影响较大"
+                        )
+                    elif score > 0.7:
+                        recommendations['medium_term_actions'].append(
+                            f"可考虑增加{sector}行业配置，宏观环境对该行业有利"
+                        )
             
             # 基于个股影响生成建议
             high_risk_positions = portfolio_impact.get('high_risk_positions', [])
@@ -309,7 +338,7 @@ class PortfolioMacroIntegration:
                     "考虑降低高风险持仓权重或设置更严格的止损"
                 )
             
-            # 监控要点
+            # 监控要点（保留，这些是合理的固定监控项）
             recommendations['monitoring_points'].extend([
                 "关注美联储政策变化对利率环境的影响",
                 "监控VIX指数变化，警惕市场情绪恶化",

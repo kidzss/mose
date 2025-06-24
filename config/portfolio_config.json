@@ -1,80 +1,55 @@
 {
-    "positions": {
-        "NVDA": {
-            "cost_basis": 97.06,
-            "stop_loss": 0.12,
-            "weight": 0.15
-        },
-        "MSFT": {
-            "cost_basis": 359.60,
-            "stop_loss": 0.12,
-            "weight": 0.15
-        },
-        "PFE": {
-            "cost_basis": 22.08,
-            "stop_loss": 0.10,
-            "weight": 0.10
-        },
-        "GOOG": {
-            "cost_basis": 150.16,
-            "stop_loss": 0.12,
-            "weight": 0.15
-        },
-        "AMD": {
-            "cost_basis": 85.71,
-            "stop_loss": 0.12,
-            "weight": 0.15
-        },
-        "TSLA": {
-            "cost_basis": 227.62,
-            "stop_loss": 0.15,
-            "weight": 0.15
-        },
-        "TMDX": {
-            "cost_basis": 87.78,
-            "stop_loss": 0.10,
-            "weight": 0.15
-        }
+  "update_time": "2025-06-20T12:25:59.691595",
+  "total_assets": 27578,
+  "cash_balance": 10672.058625488282,
+  "positions": {
+    "AMD": {
+      "shares": 35,
+      "current_price": 128.7799072265625,
+      "market_value": 4507.2967529296875,
+      "weight": 16.343813013741705
     },
-    "monitor_config": {
-        "price_alert_threshold": 0.05,
-        "loss_alert_threshold": 0.05,
-        "profit_target": 0.25,
-        "stop_loss": 0.15,
-        "check_interval": 60,
-        "email_notifications": true,
-        "update_interval": 60,
-        "risk_thresholds": {
-            "volatility": 0.02,
-            "concentration": 0.3,
-            "var": 0.1
-        },
-        "notification_settings": {
-            "email": true,
-            "slack": false,
-            "telegram": false
-        },
-        "sector_specific_settings": {
-            "semiconductor": {
-                "stop_loss": 0.08,
-                "price_alert_threshold": 0.03,
-                "volatility_threshold": 0.03
-            },
-            "tech": {
-                "stop_loss": 0.12,
-                "price_alert_threshold": 0.04,
-                "volatility_threshold": 0.025
-            },
-            "healthcare": {
-                "stop_loss": 0.10,
-                "price_alert_threshold": 0.04,
-                "volatility_threshold": 0.02
-            },
-            "automotive": {
-                "stop_loss": 0.15,
-                "price_alert_threshold": 0.05,
-                "volatility_threshold": 0.03
-            }
-        }
+    "GOOG": {
+      "shares": 30,
+      "current_price": 170.14999389648438,
+      "market_value": 5104.499816894531,
+      "weight": 18.509318358454316
+    },
+    "NVDA": {
+      "shares": 35,
+      "current_price": 144.21499633789062,
+      "market_value": 5047.524871826172,
+      "weight": 18.302722720379187
+    },
+    "PFE": {
+      "shares": 80,
+      "current_price": 24.0049991607666,
+      "market_value": 1920.3999328613281,
+      "weight": 6.963521404240076
+    },
+    "BRK-B": {
+      "shares": 2,
+      "current_price": 485.5,
+      "market_value": 971.0,
+      "weight": 3.5209224744361443
     }
-} 
+  },
+  "recent_transactions": [
+    {
+      "date": "2025-06-20",
+      "action": "SELL",
+      "symbol": "AMD",
+      "shares": 5,
+      "price": 128.9,
+      "amount": 644.5
+    },
+    {
+      "date": "2025-06-20",
+      "action": "BUY",
+      "symbol": "BRK-B",
+      "shares": 2,
+      "price": 485.36,
+      "amount": 970.72
+    }
+  ]
+}

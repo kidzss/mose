@@ -1,23 +1,59 @@
 {
   "email": "kidzss@gmail.com",
   "risk_tolerance": "moderate",
-  "max_position_size": 0.2,
+  "max_position_size": 0.20,
   "min_quality_factor": 0.7,
   "max_results": 15,
   "min_score": 60,
   "investment_goals": {
     "time_horizon": "3-5年",
     "risk_preference": "中等风险",
-    "investment_amount": "可承受20%亏损"
+    "investment_amount": "可承受20%亏损",
+    "target_annual_return": "25%",
+    "description": "追求成长与防御平衡，波段操作为主"
   },
   "preferred_sectors": [
     "科技",
-    "消费",
+    "消费", 
     "医疗",
     "金融"
   ],
   "excluded_sectors": [
     "能源",
     "原材料"
-  ]
-}
+  ],
+  "current_portfolio": {
+    "total_assets": 27533.17,
+    "stock_allocation": 63.67,
+    "cash_allocation": 14.58,
+    "fund_allocation": 21.75,
+    "major_holdings": [
+      "NVDA",
+      "GOOG", 
+      "AMD",
+      "PFE",
+      "MRK",
+      "BRK-B"
+    ]
+  },
+  "trading_preferences": {
+    "strategy_type": "波段操作",
+    "buy_threshold": "回调15-25%时分批买入",
+    "sell_threshold": "盈利20-50%时分批卖出",
+    "stop_loss": "8-12%止损",
+    "position_management": "单股不超过20%，单行业不超过50%"
+  },
+  "automation_settings": {
+    "weekly_screening": true,
+    "monthly_analysis": true,
+    "quarterly_strategy": true,
+    "email_notifications": true,
+    "risk_alerts": true
+  },
+  "market_timing": {
+    "use_vix_signals": true,
+    "vix_buy_threshold": 25,
+    "vix_sell_threshold": 15,
+    "market_sentiment_weight": 0.3
+  }
+} 

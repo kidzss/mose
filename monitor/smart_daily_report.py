@@ -33,6 +33,14 @@ except ImportError:
     MACRO_ANALYSIS_AVAILABLE = False
     logger.warning("宏观分析模块不可用，将跳过宏观分析部分")
 
+# 添加右侧交易系统模块
+try:
+    from right_side_trading_system import RightSideTradingSystem, generate_right_side_trading_alerts, format_right_side_trading_report
+    RIGHT_SIDE_TRADING_AVAILABLE = True
+except ImportError:
+    RIGHT_SIDE_TRADING_AVAILABLE = False
+    logger.warning("右侧交易系统模块不可用，将跳过右侧交易分析部分")
+
 # 添加财务分析模块
 try:
     from monitor.financial_analyzer import FinancialAnalyzer
@@ -40,6 +48,22 @@ try:
 except ImportError:
     FINANCIAL_ANALYSIS_AVAILABLE = False
     logger.warning("财务分析模块不可用，将跳过财务分析部分")
+
+# 添加流动性分析模块
+try:
+    from analysis.liquidity_analyzer import LiquidityAnalyzer
+    LIQUIDITY_ANALYSIS_AVAILABLE = True
+except ImportError:
+    LIQUIDITY_ANALYSIS_AVAILABLE = False
+    logger.warning("流动性分析模块不可用，将跳过流动性分析部分")
+
+# 添加通胀-行业分析模块
+try:
+    from analysis.inflation_sector_analyzer import InflationSectorAnalyzer
+    INFLATION_SECTOR_ANALYSIS_AVAILABLE = True
+except ImportError:
+    INFLATION_SECTOR_ANALYSIS_AVAILABLE = False
+    logger.warning("通胀-行业分析模块不可用，将跳过通胀行业分析部分")
 
 # 配置日志
 logging.basicConfig(
@@ -61,31 +85,49 @@ class SmartDailyReportGenerator:
             portfolio: 用户持仓信息
             watch_targets: 观察目标股票（准备买入的股票）
         """
-        # 用户持仓股票列表 + 观察股票 (排除港股小米，避免数据获取问题)
-        self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'MSFT', 'PHM', 'CF', 'EOG']
         self.auto_update_data = auto_update_data
         self.data_source_type = None
         
-        # 用户持仓信息 - 从统一配置文件加载 (更新日期: 2025-06-16)
-        if portfolio is None:
-            # 从统一配置加载持仓信息
-            try:
-                from utils.portfolio_config_loader import get_portfolio_config
-                config_loader = get_portfolio_config()
+        # 从统一配置文件加载持仓信息和观察列表 (更新日期: 2025-06-19)
+        try:
+            from utils.portfolio_config_loader import get_portfolio_config
+            config_loader = get_portfolio_config()
+            
+            # 获取持仓股票列表
+            portfolio_symbols = config_loader.get_portfolio_symbols()
+            # 获取观察列表股票（排除港股和VIX指数）
+            watchlist_symbols = [symbol for symbol in config_loader.get_watchlist_symbols() 
+                               if not symbol.startswith('^') and not symbol.endswith('.HK')]
+            
+            # 合并持仓和观察列表作为监控列表
+            if watchlist is None:
+                self.watchlist = list(set(portfolio_symbols + watchlist_symbols))
+                # 排除港股小米，避免数据获取问题
+                self.watchlist = [symbol for symbol in self.watchlist if not symbol.endswith('.HK')]
+                logger.info(f"✅ 从统一配置文件加载监控列表: {len(self.watchlist)}只股票")
+                logger.info(f"   持仓股票: {len(portfolio_symbols)}只")
+                logger.info(f"   观察列表: {len(watchlist_symbols)}只")
+            else:
+                self.watchlist = watchlist
+            
+            # 加载持仓信息
+            if portfolio is None:
                 self.portfolio = config_loader.to_smart_report_format()
                 logger.info("✅ 从统一配置文件成功加载持仓信息")
-            except Exception as e:
-                logger.warning(f"加载统一配置失败，使用默认配置: {e}")
-                # 保留原有默认配置作为后备 (排除港股小米，避免数据获取问题)
-                self.portfolio = {
-                    'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.93, 'investment': 4788.89},
-                    'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.44, 'investment': 4715.83},
-                    'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.90, 'investment': 1526.65},
-                    'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.91, 'investment': 4582.24},
-                    'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.65, 'investment': 1038.22}
-                }
-        else:
-            self.portfolio = portfolio
+            else:
+                self.portfolio = portfolio
+                
+        except Exception as e:
+            logger.warning(f"加载统一配置失败，使用默认配置: {e}")
+            # 保留原有默认配置作为后备
+            self.watchlist = watchlist or ['AMD', 'GOOGL', 'PFE', 'NVDA', 'TSLA', 'MSFT', 'PHM', 'CF', 'EOG']
+            self.portfolio = portfolio or {
+                'AMD': {'cost': 126.214, 'shares': 48, 'weight': 21.93, 'investment': 4788.89},
+                'GOOGL': {'cost': 170.54, 'shares': 34, 'weight': 21.44, 'investment': 4715.83},
+                'PFE': {'cost': 25.899, 'shares': 80, 'weight': 6.90, 'investment': 1526.65},
+                'NVDA': {'cost': 138.843, 'shares': 40, 'weight': 20.91, 'investment': 4582.24},
+                'TSLA': {'cost': 179.841, 'shares': 4, 'weight': 4.65, 'investment': 1038.22}
+            }
         
         # 投资组合总价值计算 - 从统一配置文件获取
         try:
@@ -114,44 +156,44 @@ class SmartDailyReportGenerator:
             self.money_fund_allocation = 21.59
             self.money_fund_value = 5983.65
         
-        # 观察目标股票（准备买入的股票）
-        self.watch_targets = watch_targets or {
-            'MSFT': {
-                'previous_buy': 370.95,
-                'previous_sell': 453.97,
-                'previous_gain': 22.4,  # 约22.4%收益
-                'target_buy_below': 420.0,  # 建议买入价格下方
-                'reason': '准备再次买入，关注买入时机'
-            },
-            'ADBE': {
-                'previous_buy': 346.896,  # 刚刚卖出
-                'previous_sell': 398.2,
-                'previous_gain': 14.8,  # 约14.8%收益
-                'target_buy_below': 380.0,  # 建议回调后再次买入
-                'reason': '刚刚获利了结，等待回调至$380以下再次买入机会'
-            },
-            'PHM': {
-                'previous_buy': None,  # 从未购买过
-                'previous_sell': None,
-                'previous_gain': None,
-                'target_buy_below': 98.00,  # 基于50日均线支撑位($100.16)下方2%
-                'reason': '地产龙头，业绩稳健，接近买入区域，当前价格$101.61，关注50日均线支撑买入机会'
-            },
-            'CF': {
-                'previous_buy': None,  # 从未购买过
-                'previous_sell': None,
-                'previous_gain': None,
-                'target_buy_below': 84.00,  # 基于布林带下轨支撑位($85.69)下方2%
-                'reason': '化肥龙头，周期回暖，当前价格$99.93，等待回调至布林带下轨支撑位附近买入'
-            },
-            'EOG': {
-                'previous_buy': 122.119,  # 之前买入价格
-                'previous_sell': 123.20,  # 刚刚卖出价格
-                'previous_gain': 0.89,    # 约0.89%收益
-                'target_buy_below': 110.00,  # 等待更好价位
-                'reason': '能源股，因宏观环境不利卖出观望，等待更好入场时机或能源行业转好'
-            }
-        }
+        # 观察目标股票（准备买入的股票）- 从统一配置文件加载
+        if watch_targets is None:
+            try:
+                # 从统一配置文件加载观察列表详情
+                watchlist_details = config_loader.get_watchlist()
+                self.watch_targets = {}
+                
+                for symbol, details in watchlist_details.items():
+                    # 跳过港股和VIX指数
+                    if symbol.startswith('^') or symbol.endswith('.HK'):
+                        continue
+                        
+                    self.watch_targets[symbol] = {
+                        'previous_buy': details.get('previous_transactions', {}).get('last_buy'),
+                        'previous_sell': details.get('previous_transactions', {}).get('last_sell'),
+                        'previous_gain': details.get('previous_transactions', {}).get('profit_percentage'),
+                        'target_buy_below': details.get('target_buy_price', details.get('target_level')),
+                        'reason': details.get('reason', '无描述'),
+                        'category': details.get('category', '观察股票')
+                    }
+                
+                logger.info(f"✅ 从统一配置文件加载观察目标: {len(self.watch_targets)}只股票")
+                
+            except Exception as e:
+                logger.warning(f"加载观察目标失败: {e}")
+                # 使用默认观察目标
+                self.watch_targets = {
+                    'MSFT': {
+                        'previous_buy': 370.95,
+                        'previous_sell': 453.97,
+                        'previous_gain': 22.4,
+                        'target_buy_below': 420.0,
+                        'reason': '准备再次买入，关注买入时机',
+                        'category': '原有观察股'
+                    }
+                }
+        else:
+            self.watch_targets = watch_targets
         
         # 初始化数据接口 - 支持回退机制
         self._init_data_sources()
@@ -171,6 +213,26 @@ class SmartDailyReportGenerator:
             except Exception as e:
                 logger.error(f"宏观分析模块初始化失败: {e}")
                 self.macro_integration = None
+        
+        # 初始化流动性分析器
+        self.liquidity_analyzer = None
+        if LIQUIDITY_ANALYSIS_AVAILABLE:
+            try:
+                self.liquidity_analyzer = LiquidityAnalyzer()
+                logger.info("流动性分析模块初始化成功")
+            except Exception as e:
+                logger.error(f"流动性分析模块初始化失败: {e}")
+                self.liquidity_analyzer = None
+        
+        # 初始化通胀-行业分析器
+        self.inflation_sector_analyzer = None
+        if INFLATION_SECTOR_ANALYSIS_AVAILABLE:
+            try:
+                self.inflation_sector_analyzer = InflationSectorAnalyzer()
+                logger.info("通胀-行业分析模块初始化成功")
+            except Exception as e:
+                logger.error(f"通胀-行业分析模块初始化失败: {e}")
+                self.inflation_sector_analyzer = None
         
         # 初始化财务分析器
         self.financial_analyzer = None
@@ -195,6 +257,16 @@ class SmartDailyReportGenerator:
         except Exception as e:
             logger.warning(f"增强分析器初始化失败: {e}")
             self.enhanced_analyzer = None
+        
+        # 初始化右侧交易系统（防抄底系统）
+        self.right_side_trading_system = None
+        if RIGHT_SIDE_TRADING_AVAILABLE:
+            try:
+                self.right_side_trading_system = RightSideTradingSystem()
+                logger.info("右侧交易系统初始化成功")
+            except Exception as e:
+                logger.error(f"右侧交易系统初始化失败: {e}")
+                self.right_side_trading_system = None
         
         # 设置中文字体支持
         self._setup_chinese_font()
@@ -632,6 +704,33 @@ class SmartDailyReportGenerator:
                 except Exception as e:
                     logger.error(f"{symbol} 财务分析失败: {e}")
             
+            # 流动性分析（核心功能1：增强流动性评估）
+            if self.liquidity_analyzer:
+                try:
+                    liquidity_metrics = self.liquidity_analyzer.analyze_stock_liquidity(symbol)
+                    result['liquidity_analysis'] = {
+                        'liquidity_score': liquidity_metrics.liquidity_score,
+                        'risk_level': liquidity_metrics.risk_level,
+                        'bid_ask_spread_pct': liquidity_metrics.bid_ask_spread_pct,
+                        'market_cap_tier': liquidity_metrics.market_cap_tier,
+                        'exit_difficulty': liquidity_metrics.exit_difficulty,
+                        'risk_warning': liquidity_metrics.risk_warning,
+                        'investment_suggestion': liquidity_metrics.investment_suggestion,
+                        'spread_rating': liquidity_metrics.spread_rating,
+                        'volume_consistency': liquidity_metrics.volume_consistency,
+                        'market_depth_score': liquidity_metrics.market_depth_score,
+                        'liquidity_reasons': liquidity_metrics.liquidity_reasons,
+                        'avg_daily_volume': liquidity_metrics.avg_daily_volume
+                    }
+                    logger.info(f"{symbol} 流动性分析完成 - 评分: {liquidity_metrics.liquidity_score:.1f}, 风险: {liquidity_metrics.liquidity_risk_level}")
+                except Exception as e:
+                    logger.error(f"{symbol} 流动性分析失败: {e}")
+                    result['liquidity_analysis'] = {
+                        'liquidity_score': 0,
+                        'risk_level': 'critical',
+                        'warning_message': f"流动性分析失败: {str(e)}"
+                    }
+            
             # 增强分析（新功能集成）
             if self.enhanced_analyzer:
                 try:
@@ -658,20 +757,83 @@ class SmartDailyReportGenerator:
                             result['enhanced_warnings'].extend(enhanced_warnings)
                             
                     else:
-                        logger.warning(f"{symbol} 增强分析数据不可用")
+                        logger.warning(f"{symbol} 增强分析不可用或出错")
                 except Exception as e:
                     logger.error(f"{symbol} 增强分析失败: {e}")
             
-            # 生成图表
+            # 右侧交易分析（防抄底系统）
+            if self.right_side_trading_system:
+                try:
+                    right_side_analysis = self.right_side_trading_system.analyze_trend_confirmation(symbol)
+                    if right_side_analysis and 'error' not in right_side_analysis:
+                        result['right_side_trading'] = right_side_analysis
+                        
+                        # 记录右侧交易分析的关键信息
+                        trend_status = right_side_analysis['trend_status']
+                        entry_signals = right_side_analysis['entry_signals']
+                        risk_warnings = right_side_analysis['risk_warnings']
+                        
+                        logger.info(f"{symbol} 右侧交易分析完成 - 趋势: {trend_status['direction']} ({trend_status['strength']['level']}), 确认: {trend_status['confirmed']}")
+                        
+                        # 将右侧交易建议合并到主要结果中
+                        right_side_recommendations = []
+                        
+                        # 买入信号
+                        if entry_signals['buy_signals']:
+                            for signal in entry_signals['buy_signals']:
+                                right_side_recommendations.append(f"✅ 右侧买入: {signal}")
+                        
+                        # 卖出信号
+                        if entry_signals['sell_signals']:
+                            for signal in entry_signals['sell_signals']:
+                                right_side_recommendations.append(f"🔴 右侧卖出: {signal}")
+                        
+                        # 等待信号
+                        if entry_signals['wait_signals']:
+                            for signal in entry_signals['wait_signals']:
+                                right_side_recommendations.append(f"⏳ 右侧等待: {signal}")
+                        
+                        if right_side_recommendations:
+                            if 'right_side_recommendations' not in result:
+                                result['right_side_recommendations'] = []
+                            result['right_side_recommendations'].extend(right_side_recommendations)
+                        
+                        # 将风险警告合并
+                        if risk_warnings:
+                            if 'right_side_warnings' not in result:
+                                result['right_side_warnings'] = []
+                            result['right_side_warnings'].extend(risk_warnings)
+                            
+                    else:
+                        logger.warning(f"{symbol} 右侧交易分析不可用或出错: {right_side_analysis.get('error', '未知错误')}")
+                except Exception as e:
+                    logger.error(f"{symbol} 右侧交易分析失败: {e}")
+
+            # 创建图表
             chart_path = self._create_chart(symbol, data, env_result)
-            result['chart_path'] = chart_path
+            if chart_path:
+                result['chart_base64'] = self._image_to_base64(chart_path)
             
-            logger.info(f"{symbol} 分析完成 - 环境: {result['environment']}, 信号质量: {result['signal_quality']:.2f}, 数据质量: {quality_info['quality_score']:.0f}分")
+            # 警报系统分析
+            try:
+                alerts = self.alert_system.check_alerts(symbol, data)
+                result['alerts'] = alerts
+            except Exception as e:
+                logger.warning(f"{symbol} 警报检查失败: {e}")
+                result['alerts'] = []
+            
             return result
             
         except Exception as e:
-            logger.error(f"分析 {symbol} 出错: {e}")
-            return result
+            logger.error(f"分析 {symbol} 时出错: {e}")
+            return {
+                'symbol': symbol,
+                'current_price': current_price,
+                'price_change': price_change,
+                'volume': data['volume'].iloc[-1],
+                'error': str(e),
+                'data_quality': quality_info
+            }
     
     def _image_to_base64(self, image_path: str) -> str:
         """将图片文件转换为base64编码"""
@@ -679,7 +841,7 @@ class SmartDailyReportGenerator:
             if os.path.exists(image_path):
                 with open(image_path, 'rb') as img_file:
                     img_data = base64.b64encode(img_file.read()).decode('utf-8')
-                    return f"data:image/png;base64,{img_data}"
+                    return img_data  # 只返回base64编码，不包含前缀
             return ""
         except Exception as e:
             logger.error(f"转换图片到base64失败: {e}")
@@ -809,7 +971,8 @@ class SmartDailyReportGenerator:
             for item in monitoring[:3]:  # 只显示前3项
                 monitoring_items += f"<li>{item}</li>"
             
-            return f"""
+            # 构建基础宏观分析HTML
+            html = f"""
                 <div class="data-status" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);">
                     <h3 style="margin-top: 0;">🌍 宏观环境分析</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
@@ -864,6 +1027,146 @@ class SmartDailyReportGenerator:
                     </div>
                 </div>
             """
+            
+            # 添加通胀-行业分析展示（核心功能2：完善宏观-行业影响分析）
+            logger.info(f"🔍 检查通胀-行业分析: {'inflation_sector_analysis' in macro_analysis}")
+            if 'inflation_sector_analysis' in macro_analysis:
+                logger.info("✅ 进入通胀-行业分析HTML生成代码块")
+                inflation_analysis = macro_analysis['inflation_sector_analysis']
+                inflation_env = inflation_analysis.get('inflation_environment', {})
+                sector_analysis = inflation_analysis.get('sector_analysis', {})
+                recommendations = inflation_analysis.get('investment_recommendations', [])
+                warnings = inflation_analysis.get('risk_warnings', [])
+                
+                # 通胀环境状态
+                regime = inflation_env.get('regime', '未知')
+                confidence = inflation_env.get('confidence', 0) * 100
+                trend = inflation_env.get('trend', '稳定')
+                risk_level = inflation_env.get('risk_level', 'medium')
+                
+                # 确定通胀环境的颜色
+                inflation_colors = {
+                    'low': '#28a745',
+                    'medium': '#ffc107',
+                    'medium_high': '#fd7e14',
+                    'high': '#dc3545'
+                }
+                inflation_color = inflation_colors.get(risk_level, '#6c757d')
+                
+                # 生成行业通胀敏感性表格
+                inflation_sector_rows = ""
+                sorted_sectors = sorted(sector_analysis.items(), 
+                                      key=lambda x: x[1]['overall_score'], reverse=True)
+                
+                for sector, data in sorted_sectors:
+                    score = data['overall_score']
+                    beta = data['inflation_beta']
+                    pricing_power = data['pricing_power']
+                    
+                    score_color = '#28a745' if score > 0.6 else '#ffc107' if score > 0.4 else '#dc3545'
+                    beta_display = f"+{beta:.2f}" if beta > 0 else f"{beta:.2f}"
+                    beta_color = '#28a745' if beta > 0 else '#dc3545'
+                    
+                    sector_display = sector.replace('_', ' ').title()
+                    
+                    inflation_sector_rows += f"""
+                    <tr>
+                        <td>{sector_display}</td>
+                        <td style="color: {score_color}; font-weight: bold;">{score:.2f}</td>
+                        <td style="color: {beta_color}; font-weight: bold;">{beta_display}</td>
+                        <td>{pricing_power:.2f}</td>
+                        <td style="font-size: 0.9em;">{data['investment_suggestion'][:30]}...</td>
+                    </tr>
+                    """
+                
+                # 生成投资建议列表
+                recommendation_items = ""
+                for rec in recommendations[:6]:  # 显示前6项建议
+                    recommendation_items += f"<li>{rec}</li>"
+                
+                # 生成风险警告列表
+                warning_items = ""
+                for warning in warnings[:4]:  # 显示前4项警告
+                    warning_items += f"<li>{warning}</li>"
+                
+                # 添加通胀-行业分析HTML（使用更安全的字符串拼接）
+                try:
+                    inflation_html = f"""
+<div class="summary" style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #333; margin-top: 20px;">
+    <h3 style="margin-top: 0; color: #c0392b;">🔥 通胀-行业影响分析 <span style="font-size: 0.8em; color: #666;">(Enhanced!)</span></h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+        <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.9em; margin-bottom: 5px;">通胀环境</div>
+            <div style="font-size: 1.2em; font-weight: bold; color: {inflation_color};">{regime}</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.9em; margin-bottom: 5px;">分析信心度</div>
+            <div style="font-size: 1.2em; font-weight: bold;">{confidence:.0f}%</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.9em; margin-bottom: 5px;">通胀趋势</div>
+            <div style="font-size: 1.2em; font-weight: bold;">{trend}</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.9em; margin-bottom: 5px;">风险等级</div>
+            <div style="font-size: 1.2em; font-weight: bold; color: {inflation_color};">{risk_level.upper()}</div>
+        </div>
+    </div>
+    
+    <h4 style="color: #8e44ad; margin-bottom: 15px;">📊 行业通胀敏感性分析</h4>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.2); border-radius: 8px;">
+            <thead>
+                <tr style="background: rgba(255,255,255,0.1);">
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.3);">行业</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">影响评分</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">通胀敏感度</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">定价能力</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3);">投资建议</th>
+                </tr>
+            </thead>
+            <tbody>
+                {inflation_sector_rows}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+    <div class="summary" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
+        <h4 style="margin-top: 0; color: #27ae60;">🎯 通胀环境投资建议</h4>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.95em;">
+            {recommendation_items}
+        </ul>
+    </div>
+    
+    <div class="summary" style="background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%); color: #333;">
+        <h4 style="margin-top: 0; color: #d35400;">⚠️ 通胀风险警告</h4>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.95em;">
+            {warning_items}
+        </ul>
+    </div>
+</div>
+"""
+                    
+                    # 确保HTML拼接成功
+                    html += inflation_html
+                    logger.info(f"✅ 通胀-行业分析HTML已添加到报告中 ({len(inflation_html)} 字符)")
+                    
+                except Exception as inflation_html_error:
+                    logger.error(f"❌ 通胀HTML生成失败: {inflation_html_error}")
+                    # 添加简化版本确保有内容显示
+                    html += f"""
+<div class="summary" style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #333; margin-top: 20px;">
+    <h3 style="margin-top: 0; color: #c0392b;">🔥 通胀-行业影响分析</h3>
+    <p>通胀环境: {regime} (信心度: {confidence:.0f}%)</p>
+    <p>风险等级: {risk_level}</p>
+    <p>分析数据获取成功，详细显示遇到技术问题</p>
+</div>
+"""
+            
+            return html
             
         except Exception as e:
             logger.error(f"生成宏观分析HTML失败: {e}")
@@ -1354,6 +1657,77 @@ class SmartDailyReportGenerator:
                         </div>
                     </div>"""
             
+            # 添加流动性分析（核心功能1：增强流动性评估）
+            if 'liquidity_analysis' in result:
+                liquidity = result['liquidity_analysis']
+                
+                # 根据流动性风险等级确定背景色
+                risk_level = liquidity['risk_level']
+                if risk_level == 'low':
+                    liquidity_class = "portfolio-profit"  # 绿色
+                elif risk_level == 'medium':
+                    liquidity_class = "timing-neutral"  # 黄色
+                elif risk_level == 'high':
+                    liquidity_class = "timing-poor"  # 红色
+                else:  # critical
+                    liquidity_class = "portfolio-loss"  # 深红色
+                
+                html += f"""
+                    <div class="buy-timing-info {liquidity_class}">
+                        <h4>💧 流动性风险评估 <span style="font-size: 0.8em; color: #666;">(New!)</span></h4>
+                        <div class="timing-rating">流动性评分: {liquidity['liquidity_score']:.1f}/10 | 风险等级: {liquidity['risk_level'].upper()}</div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
+                            <div>
+                                <strong>💱 价差分析:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.0em;">买卖价差: {liquidity['bid_ask_spread_pct']:.3f}%</span>
+                                    <div style="margin-top: 3px; font-size: 0.9em; color: #666;">
+                                        价差等级: {liquidity['spread_rating']}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>📊 成交量稳定性:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.0em;">一致性: {liquidity['volume_consistency']:.3f}</span>
+                                    <div style="margin-top: 3px; font-size: 0.9em; color: #666;">
+                                        平均日成交量: {liquidity['avg_daily_volume']:,.0f}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>🏢 市值等级:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.0em;">{liquidity['market_cap_tier'].upper()}</span>
+                                    <div style="margin-top: 3px; font-size: 0.9em; color: #666;">
+                                        市场深度: {liquidity['market_depth_score']:.3f}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>⚠️ 风险提示:</strong>
+                                <div style="margin: 5px 0;">
+                                    <span style="font-size: 1.0em;">{liquidity['risk_warning']}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 5px;">
+                            <strong>📋 流动性分析要点:</strong>
+                            <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">"""
+                
+                for reason in liquidity['liquidity_reasons']:
+                    html += f"<li>{reason}</li>"
+                
+                html += f"""
+                            </ul>
+                            <div style="margin-top: 10px; font-style: italic;">
+                                <strong>💡 投资建议:</strong> {liquidity['investment_suggestion']}
+                            </div>
+                        </div>
+                    </div>"""
+            
             # 添加增强分析显示（新功能）
             if 'enhanced_analysis' in result:
                 enhanced = result['enhanced_analysis']
@@ -1537,13 +1911,121 @@ class SmartDailyReportGenerator:
                 html += """
                     </div>"""
             
+            # 添加右侧交易分析显示（防抄底系统）
+            if 'right_side_trading' in result:
+                right_side = result['right_side_trading']
+                trend_status = right_side['trend_status']
+                entry_signals = right_side['entry_signals']
+                risk_warnings = right_side['risk_warnings']
+                
+                # 根据趋势状态确定背景色
+                if trend_status['direction'] == '上升' and trend_status['confirmed']:
+                    right_side_class = "portfolio-profit"  # 绿色 - 上升趋势已确认
+                elif trend_status['direction'] == '上升' and not trend_status['confirmed']:
+                    right_side_class = "timing-good"  # 蓝色 - 上升趋势未确认
+                elif trend_status['direction'] == '震荡':
+                    right_side_class = "timing-neutral"  # 黄色 - 震荡
+                elif trend_status['direction'] == '下跌' and not trend_status['confirmed']:
+                    right_side_class = "timing-poor"  # 橙色 - 下跌趋势未确认
+                else:
+                    right_side_class = "portfolio-loss"  # 红色 - 下跌趋势已确认
+                
+                html += f"""
+                    <div class="buy-timing-info {right_side_class}">
+                        <h4>🎯 右侧交易分析 <span style="font-size: 0.8em; color: #666;">(防抄底系统)</span></h4>
+                        <div class="timing-rating">
+                            趋势状态: {trend_status['direction']} | 
+                            强度: {trend_status['strength']['level']} | 
+                            {'✅ 已确认' if trend_status['confirmed'] else '❌ 未确认'}
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
+                            <div>
+                                <strong>📊 趋势分析:</strong>
+                                <div style="margin: 5px 0; font-size: 0.9em;">
+                                    <div>方向: <span style="font-weight: bold;">{trend_status['direction']}</span></div>
+                                    <div>强度: <span style="font-weight: bold;">{trend_status['strength']['level']}</span></div>
+                                    <div>持续: <span style="font-weight: bold;">{trend_status['trend_days']}天</span></div>
+                                    <div>确认: <span style="font-weight: bold;">{'是' if trend_status['confirmed'] else '否'}</span></div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>🔍 技术指标:</strong>
+                                <div style="margin: 5px 0; font-size: 0.9em;">
+                                    <div>动量得分: {trend_status['strength']['momentum_score']}/3</div>
+                                    <div>成交量: {'✅ 配合' if trend_status['strength']['volume_confirmed'] else '❌ 萎缩'}</div>
+                                    <div>RSI趋势: {trend_status['strength']['rsi_trend']}</div>
+                                    <div>MACD: {'✅ 金叉' if trend_status['strength']['macd_bullish'] else '❌ 死叉'}</div>
+                                </div>
+                            </div>
+                        </div>"""
+                
+                # 显示买入信号
+                if entry_signals['buy_signals']:
+                    html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(40, 167, 69, 0.1); border-left: 4px solid #28a745; border-radius: 0 5px 5px 0;">
+                            <strong>🟢 右侧买入信号:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for signal in entry_signals['buy_signals']:
+                        html += f"<li>{signal}</li>"
+                    
+                    html += "</ul></div>"
+                
+                # 显示卖出信号
+                if entry_signals['sell_signals']:
+                    html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545; border-radius: 0 5px 5px 0;">
+                            <strong>🔴 右侧卖出信号:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for signal in entry_signals['sell_signals']:
+                        html += f"<li>{signal}</li>"
+                    
+                    html += "</ul></div>"
+                
+                # 显示等待信号
+                if entry_signals['wait_signals']:
+                    html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; border-radius: 0 5px 5px 0;">
+                            <strong>🟡 右侧等待信号:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for signal in entry_signals['wait_signals']:
+                        html += f"<li>{signal}</li>"
+                    
+                    html += "</ul></div>"
+                
+                # 显示风险警告
+                if risk_warnings:
+                    html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(255, 152, 0, 0.1); border-left: 4px solid #ff9800; border-radius: 0 5px 5px 0;">
+                            <strong>⚠️ 左侧交易风险警告:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                    
+                    for warning in risk_warnings:
+                        html += f"<li>{warning}</li>"
+                    
+                    html += "</ul></div>"
+                
+                # 添加右侧交易核心原则提醒
+                html += """
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(0, 123, 255, 0.1); border-left: 4px solid #007bff; border-radius: 0 5px 5px 0;">
+                            <strong>💡 右侧交易核心原则:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px; font-size: 0.9em;">
+                                <li>✅ 趋势确认后再进入，不抄底不摸顶</li>
+                                <li>✅ 等待突破确认，避免假突破陷阱</li>
+                                <li>✅ 成交量必须配合，无量上涨不追</li>
+                                <li>✅ 设置止损位，严格执行纪律</li>
+                            </ul>
+                        </div>
+                    </div>"""
+            
             # 添加图表显示
-            if result.get('chart_path') and os.path.exists(result['chart_path']):
-                base64_image = self._image_to_base64(result['chart_path'])
-                if base64_image:
+            if result.get('chart_base64') and result['chart_base64']:
                     html += f"""
                     <div style="text-align: center; margin-top: 15px;">
-                        <img src="{base64_image}" alt="{symbol}技术分析图表" class="chart-image">
+                        <img src="data:image/png;base64,{result['chart_base64']}" alt="{symbol}技术分析图表" class="chart-image">
                     </div>"""
             
             html += f"""
@@ -1567,20 +2049,36 @@ class SmartDailyReportGenerator:
     
     def _get_macro_analysis(self) -> Optional[Dict]:
         """获取宏观分析结果"""
-        if not self.macro_integration:
-            return None
-            
         try:
-            logger.info("开始宏观因子分析...")
-            macro_report = self.macro_integration.generate_macro_report()
+            macro_analysis = {}
             
-            if 'error' in macro_report:
-                logger.error(f"宏观分析失败: {macro_report['error']}")
-                return None
+            # 基础宏观分析
+            if self.macro_integration:
+                try:
+                    logger.info("开始基础宏观因子分析...")
+                    base_macro = self.macro_integration.generate_macro_report()
+                    
+                    if 'error' not in base_macro:
+                        macro_analysis.update(base_macro)
+                        logger.info("基础宏观分析完成")
+                    else:
+                        logger.error(f"基础宏观分析失败: {base_macro['error']}")
+                except Exception as e:
+                    logger.error(f"基础宏观分析失败: {e}")
+            
+            # 通胀-行业分析（核心功能2：完善宏观-行业影响分析）
+            if self.inflation_sector_analyzer:
+                try:
+                    logger.info("开始通胀-行业影响分析...")
+                    inflation_report = self.inflation_sector_analyzer.generate_inflation_sector_report()
+                    if inflation_report:
+                        macro_analysis['inflation_sector_analysis'] = inflation_report
+                        logger.info("通胀-行业分析完成")
+                except Exception as e:
+                    logger.error(f"通胀-行业分析失败: {e}")
+            
+            return macro_analysis if macro_analysis else None
                 
-            logger.info("宏观分析完成")
-            return macro_report
-            
         except Exception as e:
             logger.error(f"获取宏观分析失败: {e}")
             return None

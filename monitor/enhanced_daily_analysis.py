@@ -2,6 +2,7 @@
 """
 增强版每日持股分析系统
 整合宏观分析结果，提供详细通俗的分析和操作建议
+包含Google投资策略的专业指导
 """
 
 import sys
@@ -36,14 +37,19 @@ class EnhancedDailyAnalysis:
         # 初始化宏观分析器
         self.macro_integration = PortfolioMacroIntegration(portfolio_config_path)
         
+        # 加载Google投资策略
+        self.google_strategy = self._load_google_strategy()
+        
         # 股票中文名称映射
         self.stock_names = {
             'AMD': 'AMD(超威半导体)',
             'NVDA': 'NVIDIA(英伟达)',
+            'GOOG': 'Google(谷歌)',
             'GOOGL': 'Google(谷歌)',
             'TSLA': 'Tesla(特斯拉)',
             'PFE': 'Pfizer(辉瑞制药)',
-            'EOG': 'EOG Resources(EOG能源)',
+            'MRK': 'Merck(默沙东)',
+            'BRK-B': 'Berkshire Hathaway(伯克希尔)',
             'TMDX': 'TransMedics(移植医疗)',
             '9999.HK': '小米集团-W'
         }
@@ -66,7 +72,16 @@ class EnhancedDailyAnalysis:
             logger.error(f"加载配置失败: {e}")
             return {}
     
-    def get_stock_data(self, symbol: str, period: str = "5d") -> Optional[pd.DataFrame]:
+    def _load_google_strategy(self) -> Dict:
+        """加载Google投资策略"""
+        try:
+            with open('../google_investment_strategy.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.warning(f"加载Google策略失败: {e}")
+            return {}
+    
+    def get_stock_data(self, symbol: str, period: str = "30d") -> Optional[pd.DataFrame]:
         """获取股票数据"""
         try:
             stock = yf.Ticker(symbol)
@@ -85,12 +100,24 @@ class EnhancedDailyAnalysis:
             ma5 = close.rolling(5).mean().iloc[-1] if len(close) >= 5 else close.iloc[-1]
             ma20 = close.rolling(20).mean().iloc[-1] if len(close) >= 20 else close.iloc[-1]
             
-            # 计算RSI
-            delta = close.diff()
-            gain = (delta.where(delta > 0, 0)).rolling(14).mean() if len(delta) >= 14 else 0
-            loss = (-delta.where(delta < 0, 0)).rolling(14).mean() if len(delta) >= 14 else 0
-            rs = gain / loss if loss != 0 else float('inf')
-            rsi = 100 - (100 / (1 + rs)) if rs != float('inf') else 100
+            # 计算RSI - 修复计算逻辑
+            rsi = 50  # 默认值
+            if len(close) >= 15:  # 至少需要15个数据点来计算14期RSI
+                delta = close.diff()
+                gain = delta.where(delta > 0, 0)
+                loss = -delta.where(delta < 0, 0)
+                
+                # 计算14期平均
+                avg_gain = gain.rolling(window=14, min_periods=14).mean()
+                avg_loss = loss.rolling(window=14, min_periods=14).mean()
+                
+                # 计算RS和RSI
+                rs = avg_gain / avg_loss
+                rsi_series = 100 - (100 / (1 + rs))
+                
+                # 获取最新的RSI值
+                if not rsi_series.isna().iloc[-1]:
+                    rsi = rsi_series.iloc[-1]
             
             # 当前价格
             current_price = close.iloc[-1]
@@ -101,17 +128,32 @@ class EnhancedDailyAnalysis:
             else:
                 price_change = 0
             
+            # 成交量比率
+            volume_ratio = 1.0
+            if len(data) >= 20:
+                current_volume = data['Volume'].iloc[-1]
+                avg_volume = data['Volume'].rolling(20).mean().iloc[-1]
+                if avg_volume > 0:
+                    volume_ratio = current_volume / avg_volume
+            
             return {
                 'current_price': current_price,
                 'ma5': ma5,
                 'ma20': ma20,
-                'rsi': rsi.iloc[-1] if hasattr(rsi, 'iloc') else rsi,
+                'rsi': rsi,
                 'price_change': price_change,
-                'volume_ratio': data['Volume'].iloc[-1] / data['Volume'].rolling(20).mean().iloc[-1] if len(data) >= 20 else 1.0
+                'volume_ratio': volume_ratio
             }
         except Exception as e:
             logger.error(f"计算技术指标失败: {e}")
-            return {}
+            return {
+                'current_price': 0,
+                'ma5': 0,
+                'ma20': 0,
+                'rsi': 50,
+                'price_change': 0,
+                'volume_ratio': 1.0
+            }
     
     def analyze_stock_sentiment(self, symbol: str, technical_data: Dict) -> Dict:
         """分析股票情绪"""
@@ -183,6 +225,48 @@ class EnhancedDailyAnalysis:
         
         return sentiment
     
+    def get_google_strategy_analysis(self, technical_data: Dict) -> Dict:
+        """获取Google策略分析"""
+        if not self.google_strategy:
+            return {}
+        
+        current_price = technical_data.get('current_price', 0)
+        
+        # 获取策略执行计划
+        execution_plan = self.google_strategy.get('execution_plan', {})
+        batches = execution_plan.get('execution_batches', [])
+        
+        strategy_analysis = {
+            'current_status': '',
+            'next_actions': [],
+            'risk_alerts': [],
+            'execution_conditions': []
+        }
+        
+        # 分析当前价格相对于策略触发条件
+        if current_price >= 165:
+            strategy_analysis['current_status'] = '✅ 价格达到第一批减仓条件($165+)'
+            strategy_analysis['next_actions'].append('可执行第一批减仓4股GOOG')
+            strategy_analysis['execution_conditions'].append('立即执行条件已满足')
+        elif current_price <= 160:
+            strategy_analysis['current_status'] = '⚠️ 价格接近第二批减仓条件($160以下)'
+            strategy_analysis['next_actions'].append('关注是否触发第二批减仓')
+            strategy_analysis['execution_conditions'].append('价格达到$160或$170时考虑行动')
+        else:
+            strategy_analysis['current_status'] = f'🟡 当前价格${current_price:.2f}，等待触发条件'
+            strategy_analysis['next_actions'].append('继续观察，等待价格触发')
+            strategy_analysis['execution_conditions'].append('等待价格≥$165或≤$160')
+        
+        # 风险管理检查
+        if current_price <= 155:
+            strategy_analysis['risk_alerts'].append('🚨 价格触及止损位$155，考虑止损')
+        elif current_price >= 185:
+            strategy_analysis['risk_alerts'].append('🎯 价格达到第一目标位$185，考虑获利了结')
+        elif current_price >= 200:
+            strategy_analysis['risk_alerts'].append('🎯 价格达到第二目标位$200，建议获利了结')
+        
+        return strategy_analysis
+    
     def generate_operation_suggestions(self, symbol: str, position_info: Dict, 
                                      technical_data: Dict, sentiment: Dict, 
                                      macro_impact: Dict) -> List[str]:
@@ -198,68 +282,46 @@ class EnhancedDailyAnalysis:
             # 收益率
             return_pct = (current_price - cost_basis) / cost_basis * 100 if cost_basis > 0 else 0
             
-            # 宏观影响
-            macro_score = macro_impact.get('impact_score', 0.5)
-            impact_level = macro_impact.get('impact_level', 'neutral')
+            # 特殊处理Google策略
+            if symbol == 'GOOG':
+                google_analysis = self.get_google_strategy_analysis(technical_data)
+                if google_analysis:
+                    suggestions.append(f"📋 Google专项策略分析:")
+                    suggestions.append(f"   状态: {google_analysis['current_status']}")
+                    for action in google_analysis['next_actions']:
+                        suggestions.append(f"   行动: {action}")
+                    for alert in google_analysis['risk_alerts']:
+                        suggestions.append(f"   警告: {alert}")
+                    suggestions.append("")
             
-            # 技术指标
-            rsi = technical_data.get('rsi', 50)
-            price_change = technical_data.get('price_change', 0)
+            # 通用建议逻辑
+            if return_pct > 20:
+                suggestions.append(f"💰 {symbol} 盈利{return_pct:.1f}%，考虑分批获利了结")
+            elif return_pct < -15:
+                suggestions.append(f"⚠️ {symbol} 亏损{return_pct:.1f}%，注意风险控制")
             
-            # 基于收益率的建议
-            if return_pct > 15:
-                suggestions.append(f"🎯 **盈利丰厚**: {symbol}已盈利{return_pct:.1f}%，建议考虑部分止盈，锁定收益")
-                suggestions.append(f"💡 **操作建议**: 可以先卖出30-50%的仓位，剩余部分设置追踪止损")
-            elif return_pct > 8:
-                suggestions.append(f"✅ **适度盈利**: {symbol}盈利{return_pct:.1f}%，可以继续持有并设置保护性止损")
-                suggestions.append(f"💡 **操作建议**: 设置8-10%的追踪止损，保护已有收益")
-            elif return_pct < -8:
-                suggestions.append(f"⚠️ **亏损较大**: {symbol}亏损{abs(return_pct):.1f}%，需要重点关注")
-                suggestions.append(f"💡 **操作建议**: 如果亏损超过15%，建议考虑止损出局")
+            # 基于权重的建议
+            if weight > 20:
+                suggestions.append(f"⚖️ {symbol} 权重过高({weight:.1f}%)，建议适度减仓分散风险")
+            elif weight < 5:
+                suggestions.append(f"📈 {symbol} 权重较低({weight:.1f}%)，可考虑增加配置")
             
-            # 基于宏观环境的建议
-            if impact_level == 'positive':
-                suggestions.append(f"🌟 **宏观有利**: 当前宏观环境对{symbol}有利(得分{macro_score:.2f})，可以考虑逢低加仓")
-            elif impact_level == 'negative':
-                suggestions.append(f"🚨 **宏观不利**: 当前宏观环境对{symbol}不利(得分{macro_score:.2f})，建议降低仓位")
-                suggestions.append(f"💡 **操作建议**: 建议将仓位控制在5%以下，或考虑暂时出局观望")
-            elif impact_level == 'very_negative':
-                suggestions.append(f"❌ **宏观恶劣**: 宏观环境对{symbol}非常不利，强烈建议减仓或清仓")
+            # 基于情绪的建议
+            if sentiment['level'] == '积极':
+                suggestions.append(f"🟢 {symbol} 技术面积极，适合持有或增仓")
+            elif sentiment['level'] == '悲观':
+                suggestions.append(f"🔴 {symbol} 技术面悲观，注意风险控制")
             
-            # 基于技术指标的建议
-            if rsi > 75:
-                suggestions.append(f"📈 **技术超买**: RSI达到{rsi:.1f}，股价可能面临回调压力")
-                suggestions.append(f"💡 **操作建议**: 暂时不宜追高，等待回调机会再考虑加仓")
-            elif rsi < 25:
-                suggestions.append(f"📉 **技术超卖**: RSI跌至{rsi:.1f}，可能存在反弹机会")
-                suggestions.append(f"💡 **操作建议**: 可以考虑分批逢低买入，但要设置好止损")
-            
-            # 基于仓位权重的建议
-            if weight > 25:
-                suggestions.append(f"⚖️ **仓位过重**: {symbol}占比{weight:.1f}%过高，存在集中度风险")
-                suggestions.append(f"💡 **操作建议**: 建议将单一股票仓位控制在20%以下，进行适当分散")
-            elif weight > 20:
-                suggestions.append(f"⚖️ **仓位较重**: {symbol}占比{weight:.1f}%偏高，注意风险控制")
-            
-            # 基于当日表现的建议
-            if price_change > 5:
-                suggestions.append(f"🚀 **今日大涨**: {symbol}今日涨幅{price_change:.1f}%，注意获利回吐风险")
-                suggestions.append(f"💡 **操作建议**: 可以考虑减仓一部分，落袋为安")
-            elif price_change < -5:
-                suggestions.append(f"📉 **今日大跌**: {symbol}今日跌幅{price_change:.1f}%，需要分析跌因")
-                if sentiment['level'] in ['积极', '偏积极']:
-                    suggestions.append(f"💡 **操作建议**: 如果是技术性调整，可以考虑逢低加仓")
-                else:
-                    suggestions.append(f"💡 **操作建议**: 建议暂时观望，等待企稳信号")
-            
-            # 如果没有具体建议，给出通用建议
-            if not suggestions:
-                suggestions.append(f"📊 **持续关注**: {symbol}当前表现平稳，建议继续持有并密切关注")
-                suggestions.append(f"💡 **操作建议**: 保持现有仓位，设置合理的止盈止损点位")
+            # 基于宏观影响的建议
+            macro_level = macro_impact.get('impact_level', '中性')
+            if macro_level == '积极':
+                suggestions.append(f"🌟 宏观环境对{symbol}有利，可保持或增加仓位")
+            elif macro_level == '消极':
+                suggestions.append(f"🌧️ 宏观环境对{symbol}不利，建议谨慎操作")
                 
         except Exception as e:
             logger.error(f"生成操作建议失败: {e}")
-            suggestions.append("⚠️ 暂时无法生成操作建议，请手动分析")
+            suggestions.append("⚠️ 生成建议时出现错误，请手动分析")
         
         return suggestions
     

@@ -395,6 +395,24 @@ class Phase2ProfessionalScreener:
         self.ff_factors = FamaFrenchFactors()
         self.quality_factors = QualityFactors()
         # Email functionality now provided by unified_email_api
+        
+        # 初始化流动性分析器
+        try:
+            from analysis.liquidity_analyzer import LiquidityAnalyzer
+            self.liquidity_analyzer = LiquidityAnalyzer()
+            logger.info("流动性分析模块初始化成功")
+        except ImportError:
+            self.liquidity_analyzer = None
+            logger.warning("流动性分析模块不可用，将跳过流动性分析部分")
+        
+        # 初始化通胀-行业分析器
+        try:
+            from analysis.inflation_sector_analyzer import InflationSectorAnalyzer
+            self.inflation_sector_analyzer = InflationSectorAnalyzer()
+            logger.info("通胀-行业分析模块初始化成功")
+        except ImportError:
+            self.inflation_sector_analyzer = None
+            logger.warning("通胀-行业分析模块不可用，将跳过通胀行业分析部分")
         self.alpha_vantage = AlphaVantageClient()
         self.yfinance_client = YFinanceClient()
         
@@ -804,6 +822,24 @@ class Phase2ProfessionalScreener:
                     'sentiment_score': 0.0
                 }
             
+            # 添加流动性分析（核心功能1：增强流动性评估）
+            liquidity_info = None
+            if self.liquidity_analyzer:
+                try:
+                    liquidity_metrics = self.liquidity_analyzer.analyze_stock_liquidity(symbol)
+                    liquidity_info = {
+                        'liquidity_score': liquidity_metrics.liquidity_score,
+                        'risk_level': liquidity_metrics.risk_level,
+                        'bid_ask_spread_pct': liquidity_metrics.bid_ask_spread_pct,
+                        'volume_consistency': liquidity_metrics.volume_consistency,
+                        'market_cap_tier': liquidity_metrics.market_cap_tier,
+                        'investment_suggestion': liquidity_metrics.investment_suggestion,
+                        'risk_warning': liquidity_metrics.risk_warning
+                    }
+                except Exception as e:
+                    logger.warning(f"流动性分析失败 {symbol}: {e}")
+                    liquidity_info = None
+            
             return {
                 'symbol': symbol,
                 'multifactor_score': multifactor_score,
@@ -815,6 +851,7 @@ class Phase2ProfessionalScreener:
                 'sharpe_ratio': risk_metrics.sharpe_ratio,
                 'max_drawdown': risk_metrics.max_drawdown,
                 'market_sentiment': sentiment_info,
+                'liquidity_analysis': liquidity_info,  # 新增流动性分析结果
                 'analysis_time': datetime.now().isoformat()
             }
             
@@ -895,6 +932,7 @@ class Phase2ProfessionalScreener:
                     <th>多因子评分</th>
                     <th>质量因子</th>
                     <th>动量因子</th>
+                    <th>流动性评分</th>
                     <th>夏普比率</th>
                     <th>当前价格</th>
                 </tr>
@@ -902,6 +940,12 @@ class Phase2ProfessionalScreener:
         
         for i, stock in enumerate(results, 1):
             row_class = "high-score" if stock['multifactor_score'] >= 70 else ""
+            
+            # 获取流动性评分，如果没有则显示N/A
+            liquidity_score = "N/A"
+            if stock.get('liquidity_analysis'):
+                liquidity_score = f"{stock['liquidity_analysis']['liquidity_score']:.1f}"
+            
             html += f"""
                 <tr class="{row_class}">
                     <td>{i}</td>
@@ -909,6 +953,7 @@ class Phase2ProfessionalScreener:
                     <td>{stock['multifactor_score']:.1f}</td>
                     <td>{stock['quality_factor']:.2f}</td>
                     <td>{stock['momentum_factor']:.2f}</td>
+                    <td>{liquidity_score}</td>
                     <td>{stock['sharpe_ratio']:.2f}</td>
                     <td>${stock['current_price']:.2f}</td>
                 </tr>

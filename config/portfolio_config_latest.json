@@ -1,0 +1,79 @@
+{
+  "update_time": "2025-06-20T22:48:15.155330",
+  "total_assets": 27533.17,
+  "asset_allocation": {
+    "stocks": {
+      "value": 17530.369339,
+      "percentage": 63.67
+    },
+    "cash": {
+      "value": 4014.336186,
+      "percentage": 14.58
+    },
+    "funds": {
+      "value": 5988.464475,
+      "percentage": 21.75
+    }
+  },
+  "stock_positions": {
+    "PFE": {
+      "shares": 80,
+      "avg_price": 25.899,
+      "weight": 6.96,
+      "market_value": 2071.92,
+      "status": "医药防御"
+    },
+    "NVDA": {
+      "shares": 35,
+      "avg_price": 137.942,
+      "weight": 18.29,
+      "market_value": 4827.97,
+      "status": "核心科技"
+    },
+    "MRK": {
+      "shares": 8,
+      "avg_price": 79.363,
+      "weight": 2.3,
+      "market_value": 634.904,
+      "status": "新建仓"
+    },
+    "GOOG": {
+      "shares": 30,
+      "avg_price": 170.0,
+      "weight": 18.28,
+      "market_value": 5100.0,
+      "status": "核心科技"
+    },
+    "BRK-B": {
+      "shares": 2,
+      "avg_price": 485.36,
+      "weight": 3.52,
+      "market_value": 970.72,
+      "status": "价值防御"
+    },
+    "AMD": {
+      "shares": 30,
+      "avg_price": 125.212,
+      "weight": 13.97,
+      "market_value": 3756.36,
+      "status": "已减持"
+    }
+  },
+  "recent_changes": [
+    {
+      "date": "2025-06-20",
+      "action": "SELL",
+      "symbol": "AMD",
+      "shares": 5,
+      "note": "继续减仓，从35股减至30股"
+    },
+    {
+      "date": "2025-06-20",
+      "action": "BUY",
+      "symbol": "MRK",
+      "shares": 8,
+      "price": 79.363,
+      "note": "新建仓防御性医药股"
+    }
+  ]
+}

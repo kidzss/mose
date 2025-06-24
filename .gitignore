@@ -61,4 +61,73 @@ data_updater.log
 backtest_results_*.png
 cpgw_strategy_equity.png
 best_results.json
-data_quality_report.txt 
+data_quality_report.txt
+
+# Images and Media
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+*.ico
+
+# Text files
+*.txt
+*.md.backup
+*.md.bak
+
+# HTML reports
+*.html
+
+# JSON result files
+*.json
+!config/*.json
+!*config*.json
+
+# CSV data files
+*.csv
+!config/*.csv
+!stock_pool/*.csv
+
+# Temporary files
+temp/
+tmp/
+*_temp*
+*_tmp*
+*.tmp
+*.bak
+*.backup
+
+# SQL backups
+*.sql
+
+# Cache files
+*_cache/
+cache/
+*.cache
+
+# Output directories
+output/
+outputs/
+results/
+reports/
+charts/
+
+# Log directories
+logs/
+log/
+
+# Test outputs
+test_output/
+*_test_results*
+
+# Analysis files
+*_analysis_*.png
+*_analysis_*.html
+*_analysis_*.json
+
+# Chinese filename patterns
+*智能股票日报*
+*核心功能测试结果* 

@@ -1,25 +1,45 @@
 {
     "meta": {
-        "last_updated": "2025-06-17",
-        "total_assets": 27722.97,
+        "last_updated": "2025-06-23",
+        "total_assets": 27533.17,
         "currency": "USD",
-        "description": "更新配置 - 卖出EOG并根据实际数据调整投资组合"
+        "description": "持仓调整更新 - AMD继续减仓(30→20股)，MRK新建仓8股，优化投资组合配置，AMD占比降至9.42%",
+        "watchlist_update": {
+            "date": "2025-06-19",
+            "added_stocks": 34,
+            "total_watchlist": 39,
+            "categories": {
+                "防御性股票": 5,
+                "金融股票": 6,
+                "医疗股票": 3,
+                "科技股票": 7,
+                "消费股票": 4,
+                "能源股票": 2,
+                "ETF基金": 6,
+                "市场指标": 1,
+                "原有观察股": 5
+            }
+        }
     },
     "portfolio": {
-        "total_value": 27722.97,
+        "total_value": 27533.17,
         "stock_allocation": {
-            "total_amount": 21121.29,
-            "percentage": 76.18,
-            "note": "仅包含美股，港股小米单独记录"
+            "total_amount": 17530.37,
+            "percentage": 63.67,
+            "note": "仅包含美股，港股小米单独记录，AMD继续减仓，MRK新建仓"
         },
         "cash_allocation": {
-            "amount": 609.91,
-            "percentage": 2.20
+            "amount": 4014.34,
+            "percentage": 14.58
         },
         "money_fund_allocation": {
-            "amount": 5983.65,
-            "percentage": 21.59,
-            "description": "美元货币型基金"
+            "amount": 5988.46,
+            "percentage": 21.75,
+            "description": "美元货币型基金",
+            "annual_yield": 4.0,
+            "liquidity": "T+0随时赎回",
+            "risk_level": "极低风险",
+            "note": "相当于高息现金等价物"
         },
         "hk_stock_allocation": {
             "total_amount": 97.03,
@@ -28,45 +48,91 @@
         }
     },
     "positions": {
-        "AMD": {
-            "shares": 48,
-            "cost_basis": 126.214,
-            "weight": 21.93,
-            "investment_amount": 4788.89,
-            "sector": "Technology",
-            "stop_loss_threshold": 0.08
-        },
-        "GOOGL": {
-            "shares": 34,
-            "cost_basis": 170.540,
-            "weight": 21.44,
-            "investment_amount": 4715.83,
-            "sector": "Technology", 
-            "stop_loss_threshold": 0.12
-        },
         "NVDA": {
-            "shares": 40,
-            "cost_basis": 138.843,
-            "weight": 20.91,
-            "investment_amount": 4582.24,
+            "shares": 35,
+            "cost_basis": 137.942,
+            "weight": 18.29,
+            "investment_amount": 4827.97,
             "sector": "Technology",
-            "stop_loss_threshold": 0.08
+            "stop_loss_threshold": 0.08,
+            "current_price": 143.86,
+            "current_value": 5035.10,
+            "unrealized_pnl": 207.13,
+            "transaction_note": "减持5股，从40股减至35股"
+        },
+        "GOOG": {
+            "shares": 30,
+            "cost_basis": 170.00,
+            "weight": 18.28,
+            "investment_amount": 5100.00,
+            "sector": "Technology", 
+            "stop_loss_threshold": 0.12,
+            "current_price": 167.73,
+            "current_value": 5031.90,
+            "unrealized_pnl": -68.10
+        },
+        "AMD": {
+            "shares": 20,
+            "cost_basis": 125.212,
+            "weight": 9.42,
+            "investment_amount": 2504.24,
+            "sector": "Technology",
+            "stop_loss_threshold": 0.08,
+            "current_price": 128.24,
+            "current_value": 2564.80,
+            "unrealized_pnl": 60.56,
+            "transaction_note": "继续减仓，从30股减至20股，RSI超买73.0+无量上涨，保护利润"
         },
         "PFE": {
             "shares": 80,
             "cost_basis": 25.899,
-            "weight": 6.90,
-            "investment_amount": 1526.65,
+            "weight": 6.96,
+            "investment_amount": 2071.92,
             "sector": "Healthcare",
-            "stop_loss_threshold": 0.10
+            "stop_loss_threshold": 0.10,
+            "current_price": 23.98,
+            "current_value": 1918.40,
+            "unrealized_pnl": -153.52
+        },
+        "MRK": {
+            "shares": 8,
+            "cost_basis": 79.363,
+            "weight": 2.30,
+            "investment_amount": 634.90,
+            "sector": "Healthcare",
+            "stop_loss_threshold": 0.10,
+            "current_price": 79.01,
+            "current_value": 632.08,
+            "unrealized_pnl": -2.82,
+            "transaction_note": "新建仓防御性医药股"
+        },
+        "BRK-B": {
+            "shares": 2,
+            "cost_basis": 485.36,
+            "weight": 3.52,
+            "investment_amount": 970.72,
+            "sector": "Financial",
+            "stop_loss_threshold": 0.12,
+            "current_price": 485.01,
+            "current_value": 970.02,
+            "unrealized_pnl": -0.70,
+            "transaction_note": "价值防御配置"
         },
         "TSLA": {
-            "shares": 4,
+            "shares": 0,
             "cost_basis": 179.841,
-            "weight": 4.65,
-            "investment_amount": 1038.22,
+            "weight": 0.00,
+            "investment_amount": 0.00,
             "sector": "Automotive",
-            "stop_loss_threshold": 0.15
+            "stop_loss_threshold": 0.15,
+            "status": "SOLD",
+            "exit_date": "2025-06-20",
+            "exit_price": 324.00,
+            "exit_shares": 4,
+            "total_return": 576.00,
+            "return_percentage": 79.6,
+            "holding_period_days": "约6个月",
+            "exit_reason": "波段操作获利了结，符合右侧交易策略"
         },
         "9999.HK": {
             "shares": 14,
@@ -102,22 +168,150 @@
             },
             "reason": "刚刚获利了结，等待回调至$380以下再次买入机会"
         },
-        "PHM": {
-            "target_buy_price": 98.0,
-            "reason": "地产龙头，业绩稳健，接近买入区域，关注50日均线支撑买入机会"
+        "JNJ": {
+            "target_buy_price": 160.0,
+            "category": "防御性股票",
+            "reason": "医疗健康龙头，分红贵族，防御性配置首选"
         },
-        "CF": {
-            "target_buy_price": 84.0,
-            "reason": "化肥龙头，周期回暖，等待回调至布林带下轨支撑位附近买入"
+        "PG": {
+            "target_buy_price": 150.0,
+            "category": "防御性股票",
+            "reason": "消费必需品龙头，稳定分红，抗衰退能力强"
         },
-        "EOG": {
-            "target_buy_price": 110.0,
-            "previous_transactions": {
-                "last_buy": 122.119,
-                "last_sell": 123.20,
-                "profit_percentage": 0.89
-            },
-            "reason": "能源股，因宏观环境不利卖出观望，等待更好入场时机或能源行业转好"
+        "KO": {
+            "target_buy_price": 58.0,
+            "category": "防御性股票",
+            "reason": "可口可乐，全球品牌，稳定现金流，长期价值投资"
+        },
+        "WMT": {
+            "target_buy_price": 165.0,
+            "category": "防御性股票",
+            "reason": "零售巨头，抗通胀能力强，电商转型成功"
+        },
+        "JPM": {
+            "target_buy_price": 270.0,
+            "category": "金融股票",
+            "reason": "美国银行业龙头，资产质量优秀，利率上升受益"
+        },
+        "GS": {
+            "target_buy_price": 450.0,
+            "category": "金融股票",
+            "reason": "投行龙头，交易业务强劲，市场波动受益"
+        },
+        "BAC": {
+            "target_buy_price": 40.0,
+            "category": "金融股票",
+            "reason": "美国第二大银行，净息差改善，估值合理"
+        },
+        "WFC": {
+            "target_buy_price": 55.0,
+            "category": "金融股票",
+            "reason": "富国银行，监管压力缓解，业务恢复正常"
+        },
+        "V": {
+            "target_buy_price": 260.0,
+            "category": "金融股票",
+            "reason": "支付网络龙头，无信用风险，全球化受益"
+        },
+        "MA": {
+            "target_buy_price": 450.0,
+            "category": "金融股票",
+            "reason": "万事达，支付双寄头之一，增长稳定"
+        },
+        "ABT": {
+            "target_buy_price": 130.0,
+            "category": "医疗股票",
+            "reason": "医疗设备龙头，多元化业务，创新能力强"
+        },
+        "ORCL": {
+            "target_buy_price": 135.0,
+            "category": "科技股票",
+            "reason": "数据库软件龙头，云转型成功，AI受益股"
+        },
+        "IBM": {
+            "target_buy_price": 180.0,
+            "category": "科技股票",
+            "reason": "蓝筹科技股，AI和混合云布局，分红稳定"
+        },
+        "PLTR": {
+            "target_buy_price": 25.0,
+            "category": "科技股票",
+            "reason": "大数据分析龙头，政府合同稳定，AI概念"
+        },
+        "CRM": {
+            "target_buy_price": 240.0,
+            "category": "科技股票",
+            "reason": "CRM软件龙头，订阅模式稳定，企业数字化受益"
+        },
+        "INTC": {
+            "target_buy_price": 30.0,
+            "category": "科技股票",
+            "reason": "芯片巨头，估值底部，制程技术追赶，分红高"
+        },
+        "CSCO": {
+            "target_buy_price": 48.0,
+            "category": "科技股票",
+            "reason": "网络设备龙头，5G和云基础设施受益"
+        },
+        "COST": {
+            "target_buy_price": 850.0,
+            "category": "消费股票",
+            "reason": "会员制零售龙头，客户粘性强，抗通胀能力优秀"
+        },
+        "HD": {
+            "target_buy_price": 350.0,
+            "category": "消费股票",
+            "reason": "家装零售龙头，地产后周期受益，DIY趋势"
+        },
+        "DIS": {
+            "target_buy_price": 95.0,
+            "category": "消费股票",
+            "reason": "娱乐巨头，流媒体转型，主题公园恢复"
+        },
+        "NFLX": {
+            "target_buy_price": 580.0,
+            "category": "消费股票",
+            "reason": "流媒体龙头，全球化布局，内容护城河深厚"
+        },
+        "XOM": {
+            "target_buy_price": 115.0,
+            "category": "能源股票",
+            "reason": "石油巨头，现金流强劲，分红和回购积极"
+        },
+        "CVX": {
+            "target_buy_price": 155.0,
+            "category": "能源股票",
+            "reason": "综合能源公司，财务稳健，能源转型布局"
+        },
+        "SPY": {
+            "target_buy_price": 590.0,
+            "category": "ETF基金",
+            "reason": "标普500指数基金，市场基准，分散投资首选"
+        },
+        "QQQ": {
+            "target_buy_price": 470.0,
+            "category": "ETF基金",
+            "reason": "纳斯达克100指数，科技股集中配置"
+        },
+        "XLK": {
+            "target_buy_price": 210.0,
+            "category": "ETF基金",
+            "reason": "科技板块ETF，AI和云计算主题投资"
+        },
+        "IWM": {
+            "target_buy_price": 220.0,
+            "category": "ETF基金",
+            "reason": "小盘股指数，经济复苏受益，估值相对合理"
+        },
+        "GLD": {
+            "target_buy_price": 220.0,
+            "category": "ETF基金",
+            "reason": "黄金ETF，通胀对冲，地缘风险避险"
+        },
+        "^VIX": {
+            "target_level": 25.0,
+            "category": "市场指标",
+            "reason": "恐慌指数，市场情绪指标，高位时为买入时机"
         }
     },
     "monitoring_config": {

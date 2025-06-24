@@ -312,12 +312,96 @@ class AlertSystem:
             return f"趋势不明朗，等待方向确认"
 
     def _get_volume_explanation(self, volume: float, volume_ma20: float) -> str:
-        """获取成交量指标的解释"""
-        if volume > volume_ma20 * 2:
-            return f"成交量显著放大，可能有重要信息"
-        elif volume > volume_ma20 * 1.5:
-            return f"成交量温和放大，需要关注"
-        elif volume < volume_ma20 * 0.5:
-            return f"成交量显著萎缩，交投清淡"
+        """获取成交量解释"""
+        ratio = volume / volume_ma20
+        if ratio > 2.0:
+            return f"成交量大幅放大（{ratio:.1f}倍），市场关注度高"
+        elif ratio > 1.5:
+            return f"成交量明显放大（{ratio:.1f}倍），值得关注"
+        elif ratio < 0.5:
+            return "成交量萎缩，市场关注度低"
         else:
-            return f"成交量正常，市场交投平稳" 
+            return "成交量正常"
+    
+    def check_alerts(self, symbol: str, data: pd.DataFrame) -> List[Dict]:
+        """检查股票警报 - 为SmartDailyReport提供的接口方法"""
+        try:
+            if data.empty:
+                return []
+            
+            alerts = []
+            indicators = self.calculate_technical_indicators(symbol, data)
+            current_price = data['close'].iloc[-1]
+            
+            # 技术指标预警
+            if 'SMA_200' in indicators and current_price < indicators['SMA_200']:
+                alerts.append({
+                    'type': 'technical',
+                    'level': 'warning',
+                    'message': f"跌破200日均线，建议关注",
+                    'indicator': 'SMA_200',
+                    'value': indicators['SMA_200']
+                })
+            
+            # RSI预警
+            if 'RSI' in indicators:
+                rsi = indicators['RSI']
+                if rsi > 70:
+                    alerts.append({
+                        'type': 'technical',
+                        'level': 'warning',
+                        'message': f"RSI超买（{rsi:.1f}），可考虑减仓",
+                        'indicator': 'RSI',
+                        'value': rsi
+                    })
+                elif rsi < 30:
+                    alerts.append({
+                        'type': 'technical',
+                        'level': 'opportunity',
+                        'message': f"RSI超卖（{rsi:.1f}），可考虑加仓",
+                        'indicator': 'RSI',
+                        'value': rsi
+                    })
+            
+            # MACD信号
+            if 'MACD' in indicators and 'MACD_Signal' in indicators:
+                macd = indicators['MACD']
+                signal = indicators['MACD_Signal']
+                if macd < signal and macd > 0:
+                    alerts.append({
+                        'type': 'technical',
+                        'level': 'warning',
+                        'message': "MACD形成死叉，注意风险",
+                        'indicator': 'MACD',
+                        'value': macd
+                    })
+            
+            # 波动率预警
+            if 'Volatility' in indicators:
+                volatility = indicators['Volatility']
+                if volatility > self.alert_thresholds['volatility_threshold']:
+                    alerts.append({
+                        'type': 'risk',
+                        'level': 'warning',
+                        'message': f"波动率异常（{volatility:.2f}），建议设置止损",
+                        'indicator': 'Volatility',
+                        'value': volatility
+                    })
+            
+            # 成交量预警
+            if 'Volume_Ratio' in indicators:
+                volume_ratio = indicators['Volume_Ratio']
+                if volume_ratio > self.alert_thresholds['volume_threshold']:
+                    alerts.append({
+                        'type': 'volume',
+                        'level': 'info',
+                        'message': f"成交量放大，是20日均量{volume_ratio:.1f}倍",
+                        'indicator': 'Volume_Ratio',
+                        'value': volume_ratio
+                    })
+            
+            return alerts
+            
+        except Exception as e:
+            self.logger.error(f"检查{symbol}警报时出错: {e}")
+            return [] 
