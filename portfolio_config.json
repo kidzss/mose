@@ -184,9 +184,9 @@
             "reason": "可口可乐，全球品牌，稳定现金流，长期价值投资"
         },
         "WMT": {
-            "target_buy_price": 165.0,
+            "target_buy_price": 92.0,
             "category": "防御性股票",
-            "reason": "零售巨头，抗通胀能力强，电商转型成功"
+            "reason": "零售巨头，抗通胀能力强，电商转型成功。目标买入价设为当前价格下方6%"
         },
         "JPM": {
             "target_buy_price": 270.0,
