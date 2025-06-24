@@ -444,12 +444,16 @@ class PortfolioPerformancePredictor:
         
         plt.tight_layout()
         
-        # 保存图表
+        # 确保temp_pic目录存在
+        import os
+        os.makedirs('temp_pic', exist_ok=True)
+        
+        # 保存图表到temp_pic目录
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        plt.savefig(f'portfolio_prediction_comparison_{timestamp}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'temp_pic/portfolio_prediction_comparison_{timestamp}.png', dpi=300, bbox_inches='tight')
         plt.show()
         
-        logger.info(f"📊 可视化图表已保存: portfolio_prediction_comparison_{timestamp}.png")
+        logger.info(f"📊 可视化图表已保存: temp_pic/portfolio_prediction_comparison_{timestamp}.png")
 
 def main():
     """主函数"""

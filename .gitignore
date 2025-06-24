@@ -130,4 +130,7 @@ test_output/
 
 # Chinese filename patterns
 *智能股票日报*
-*核心功能测试结果* 
+*核心功能测试结果*
+
+# Temporary picture directory
+temp_pic/ 

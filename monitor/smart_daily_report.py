@@ -906,8 +906,11 @@ class SmartDailyReportGenerator:
             
             plt.tight_layout()
             
-            # 保存图表
-            chart_filename = f"{symbol}_analysis_{datetime.now().strftime('%Y%m%d')}.png"
+            # 确保temp_pic目录存在
+            os.makedirs('temp_pic', exist_ok=True)
+            
+            # 保存图表到temp_pic目录
+            chart_filename = f"temp_pic/{symbol}_analysis_{datetime.now().strftime('%Y%m%d')}.png"
             plt.savefig(chart_filename, dpi=300, bbox_inches='tight')
             plt.close()
             
