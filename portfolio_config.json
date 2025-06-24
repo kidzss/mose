@@ -169,7 +169,7 @@
             "reason": "刚刚获利了结，等待回调至$380以下再次买入机会"
         },
         "JNJ": {
-            "target_buy_price": 160.0,
+            "target_buy_price": 142.0,
             "category": "防御性股票",
             "reason": "医疗健康龙头，分红贵族，防御性配置首选"
         },
@@ -194,7 +194,7 @@
             "reason": "美国银行业龙头，资产质量优秀，利率上升受益"
         },
         "GS": {
-            "target_buy_price": 450.0,
+            "target_buy_price": 580.0,
             "category": "金融股票",
             "reason": "投行龙头，交易业务强劲，市场波动受益"
         },
@@ -224,17 +224,17 @@
             "reason": "医疗设备龙头，多元化业务，创新能力强"
         },
         "ORCL": {
-            "target_buy_price": 135.0,
+            "target_buy_price": 185.0,
             "category": "科技股票",
             "reason": "数据库软件龙头，云转型成功，AI受益股"
         },
         "IBM": {
-            "target_buy_price": 180.0,
+            "target_buy_price": 265.0,
             "category": "科技股票",
             "reason": "蓝筹科技股，AI和混合云布局，分红稳定"
         },
         "PLTR": {
-            "target_buy_price": 25.0,
+            "target_buy_price": 125.0,
             "category": "科技股票",
             "reason": "大数据分析龙头，政府合同稳定，AI概念"
         },
@@ -244,7 +244,7 @@
             "reason": "CRM软件龙头，订阅模式稳定，企业数字化受益"
         },
         "INTC": {
-            "target_buy_price": 30.0,
+            "target_buy_price": 20.0,
             "category": "科技股票",
             "reason": "芯片巨头，估值底部，制程技术追赶，分红高"
         },
@@ -269,17 +269,17 @@
             "reason": "娱乐巨头，流媒体转型，主题公园恢复"
         },
         "NFLX": {
-            "target_buy_price": 580.0,
+            "target_buy_price": 1100.0,
             "category": "消费股票",
             "reason": "流媒体龙头，全球化布局，内容护城河深厚"
         },
         "XOM": {
-            "target_buy_price": 115.0,
+            "target_buy_price": 105.0,
             "category": "能源股票",
             "reason": "石油巨头，现金流强劲，分红和回购积极"
         },
         "CVX": {
-            "target_buy_price": 155.0,
+            "target_buy_price": 138.0,
             "category": "能源股票",
             "reason": "综合能源公司，财务稳健，能源转型布局"
         },
@@ -299,7 +299,7 @@
             "reason": "科技板块ETF，AI和云计算主题投资"
         },
         "IWM": {
-            "target_buy_price": 220.0,
+            "target_buy_price": 199.0,
             "category": "ETF基金",
             "reason": "小盘股指数，经济复苏受益，估值相对合理"
         },

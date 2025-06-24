@@ -32,10 +32,13 @@ class RightSideTradingSystem:
             # 计算技术指标
             data = self._calculate_indicators(data)
             
-            # 分析右侧交易信号
+                        # 分析右侧交易信号
             trend_status = self._analyze_trend_status(data)
             entry_signals = self._check_entry_signals(data)
             risk_warnings = self._check_left_side_risks(data)
+            
+            # 综合决策分析
+            comprehensive_decision = self._make_comprehensive_decision(trend_status, entry_signals, risk_warnings)
             
             return {
                 "symbol": symbol,
@@ -43,6 +46,7 @@ class RightSideTradingSystem:
                 "trend_status": trend_status,
                 "entry_signals": entry_signals,
                 "risk_warnings": risk_warnings,
+                "comprehensive_decision": comprehensive_decision,  # 新增综合决策
                 "analysis_date": datetime.now().strftime("%Y-%m-%d %H:%M")
             }
             
@@ -396,6 +400,96 @@ class RightSideTradingSystem:
             warnings.append("⚠️ 高位震荡：RSI超买且动量不足，谨防回调")
         
         return warnings
+
+    def _make_comprehensive_decision(self, trend_status: Dict, entry_signals: Dict, risk_warnings: List[str]) -> Dict:
+        """综合决策分析 - 给出明确的操作建议"""
+        
+        # 基础信息
+        trend_confirmed = trend_status['confirmed']
+        trend_strength = trend_status['strength']['level']
+        volume_confirmed = trend_status['strength']['volume_confirmed']
+        
+        buy_signals_count = len(entry_signals['buy_signals'])
+        sell_signals_count = len(entry_signals['sell_signals'])
+        
+        # 风险因素分析
+        has_volume_risk = any("无量上涨" in warning for warning in risk_warnings)
+        has_trend_risk = any("反弹陷阱" in warning for warning in risk_warnings)
+        has_overbought_risk = any("高位震荡" in warning for warning in risk_warnings)
+        
+        # 决策逻辑
+        decision_score = 0
+        decision_factors = []
+        risk_factors = []
+        
+        # 正面因素评分
+        if trend_confirmed:
+            decision_score += 2
+            decision_factors.append("✅ 趋势已确认")
+        else:
+            decision_score -= 1
+            risk_factors.append("❌ 趋势未确认")
+            
+        if volume_confirmed:
+            decision_score += 2
+            decision_factors.append("✅ 成交量配合")
+        else:
+            decision_score -= 2
+            risk_factors.append("❌ 成交量不足")
+            
+        if buy_signals_count > 0:
+            decision_score += buy_signals_count
+            decision_factors.append(f"✅ {buy_signals_count}个买入信号")
+            
+        if sell_signals_count > 0:
+            decision_score -= sell_signals_count * 2
+            risk_factors.append(f"❌ {sell_signals_count}个卖出信号")
+        
+        # 风险因素扣分
+        if has_volume_risk:
+            decision_score -= 3
+            risk_factors.append("⚠️ 无量上涨风险")
+            
+        if has_trend_risk:
+            decision_score -= 2
+            risk_factors.append("⚠️ 反弹陷阱风险")
+            
+        if has_overbought_risk:
+            decision_score -= 1
+            risk_factors.append("⚠️ 高位震荡风险")
+        
+        # 综合决策
+        if decision_score >= 3:
+            action = "积极买入"
+            confidence = "高"
+            color = "🟢"
+            reason = "多项正面因素确认，符合右侧交易条件"
+        elif decision_score >= 1:
+            action = "谨慎买入"
+            confidence = "中"
+            color = "🟡"
+            reason = "有一定买入条件，但需控制仓位"
+        elif decision_score >= -1:
+            action = "观望等待"
+            confidence = "中"
+            color = "🟡"
+            reason = "信号不够明确，建议等待更好时机"
+        else:
+            action = "暂不买入"
+            confidence = "高"
+            color = "🔴"
+            reason = "存在明显风险因素，不符合右侧交易条件"
+        
+        return {
+            "action": action,
+            "confidence": confidence,
+            "color": color,
+            "reason": reason,
+            "score": decision_score,
+            "positive_factors": decision_factors,
+            "risk_factors": risk_factors,
+            "summary": f"{color} {action}：{reason}"
+        }
 
 def generate_right_side_trading_alerts(portfolio_positions: Dict, watchlist: Dict) -> Dict:
     """为投资组合生成右侧交易提醒"""

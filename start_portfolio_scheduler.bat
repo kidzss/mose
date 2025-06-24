@@ -17,7 +17,7 @@ if %errorlevel% neq 0 (
 echo ✅ conda环境激活成功
 echo.
 
-echo 🕐 启动持股分析定时调度器...
+echo 🕐 启动持股分析定时调度器...weos
 echo 💡 系统将按计划自动运行持股分析并发送报告
 echo.
 echo 📅 调度计划:

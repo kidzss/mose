@@ -268,6 +268,16 @@ class SmartDailyReportGenerator:
                 logger.error(f"右侧交易系统初始化失败: {e}")
                 self.right_side_trading_system = None
         
+        # 初始化股票类型分析器
+        self.stock_type_analyzer = None
+        try:
+            from monitor.stock_type_analyzer import StockTypeAnalyzer
+            self.stock_type_analyzer = StockTypeAnalyzer()
+            logger.info("股票类型分析器初始化成功")
+        except Exception as e:
+            logger.warning(f"股票类型分析器初始化失败: {e}")
+            self.stock_type_analyzer = None
+        
         # 设置中文字体支持
         self._setup_chinese_font()
         
@@ -808,6 +818,31 @@ class SmartDailyReportGenerator:
                         logger.warning(f"{symbol} 右侧交易分析不可用或出错: {right_side_analysis.get('error', '未知错误')}")
                 except Exception as e:
                     logger.error(f"{symbol} 右侧交易分析失败: {e}")
+            
+            # 股票类型分析（动态权重调整）
+            if self.stock_type_analyzer:
+                try:
+                    # 计算各维度评分
+                    technical_score = self._calculate_technical_score(data, result)
+                    fundamental_score = self._calculate_fundamental_score(result)
+                    sentiment_score = self._calculate_sentiment_score(data, result)
+                    
+                    stock_type_analysis = self.stock_type_analyzer.calculate_comprehensive_score(
+                        symbol, technical_score, fundamental_score, sentiment_score, data
+                    )
+                    result['stock_type_analysis'] = stock_type_analysis
+                    logger.info(f"{symbol} 股票类型分析完成 - 类型: {stock_type_analysis['stock_name']}, 评分: {stock_type_analysis['scores']['comprehensive']:.1f}")
+                except Exception as e:
+                    logger.error(f"{symbol} 股票类型分析失败: {e}")
+
+            # 波段交易分析（长期持有+波段操作）
+            if symbol in self.portfolio:
+                try:
+                    wave_analysis = self._analyze_wave_trading(symbol, result, data)
+                    result['wave_trading_analysis'] = wave_analysis
+                    logger.info(f"{symbol} 波段交易分析完成")
+                except Exception as e:
+                    logger.error(f"{symbol} 波段交易分析失败: {e}")
 
             # 创建图表
             chart_path = self._create_chart(symbol, data, env_result)
@@ -835,6 +870,334 @@ class SmartDailyReportGenerator:
                 'data_quality': quality_info
             }
     
+    def _calculate_technical_score(self, data: pd.DataFrame, result: Dict) -> float:
+        """计算技术面评分 (0-10)"""
+        try:
+            score = 5  # 基础分5分
+            current_price = result['current_price']
+            price_change = result['price_change']
+            
+            # 价格表现 (±2.5分)
+            if price_change > 5:
+                score += 2.5
+            elif price_change > 2:
+                score += 2
+            elif price_change > 0:
+                score += 1
+            elif price_change > -2:
+                score += 0  # 小幅下跌不扣分
+            elif price_change > -5:
+                score -= 1
+            else:
+                score -= 2.5
+            
+            # RSI指标 (±1.5分)
+            if 'rsi' in data.columns:
+                rsi = data['rsi'].iloc[-1]
+                if 30 <= rsi <= 70:  # 健康区间
+                    score += 1.5
+                elif 25 <= rsi <= 75:  # 可接受区间
+                    score += 0.5
+                elif rsi > 80 or rsi < 20:  # 极端超买超卖
+                    score -= 1.5
+                else:  # 超买超卖
+                    score -= 0.5
+            
+            # 成交量分析 (±1.5分)
+            volume = result.get('volume', 0)
+            if volume > 100000000:  # 超高成交量
+                score += 1.5
+            elif volume > 50000000:  # 高成交量
+                score += 1
+            elif volume > 10000000:  # 正常成交量
+                score += 0.5
+            elif volume < 1000000:  # 低成交量
+                score -= 1
+            
+            # 右侧交易信号 (±1.5分)
+            right_side = result.get('right_side_trading', {})
+            if right_side:
+                comprehensive_decision = right_side.get('comprehensive_decision', {})
+                if comprehensive_decision:
+                    action = comprehensive_decision.get('action', '')
+                    if action == '积极买入':
+                        score += 1.5
+                    elif action == '谨慎买入':
+                        score += 1
+                    elif action == '观望等待':
+                        score += 0
+                    else:  # 暂不买入
+                        score -= 1
+                else:
+                    # 回退到原有信号逻辑
+                    entry_signals = right_side.get('entry_signals', {})
+                    if entry_signals.get('buy_signals'):
+                        score += 1.5
+                    elif entry_signals.get('wait_signals'):
+                        score += 0.5
+                    elif entry_signals.get('sell_signals'):
+                        score -= 1
+            
+            final_score = min(10, max(0, score))
+            
+            # 调试信息
+            logger.info(f"技术面评分计算: 价格变动={price_change:.2f}%, RSI={data.get('rsi', [0]).iloc[-1] if 'rsi' in data.columns else 'N/A'}, 成交量={volume:,}, 最终评分={final_score:.1f}")
+            
+            return final_score
+        except Exception as e:
+            logger.error(f"计算技术面评分失败: {e}")
+            return 5.0
+    
+    def _calculate_fundamental_score(self, result: Dict) -> float:
+        """计算基本面评分 (0-10)"""
+        try:
+            financial = result.get('financial_analysis', {})
+            if not financial:
+                return 5.0
+            
+            # 首先尝试使用总体评分进行映射
+            total_score = financial.get('total_score', 0.5)
+            overall_rating = financial.get('overall_rating', 'average')
+            
+            # 基于财务分析总评级进行评分 (修正版)
+            if overall_rating == '优秀' or total_score >= 0.8:
+                base_score = 9.0
+            elif overall_rating == '良好' or total_score >= 0.6:
+                base_score = 7.0  # 修正：良好应该是7分而不是低分
+            elif overall_rating == '一般' or total_score >= 0.4:
+                base_score = 5.0
+            elif overall_rating == '较差' or total_score >= 0.2:
+                base_score = 3.0
+            else:
+                base_score = 1.0
+            
+            # 基于详细维度进行微调
+            score_adjustments = 0
+            
+            # 估值指标调整 (±1分)
+            dimensions = financial.get('dimensions', {})
+            if dimensions:
+                valuation = dimensions.get('valuation', {})
+                if valuation.get('summary') == '优秀':
+                    score_adjustments += 1
+                elif valuation.get('summary') == '较差':
+                    score_adjustments -= 1
+                
+                # 盈利能力调整 (±1分)
+                profitability = dimensions.get('profitability', {})
+                if profitability.get('summary') == '优秀':
+                    score_adjustments += 1
+                elif profitability.get('summary') == '较差':
+                    score_adjustments -= 1
+                
+                # 成长性调整 (±0.5分)
+                growth = dimensions.get('growth', {})
+                if growth.get('summary') == '优秀':
+                    score_adjustments += 0.5
+                elif growth.get('summary') == '较差':
+                    score_adjustments -= 0.5
+            
+            final_score = base_score + score_adjustments
+            
+            # 确保评分在合理范围内
+            final_score = min(10, max(0, final_score))
+            
+            # 调试信息
+            logger.info(f"基本面评分计算: 总评级={overall_rating}, 总分={total_score:.2f}, 基础分={base_score:.1f}, 调整={score_adjustments:.1f}, 最终={final_score:.1f}")
+            
+            return final_score
+            
+        except Exception as e:
+            logger.error(f"计算基本面评分失败: {e}")
+            return 5.0
+    
+    def _calculate_sentiment_score(self, data: pd.DataFrame, result: Dict) -> float:
+        """计算市场情绪评分 (0-10)"""
+        try:
+            score = 5  # 基础分
+            
+            # 价格动量 (±2分)
+            price_change = result.get('price_change', 0)
+            if price_change > 5:
+                score += 2
+            elif price_change > 2:
+                score += 1
+            elif price_change < -5:
+                score -= 2
+            elif price_change < -2:
+                score -= 1
+            
+            # 成交量活跃度 (±2分)
+            volume = result.get('volume', 0)
+            if volume > 100000000:  # 超高成交量
+                score += 2
+            elif volume > 50000000:  # 高成交量
+                score += 1
+            elif volume < 5000000:  # 低成交量
+                score -= 1
+            
+            # 流动性评分 (±1分)
+            liquidity = result.get('liquidity_analysis', {})
+            if liquidity.get('risk_level') == 'LOW':
+                score += 1
+            elif liquidity.get('risk_level') == 'HIGH':
+                score -= 1
+            
+            return min(10, max(0, score))
+        except Exception as e:
+            logger.error(f"计算市场情绪评分失败: {e}")
+            return 5.0
+
+    def _analyze_wave_trading(self, symbol: str, result: Dict, data: pd.DataFrame) -> Dict:
+        """分析波段交易策略（长期持有+波段操作）"""
+        try:
+            current_price = result['current_price']
+            portfolio_info = result.get('portfolio', {})
+            cost_price = portfolio_info.get('cost_price', current_price)
+            shares = portfolio_info.get('shares', 0)
+            
+            # 获取财务分析数据
+            financial_analysis = result.get('financial_analysis', {})
+            analyst_target = financial_analysis.get('target_price', current_price * 1.2)
+            pe_ratio = financial_analysis.get('pe_ratio', 15)
+            
+            # 仓位配置策略
+            core_position_pct = 60  # 核心仓位
+            wave_position_pct = 40  # 波段仓位
+            
+            # 加仓策略
+            add_levels = []
+            add_levels.append({
+                'level': 1,
+                'price': current_price * 0.95,
+                'description': '当前价-5%',
+                'shares_suggestion': '2-3股',
+                'reason': '健康回调，趋势完好'
+            })
+            add_levels.append({
+                'level': 2,
+                'price': current_price * 0.90,
+                'description': '当前价-10%',
+                'shares_suggestion': '3-4股',
+                'reason': '深度回调，价值显现'
+            })
+            add_levels.append({
+                'level': 3,
+                'price': cost_price * 0.97,
+                'description': '成本价-3%',
+                'shares_suggestion': '4-5股',
+                'reason': '成本价附近，安全边际'
+            })
+            
+            # 波段卖出策略
+            sell_levels = []
+            sell_levels.append({
+                'level': 1,
+                'price': current_price * 1.08,
+                'description': '当前价+8%',
+                'position_pct': 30,
+                'reason': '短期获利，部分兑现'
+            })
+            sell_levels.append({
+                'level': 2,
+                'price': current_price * 1.15,
+                'description': '当前价+15%',
+                'position_pct': 50,
+                'reason': '中期目标，减仓操作'
+            })
+            sell_levels.append({
+                'level': 3,
+                'price': analyst_target * 0.95 if analyst_target > current_price else current_price * 1.25,
+                'description': '目标价95%',
+                'position_pct': 100,
+                'reason': '接近目标价，清仓波段'
+            })
+            
+            # 长期目标价计算
+            if pe_ratio > 0 and pe_ratio < 50:  # PE合理范围
+                # 基于行业PE的长期目标
+                industry_pe_map = {
+                    'tech': 25, 'healthcare': 18, 'finance': 12, 
+                    'consumer': 20, 'industrial': 16, 'energy': 14,
+                    'utilities': 15, 'materials': 14, 'realestate': 18
+                }
+                fair_pe = industry_pe_map.get('tech', 18)  # 默认使用科技股PE
+                long_term_target = (current_price / pe_ratio) * fair_pe
+            else:
+                long_term_target = analyst_target if analyst_target > current_price else current_price * 1.3
+            
+            # 风险控制
+            stop_loss = cost_price * 0.85  # 成本价下15%
+            
+            # 当前操作建议
+            current_pnl_pct = portfolio_info.get('pnl_percent', 0)
+            operation_advice = []
+            
+            if current_pnl_pct > 8:
+                operation_advice.append("🟢 当前盈利较好，可考虑部分获利了结")
+                operation_advice.append(f"建议在${sell_levels[0]['price']:.2f}减持{sell_levels[0]['position_pct']}%波段仓位")
+            elif current_pnl_pct > 0:
+                operation_advice.append("🟢 当前盈利状态，保持现有仓位")
+                operation_advice.append("等待更好的卖出时机或回调加仓机会")
+            elif current_pnl_pct > -5:
+                operation_advice.append("🟡 轻微亏损，可考虑加仓摊薄成本")
+                operation_advice.append(f"如跌至${add_levels[0]['price']:.2f}可适量加仓")
+            else:
+                operation_advice.append("🔴 亏损较大，严格控制风险")
+                operation_advice.append(f"止损位${stop_loss:.2f}，如破位需要减仓")
+            
+            # 技术分析支撑
+            technical_levels = []
+            if 'sma_20' in data.columns:
+                sma_20 = data['sma_20'].iloc[-1]
+                technical_levels.append(f"20日均线支撑: ${sma_20:.2f}")
+            if 'sma_50' in data.columns:
+                sma_50 = data['sma_50'].iloc[-1]
+                technical_levels.append(f"50日均线支撑: ${sma_50:.2f}")
+            
+            # RSI状态
+            rsi_status = ""
+            if 'rsi' in data.columns:
+                rsi_value = data['rsi'].iloc[-1]
+                if rsi_value > 70:
+                    rsi_status = f"RSI {rsi_value:.1f} 超买，注意回调风险"
+                elif rsi_value < 30:
+                    rsi_status = f"RSI {rsi_value:.1f} 超卖，可能反弹机会"
+                else:
+                    rsi_status = f"RSI {rsi_value:.1f} 中性区间"
+            
+            return {
+                'position_strategy': {
+                    'core_position_pct': core_position_pct,
+                    'wave_position_pct': wave_position_pct,
+                    'description': f'{core_position_pct}%核心仓位长期持有，{wave_position_pct}%波段仓位高抛低吸'
+                },
+                'add_levels': add_levels,
+                'sell_levels': sell_levels,
+                'long_term_target': {
+                    'price': long_term_target,
+                    'upside_pct': ((long_term_target - current_price) / current_price * 100),
+                    'time_horizon': '1-3年'
+                },
+                'risk_control': {
+                    'stop_loss': stop_loss,
+                    'stop_loss_pct': ((stop_loss - cost_price) / cost_price * 100),
+                    'position_limit': '不超过组合10%'
+                },
+                'current_advice': operation_advice,
+                'technical_support': technical_levels,
+                'rsi_status': rsi_status,
+                'monitoring_points': [
+                    '技术面：RSI、MACD、均线支撑',
+                    '基本面：业绩发布、行业政策',
+                    '市场面：大盘走势、板块轮动'
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"波段交易分析失败: {e}")
+            return {'error': str(e)}
+
     def _image_to_base64(self, image_path: str) -> str:
         """将图片文件转换为base64编码"""
         try:
@@ -1914,34 +2277,147 @@ class SmartDailyReportGenerator:
                 html += """
                     </div>"""
             
+            # 添加股票类型分析显示
+            if 'stock_type_analysis' in result:
+                type_analysis = result['stock_type_analysis']
+                scores = type_analysis['scores']
+                
+                # 根据综合评分确定背景色
+                comprehensive_score = scores['comprehensive']
+                if comprehensive_score >= 8.0:
+                    type_class = "portfolio-profit"  # 绿色 - 强烈买入
+                elif comprehensive_score >= 6.5:
+                    type_class = "timing-good"  # 蓝色 - 买入
+                elif comprehensive_score >= 5.0:
+                    type_class = "timing-neutral"  # 黄色 - 持有
+                elif comprehensive_score >= 3.5:
+                    type_class = "timing-poor"  # 橙色 - 减持
+                else:
+                    type_class = "portfolio-loss"  # 红色 - 卖出
+                
+                html += f"""
+                    <div class="buy-timing-info {type_class}">
+                        <h4>🎯 智能股票类型分析 <span style="font-size: 0.8em; color: #666;">(动态权重调整)</span></h4>
+                        
+                        <div class="timing-rating" style="font-size: 1.3em; margin-bottom: 15px;">
+                            {type_analysis['rating']} | 综合评分: {comprehensive_score:.1f}/10
+                        </div>
+                        
+                        <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 5px;">
+                            <strong>📊 股票类型:</strong> {type_analysis['stock_name']} | 
+                            <strong>风险等级:</strong> {type_analysis['risk_level'].upper()}
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0;">
+                            <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #007bff;">{scores['technical']:.1f}</div>
+                                <div style="font-size: 0.9em;">技术面评分</div>
+                                <div style="font-size: 0.8em; color: #666;">权重: {type_analysis['weights']['technical']*100:.0f}%</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #28a745;">{scores['fundamental']:.1f}</div>
+                                <div style="font-size: 0.9em;">基本面评分</div>
+                                <div style="font-size: 0.8em; color: #666;">权重: {type_analysis['weights']['fundamental']*100:.0f}%</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: #ffc107;">{scores['sentiment']:.1f}</div>
+                                <div style="font-size: 0.9em;">市场情绪</div>
+                                <div style="font-size: 0.8em; color: #666;">权重: {type_analysis['weights']['sentiment']*100:.0f}%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <strong>🔍 分析重点:</strong>
+                            <ul style="margin: 8px 0; padding-left: 20px;">"""
+                
+                for focus in type_analysis['analysis_focus']:
+                    html += f"<li>{focus}</li>"
+                
+                html += f"""
+                            </ul>
+                        </div>
+                        
+                        <div style="margin: 15px 0; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px;">
+                            <strong>📋 交易策略建议:</strong>
+                            <div style="margin: 8px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9em;">
+                                <div><strong>仓位大小:</strong> {type_analysis['trading_strategy']['position_size']}</div>
+                                <div><strong>持有周期:</strong> {type_analysis['trading_strategy']['holding_period']}</div>
+                                <div><strong>止损策略:</strong> {type_analysis['trading_strategy']['stop_loss']}</div>
+                                <div><strong>获利策略:</strong> {type_analysis['trading_strategy']['take_profit']}</div>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <strong>检查频率:</strong> {type_analysis['trading_strategy']['rebalance_frequency']}
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <strong>📈 股票特征:</strong>
+                            <div style="margin: 8px 0; font-size: 0.9em;">"""
+                
+                for characteristic in type_analysis['characteristics']:
+                    html += f"<span style='margin-right: 15px; padding: 3px 8px; background: rgba(255,255,255,0.3); border-radius: 3px;'>{characteristic}</span>"
+                
+                html += """
+                            </div>
+                        </div>
+                    </div>"""
+            
             # 添加右侧交易分析显示（防抄底系统）
             if 'right_side_trading' in result:
                 right_side = result['right_side_trading']
                 trend_status = right_side['trend_status']
                 entry_signals = right_side['entry_signals']
                 risk_warnings = right_side['risk_warnings']
+                comprehensive_decision = right_side.get('comprehensive_decision', {})
                 
-                # 根据趋势状态确定背景色
-                if trend_status['direction'] == '上升' and trend_status['confirmed']:
-                    right_side_class = "portfolio-profit"  # 绿色 - 上升趋势已确认
-                elif trend_status['direction'] == '上升' and not trend_status['confirmed']:
-                    right_side_class = "timing-good"  # 蓝色 - 上升趋势未确认
-                elif trend_status['direction'] == '震荡':
-                    right_side_class = "timing-neutral"  # 黄色 - 震荡
-                elif trend_status['direction'] == '下跌' and not trend_status['confirmed']:
-                    right_side_class = "timing-poor"  # 橙色 - 下跌趋势未确认
+                # 根据综合决策确定背景色
+                if comprehensive_decision:
+                    action = comprehensive_decision['action']
+                    if action == '积极买入':
+                        right_side_class = "portfolio-profit"  # 绿色
+                    elif action == '谨慎买入':
+                        right_side_class = "timing-good"  # 蓝色
+                    elif action == '观望等待':
+                        right_side_class = "timing-neutral"  # 黄色
+                    else:  # 暂不买入
+                        right_side_class = "portfolio-loss"  # 红色
                 else:
-                    right_side_class = "portfolio-loss"  # 红色 - 下跌趋势已确认
+                    # 回退到原有逻辑
+                    if trend_status['direction'] == '上升' and trend_status['confirmed']:
+                        right_side_class = "portfolio-profit"
+                    elif trend_status['direction'] == '上升' and not trend_status['confirmed']:
+                        right_side_class = "timing-good"
+                    elif trend_status['direction'] == '震荡':
+                        right_side_class = "timing-neutral"
+                    elif trend_status['direction'] == '下跌' and not trend_status['confirmed']:
+                        right_side_class = "timing-poor"
+                    else:
+                        right_side_class = "portfolio-loss"
                 
                 html += f"""
                     <div class="buy-timing-info {right_side_class}">
-                        <h4>🎯 右侧交易分析 <span style="font-size: 0.8em; color: #666;">(防抄底系统)</span></h4>
+                        <h4>🎯 右侧交易分析 <span style="font-size: 0.8em; color: #666;">(防抄底系统)</span></h4>"""
+                
+                # 显示综合决策（如果有的话）
+                if comprehensive_decision:
+                    html += f"""
+                        <div class="timing-rating" style="font-size: 1.3em; margin-bottom: 15px;">
+                            {comprehensive_decision['summary']}
+                        </div>
+                        <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 5px;">
+                            <strong>📋 决策依据:</strong> {comprehensive_decision['reason']}
+                        </div>"""
+                else:
+                    html += f"""
                         <div class="timing-rating">
                             趋势状态: {trend_status['direction']} | 
                             强度: {trend_status['strength']['level']} | 
                             {'✅ 已确认' if trend_status['confirmed'] else '❌ 未确认'}
-                        </div>
-                        
+                        </div>"""
+                
+                # 显示详细技术分析（只在没有综合决策时显示）
+                if not comprehensive_decision:
+                    html += f"""
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
                             <div>
                                 <strong>📊 趋势分析:</strong>
@@ -2023,6 +2499,124 @@ class SmartDailyReportGenerator:
                             </ul>
                         </div>
                     </div>"""
+            
+            # 添加波段交易分析显示
+            if 'wave_trading_analysis' in result:
+                wave_analysis = result['wave_trading_analysis']
+                
+                # 检查是否有错误
+                if 'error' not in wave_analysis:
+                    html += f"""
+                    <div class="buy-timing-info timing-good">
+                        <h4>📈 波段交易策略 <span style="font-size: 0.8em; color: #666;">(长期持有+波段操作)</span></h4>"""
+                    
+                    # 仓位配置
+                    position_strategy = wave_analysis['position_strategy']
+                    html += f"""
+                        <div class="timing-rating" style="margin-bottom: 15px;">
+                            {position_strategy['description']}
+                        </div>"""
+                    
+                    # 当前操作建议
+                    current_advice = wave_analysis['current_advice']
+                    if current_advice:
+                        html += """
+                            <div style="margin: 15px 0; padding: 10px; background: rgba(40, 167, 69, 0.1); border-left: 4px solid #28a745; border-radius: 0 5px 5px 0;">
+                                <strong>💡 当前操作建议:</strong>
+                                <ul style="margin: 8px 0; padding-left: 20px;">"""
+                        
+                        for advice in current_advice:
+                            html += f"<li>{advice}</li>"
+                        
+                        html += "</ul></div>"
+                    
+                    # 加仓策略
+                    add_levels = wave_analysis['add_levels']
+                    if add_levels:
+                        html += """
+                            <div style="margin: 15px 0; padding: 10px; background: rgba(0, 123, 255, 0.1); border-left: 4px solid #007bff; border-radius: 0 5px 5px 0;">
+                                <strong>💰 加仓策略:</strong>
+                                <div style="margin: 8px 0;">"""
+                        
+                        for level in add_levels:
+                            html += f"""
+                                <div style="margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.3); border-radius: 3px;">
+                                    <strong>第{level['level']}加仓位:</strong> ${level['price']:.2f} ({level['description']}) - {level['shares_suggestion']}
+                                    <br><small style="color: #666;">理由: {level['reason']}</small>
+                                </div>"""
+                        
+                        html += "</div></div>"
+                    
+                    # 波段卖出策略
+                    sell_levels = wave_analysis['sell_levels']
+                    if sell_levels:
+                        html += """
+                            <div style="margin: 15px 0; padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; border-radius: 0 5px 5px 0;">
+                                <strong>📈 波段卖出策略:</strong>
+                                <div style="margin: 8px 0;">"""
+                        
+                        for level in sell_levels:
+                            html += f"""
+                                <div style="margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.3); border-radius: 3px;">
+                                    <strong>第{level['level']}卖出位:</strong> ${level['price']:.2f} ({level['description']}) - 减持{level['position_pct']}%波段仓位
+                                    <br><small style="color: #666;">理由: {level['reason']}</small>
+                                </div>"""
+                        
+                        html += "</div></div>"
+                    
+                    # 长期目标和风险控制
+                    long_term = wave_analysis['long_term_target']
+                    risk_control = wave_analysis['risk_control']
+                    
+                    html += f"""
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0;">
+                            <div>
+                                <strong>🏆 长期目标:</strong>
+                                <div style="margin: 5px 0; font-size: 0.9em;">
+                                    <div>目标价: <span style="font-weight: bold;">${long_term['price']:.2f}</span></div>
+                                    <div>上涨空间: <span style="font-weight: bold;">{long_term['upside_pct']:.1f}%</span></div>
+                                    <div>时间周期: <span style="font-weight: bold;">{long_term['time_horizon']}</span></div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>⚠️ 风险控制:</strong>
+                                <div style="margin: 5px 0; font-size: 0.9em;">
+                                    <div>止损位: <span style="font-weight: bold;">${risk_control['stop_loss']:.2f}</span></div>
+                                    <div>止损幅度: <span style="font-weight: bold;">{risk_control['stop_loss_pct']:.1f}%</span></div>
+                                    <div>仓位限制: <span style="font-weight: bold;">{risk_control['position_limit']}</span></div>
+                                </div>
+                            </div>
+                        </div>"""
+                    
+                    # 技术支撑和监控要点
+                    technical_support = wave_analysis.get('technical_support', [])
+                    rsi_status = wave_analysis.get('rsi_status', '')
+                    monitoring_points = wave_analysis.get('monitoring_points', [])
+                    
+                    if technical_support or rsi_status or monitoring_points:
+                        html += """
+                            <div style="margin: 15px 0; padding: 10px; background: rgba(108, 117, 125, 0.1); border-left: 4px solid #6c757d; border-radius: 0 5px 5px 0;">
+                                <strong>📊 技术分析要点:</strong>
+                                <div style="margin: 8px 0; font-size: 0.9em;">"""
+                        
+                        if rsi_status:
+                            html += f"<div><strong>RSI状态:</strong> {rsi_status}</div>"
+                        
+                        if technical_support:
+                            html += "<div><strong>技术支撑:</strong></div><ul style='margin: 5px 0; padding-left: 20px;'>"
+                            for support in technical_support:
+                                html += f"<li>{support}</li>"
+                            html += "</ul>"
+                        
+                        if monitoring_points:
+                            html += "<div><strong>监控要点:</strong></div><ul style='margin: 5px 0; padding-left: 20px;'>"
+                            for point in monitoring_points:
+                                html += f"<li>{point}</li>"
+                            html += "</ul>"
+                        
+                        html += "</div></div>"
+                    
+                    html += "</div>"
             
             # 添加图表显示
             if result.get('chart_base64') and result['chart_base64']:
