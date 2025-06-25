@@ -120,7 +120,9 @@ class StockTypeAnalyzer:
         """基于特征自动分类股票"""
         try:
             # 计算波动率（20日标准差）
-            returns = price_data['close'].pct_change().dropna()
+            # 兼容不同数据源的列名（Close/close）
+            close_col = 'Close' if 'Close' in price_data.columns else 'close'
+            returns = price_data[close_col].pct_change().dropna()
             volatility = returns.rolling(20).std().iloc[-1] * 100
             
             # 波动率分类

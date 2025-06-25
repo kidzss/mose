@@ -14,7 +14,16 @@ from plotly.subplots import make_subplots
 import yfinance as yf
 from datetime import datetime, timedelta
 import time
+import json
 import warnings
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# 导入统一分析系统
+from analysis.unified_stock_analyzer import UnifiedStockAnalyzer
+from analysis.streamlit_analysis_bridge import display_stock_analysis
+
 warnings.filterwarnings('ignore')
 
 # 页面配置
@@ -70,9 +79,60 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 全局配置
-WATCHLIST = ['AMD', 'NVDA', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'META', 'AMZN']
 INDICES = ['^GSPC', '^IXIC', '^DJI', '^VIX']
 UPDATE_INTERVAL = 60  # 秒
+
+@st.cache_data(ttl=300)  # 缓存5分钟
+def load_portfolio_config():
+    """从JSON配置文件加载持仓和观察仓信息"""
+    try:
+        with open('portfolio_config.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 提取当前持仓股票 (排除港股和已卖出的股票)
+        current_positions = []
+        portfolio_info = {}
+        
+        for symbol, position in config.get('positions', {}).items():
+            if (not symbol.endswith('.HK') and 
+                position.get('shares', 0) > 0 and 
+                position.get('status') != 'SOLD'):
+                current_positions.append(symbol)
+                portfolio_info[symbol] = {
+                    'shares': position.get('shares', 0),
+                    'cost_basis': position.get('cost_basis', 0),
+                    'weight': position.get('weight', 0),
+                    'sector': position.get('sector', 'Unknown'),
+                    'stop_loss_threshold': position.get('stop_loss_threshold', 0.08),
+                    'investment_amount': position.get('investment_amount', 0)
+                }
+        
+        # 提取观察仓股票
+        watchlist_stocks = list(config.get('watchlist', {}).keys())
+        
+        # 完整监控列表
+        all_stocks = current_positions + watchlist_stocks
+        
+        return {
+            'current_positions': current_positions,
+            'watchlist_stocks': watchlist_stocks,
+            'all_stocks': all_stocks,
+            'portfolio_info': portfolio_info,
+            'watchlist_info': config.get('watchlist', {}),
+            'meta': config.get('meta', {})
+        }
+        
+    except Exception as e:
+        st.error(f"配置文件加载失败: {e}")
+        # 返回默认配置
+        return {
+            'current_positions': ['AMD', 'NVDA'],
+            'watchlist_stocks': ['MSFT', 'AAPL'],
+            'all_stocks': ['AMD', 'NVDA', 'MSFT', 'AAPL'],
+            'portfolio_info': {},
+            'watchlist_info': {},
+            'meta': {}
+        }
 
 @st.cache_data(ttl=60)  # 缓存1分钟
 def get_realtime_data(symbols):
@@ -357,33 +417,78 @@ def main():
     # 页面标题
     st.markdown('<div class="main-header">⚡ 专业实时交易监控系统</div>', unsafe_allow_html=True)
     
+    # 加载配置信息
+    config = load_portfolio_config()
+    
     # 实时更新时间显示
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.markdown(f"**🕒 最后更新:** {current_time}")
     
+    # 显示投资组合概况
+    if config['meta']:
+        st.markdown(f"**💼 总资产:** ${config['meta'].get('total_assets', 0):,.2f}")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("持仓股票", len(config['current_positions']))
+        with col2:
+            st.metric("观察股票", len(config['watchlist_stocks']))
+        with col3:
+            st.metric("总监控", len(config['all_stocks']))
+    
     # 侧边栏配置
     st.sidebar.header("🎛️ 交易配置")
     
+    # 显示持仓信息
+    st.sidebar.subheader("💼 当前持仓")
+    for symbol in config['current_positions']:
+        info = config['portfolio_info'].get(symbol, {})
+        st.sidebar.markdown(f"**{symbol}** - {info.get('shares', 0)}股 @ ${info.get('cost_basis', 0):.2f}")
+    
     # 监控股票选择
     st.sidebar.subheader("📊 监控股票")
+    
+    # 分组显示
+    show_positions = st.sidebar.checkbox("显示持仓股票", value=True)
+    show_watchlist = st.sidebar.checkbox("显示观察仓股票", value=True)
+    
+    available_stocks = []
+    if show_positions:
+        available_stocks.extend(config['current_positions'])
+    if show_watchlist:
+        available_stocks.extend(config['watchlist_stocks'])
+    
+    # 默认选择所有持仓股票
+    default_selection = config['current_positions'][:5]  # 最多显示5只
+    
     selected_stocks = st.sidebar.multiselect(
         "选择监控股票",
-        WATCHLIST,
-        default=['AMD', 'NVDA', 'TSLA']
+        available_stocks,
+        default=default_selection
     )
     
-    # 持仓设置
-    st.sidebar.subheader("💼 持仓信息")
+    # 持仓设置 - 从配置文件获取
+    st.sidebar.subheader("💼 持仓详情")
     portfolio = {}
+    
+    # 显示实际持仓信息
     for stock in selected_stocks:
-        col1, col2 = st.sidebar.columns(2)
-        with col1:
-            shares = st.number_input(f"{stock} 股数", value=0, min_value=0, key=f"{stock}_shares")
-        with col2:
-            cost = st.number_input(f"{stock} 成本", value=0.0, min_value=0.0, key=f"{stock}_cost")
-        
-        if shares > 0:
-            portfolio[stock] = {'shares': shares, 'cost': cost}
+        if stock in config['portfolio_info']:
+            info = config['portfolio_info'][stock]
+            portfolio[stock] = {
+                'shares': info['shares'],
+                'cost': info['cost_basis'],
+                'weight': info['weight'],
+                'investment_amount': info['investment_amount']
+            }
+            
+            # 在侧边栏显示详细信息
+            with st.sidebar.expander(f"📊 {stock} 详情"):
+                st.write(f"**持股数量:** {info['shares']} 股")
+                st.write(f"**成本价格:** ${info['cost_basis']:.2f}")
+                st.write(f"**投资金额:** ${info['investment_amount']:,.2f}")
+                st.write(f"**仓位权重:** {info['weight']:.2f}%")
+                st.write(f"**行业板块:** {info['sector']}")
+                st.write(f"**止损阈值:** {info['stop_loss_threshold']*100:.1f}%")
     
     # 风险设置
     st.sidebar.subheader("⚠️ 风险管理")
@@ -414,8 +519,8 @@ def main():
             stock_data = {}
             signals = {}
     
-    # 主要内容区域
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 市场概览", "📈 监控股票", "🎯 技术分析", "💼 投资组合"])
+    # 主要内容区域 - 新增深度分析标签页
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 市场概览", "📈 监控股票", "🎯 技术分析", "🔬 深度分析", "💼 投资组合"])
     
     with tab1:
         st.header("📊 市场概览")
@@ -572,12 +677,49 @@ def main():
                     for sig in signal.get('signals', []):
                         st.write(f"• {sig}")
                 
+                # 快速入口到深度分析
+                st.info(f"💡 想要查看 {analysis_stock} 的完整分析报告？切换到 **🔬 深度分析** 标签页获取基本面、流动性、智能分析等更多信息！")
+                
                 # 详细图表
                 chart = create_stock_chart(analysis_stock, stock_data)
                 if chart:
                     st.plotly_chart(chart, use_container_width=True)
     
     with tab4:
+        st.header("🔬 深度股票分析")
+        st.markdown("**专业级股票综合分析系统** - 集成技术面、基本面、流动性、智能分析等7大维度")
+        
+        if not selected_stocks:
+            st.warning("请在侧边栏选择要分析的股票")
+        else:
+            # 股票选择器
+            deep_analysis_stock = st.selectbox("选择要深度分析的股票", selected_stocks, key="deep_analysis_selector")
+            
+            if deep_analysis_stock:
+                # 初始化统一分析器
+                if 'unified_analyzer' not in st.session_state:
+                    st.session_state.unified_analyzer = UnifiedStockAnalyzer()
+                
+                # 刷新分析按钮
+                col1, col2, col3 = st.columns([1, 1, 2])
+                with col1:
+                    if st.button("🔄 刷新分析", key="refresh_deep_analysis"):
+                        st.cache_data.clear()
+                        st.rerun()
+                
+                with col2:
+                    force_refresh = st.checkbox("强制刷新", help="跳过缓存，重新获取所有数据")
+                
+                # 显示完整的股票分析
+                try:
+                    with st.spinner(f"正在进行 {deep_analysis_stock} 的深度分析..."):
+                        display_stock_analysis(deep_analysis_stock, force_refresh=force_refresh)
+                        
+                except Exception as e:
+                    st.error(f"分析过程中出现错误: {e}")
+                    st.info("请检查股票代码是否正确，或稍后重试")
+    
+    with tab5:
         st.header("💼 投资组合管理")
         
         if not portfolio:
@@ -666,6 +808,7 @@ def main():
     # 页面底部信息
     st.markdown("---")
     st.markdown("**💡 使用说明:** 本系统提供实时市场数据和技术分析，仅供参考，投资有风险，决策需谨慎。")
+    st.markdown("**🔬 深度分析:** 集成专业级分析系统，提供技术面、基本面、流动性、智能分析等多维度评估。")
 
 if __name__ == "__main__":
     main() 
