@@ -390,7 +390,7 @@ class FinancialAnalyzer:
                 'value': free_cashflow,
                 'score': fcf_score,
                 'level': fcf_level,
-                'comment': f"自由现金流 ${free_cashflow/1000000:.0f}M，现金创造能力{fcf_level}"
+                'comment': f"自由现金流 ${free_cashflow/1000000:.0f}M，现金创造能力{fcf_level}" if free_cashflow != 0 else f"自由现金流 $0M，现金创造能力{fcf_level}"
             }
             health_score += fcf_score * 0.3
         
@@ -437,7 +437,7 @@ class FinancialAnalyzer:
         current_price = data.get('currentPrice')
         target_mean = data.get('targetMeanPrice')
         
-        if current_price and target_mean:
+        if current_price and target_mean and current_price > 0:
             upside_potential = (target_mean - current_price) / current_price
             if upside_potential >= 0.2:
                 target_score = 100
@@ -754,8 +754,8 @@ class FinancialAnalyzer:
                 }
                 industry_score += debt_industry_score * 0.2
             
-            comparison_result['industry_adjusted_score'] = industry_score / 100
-            comparison_result['summary'] = self._get_industry_summary(industry_score / 100)
+            comparison_result['industry_adjusted_score'] = industry_score / 100 if industry_score > 0 else 0.5
+            comparison_result['summary'] = self._get_industry_summary(industry_score / 100 if industry_score > 0 else 0.5)
             
             return comparison_result
             

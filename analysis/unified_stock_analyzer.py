@@ -87,13 +87,16 @@ class UnifiedStockAnalyzer:
             # 6. 股票类型分析
             stock_type_analysis = self._analyze_stock_type(symbol, basic_data, fundamental_analysis)
             
-            # 7. 右侧交易分析
+            # 7. 买入时机分析
+            timing_analysis = self._analyze_timing(symbol, technical_analysis, fundamental_analysis, basic_data)
+            
+            # 8. 右侧交易分析
             right_side_analysis = self._analyze_right_side_trading(symbol, technical_analysis, basic_data)
             
-            # 8. 市场环境分析
+            # 9. 市场环境分析
             market_environment = self._analyze_market_environment(symbol, basic_data)
             
-            # 9. 综合评分和建议
+            # 10. 综合评分和建议
             comprehensive_rating = self._calculate_comprehensive_rating(
                 technical_analysis, fundamental_analysis, enhanced_analysis, stock_type_analysis
             )
@@ -111,6 +114,7 @@ class UnifiedStockAnalyzer:
                 'technical_analysis': technical_analysis,
                 'fundamental_analysis': fundamental_analysis,
                 'liquidity_analysis': liquidity_analysis,
+                'timing_analysis': timing_analysis,
                 'enhanced_analysis': enhanced_analysis,
                 'stock_type_analysis': stock_type_analysis,
                 'right_side_analysis': right_side_analysis,
@@ -143,18 +147,27 @@ class UnifiedStockAnalyzer:
             # 获取股票信息
             info = ticker.info
             
-            # 获取实时价格和前一交易日收盘价
+            # 获取实时价格和前一交易日收盘价 - 增强验证
             current_price = hist['Close'].iloc[-1]
+            
+            # 验证当前价格有效性
+            if pd.isna(current_price) or current_price <= 0:
+                print(f"警告: {symbol} 当前价格无效，使用历史均价")
+                current_price = hist['Close'].mean()
+                if pd.isna(current_price) or current_price <= 0:
+                    current_price = 100.0  # 极端情况下的默认值
             
             # 尝试从info获取更准确的前一日收盘价
             prev_close = info.get('regularMarketPreviousClose', info.get('previousClose'))
-            if prev_close is None or prev_close == 0:
+            if prev_close is None or prev_close == 0 or pd.isna(prev_close):
                 # 如果info中没有，则使用历史数据的前一天
                 prev_close = hist['Close'].iloc[-2] if len(hist) > 1 else current_price
+                if pd.isna(prev_close) or prev_close <= 0:
+                    prev_close = current_price
             
-            # 计算价格变化
+            # 计算价格变化 - 增强除零保护
             change = current_price - prev_close
-            change_pct = ((current_price - prev_close) / prev_close) * 100 if prev_close != 0 else 0
+            change_pct = ((current_price - prev_close) / prev_close) * 100 if prev_close > 0 else 0
             
             # 调试信息
             print(f"{symbol} 价格信息: 当前={current_price:.2f}, 前收={prev_close:.2f}, 涨跌={change:+.2f} ({change_pct:+.2f}%)")
@@ -204,11 +217,23 @@ class UnifiedStockAnalyzer:
             volume_data = self._analyze_volume(hist)
             indicators.update(volume_data)
             
-            # 52周数据
-            indicators['high_52w'] = hist['High'].max()
-            indicators['low_52w'] = hist['Low'].min()
-            indicators['position_52w'] = ((current_price - indicators['low_52w']) / 
-                                        (indicators['high_52w'] - indicators['low_52w']) * 100) if indicators['high_52w'] != indicators['low_52w'] else 50
+            # 52周数据 - 增强除零保护
+            high_52w = hist['High'].max()
+            low_52w = hist['Low'].min()
+            
+            # 确保高低价有效且不相等
+            if pd.isna(high_52w) or pd.isna(low_52w) or high_52w <= 0 or low_52w <= 0:
+                high_52w = current_price * 1.1
+                low_52w = current_price * 0.9
+            
+            indicators['high_52w'] = high_52w
+            indicators['low_52w'] = low_52w
+            
+            # 计算52周位置，确保分母不为零
+            if high_52w != low_52w and high_52w > low_52w:
+                indicators['position_52w'] = ((current_price - low_52w) / (high_52w - low_52w)) * 100
+            else:
+                indicators['position_52w'] = 50  # 默认中位值
             
             # 技术评分
             tech_score = self._calculate_technical_score(indicators, current_price)
@@ -276,8 +301,18 @@ class UnifiedStockAnalyzer:
             current_price = basic_data['current_price']
             
             # 计算流动性指标
-            avg_volume = hist['Volume'].tail(20).mean()
-            current_volume = hist['Volume'].iloc[-1]
+            # 确保成交量数据不为空且为正数
+            volume_data = hist['Volume'].dropna()
+            if len(volume_data) == 0:
+                avg_volume = 1000000  # 默认值
+                current_volume = 1000000
+            else:
+                avg_volume = volume_data.tail(20).mean()
+                current_volume = volume_data.iloc[-1]
+                
+                # 确保值为正数，避免除零错误
+                avg_volume = max(avg_volume, 1) if not pd.isna(avg_volume) else 1000000
+                current_volume = max(current_volume, 1) if not pd.isna(current_volume) else 1000000
             
             # 价差分析（模拟）
             bid_ask_spread = 0.001  # 0.1% 模拟价差
@@ -373,6 +408,177 @@ class UnifiedStockAnalyzer:
             print(f"股票类型分析失败 {symbol}: {e}")
             return {'error': str(e)}
     
+    def _analyze_timing(self, symbol: str, technical_data: Dict, fundamental_data: Dict, basic_data: Dict) -> Dict:
+        """
+        买入时机分析 - 专门为避免抄底抄到半山腰而设计
+        
+        Args:
+            symbol: 股票代码
+            technical_data: 技术分析数据
+            fundamental_data: 基本面数据
+            basic_data: 基础数据
+            
+        Returns:
+            买入时机分析结果
+        """
+        try:
+            indicators = technical_data.get('indicators', {})
+            current_price = basic_data['current_price']
+            
+            # 1. 技术面信号分析
+            tech_signals = []
+            tech_score = 0
+            
+            # RSI分析 - 避免抄在山顶
+            rsi = indicators.get('rsi', 50)
+            if rsi < 35:
+                tech_signals.append("RSI偏低，存在反弹机会")
+                tech_score += 20
+            elif rsi < 50:
+                tech_signals.append("RSI健康区间，不算超买")
+                tech_score += 15
+            elif rsi > 70:
+                tech_signals.append("⚠️ RSI超买，需谨慎")
+                tech_score -= 15
+            else:
+                tech_signals.append("RSI中性偏强")
+                tech_score += 10
+            
+            # 趋势分析 - 确保不逆势
+            ma_20 = indicators.get('ma_20', current_price)
+            ma_50 = indicators.get('ma_50', current_price)
+            
+            if current_price > ma_20 > ma_50:
+                tech_signals.append("价格在均线之上，趋势向好")
+                tech_score += 25
+            elif current_price > ma_20:
+                tech_signals.append("短期趋势良好")
+                tech_score += 15
+            elif ma_20 > ma_50:
+                tech_signals.append("中期趋势开始转好")
+                tech_score += 10
+            else:
+                tech_signals.append("⚠️ 趋势偏弱，需谨慎")
+                tech_score -= 10
+            
+            # MACD分析
+            macd_line = indicators.get('macd_line', 0)
+            signal_line = indicators.get('signal_line', 0)
+            
+            if macd_line > signal_line and macd_line > 0:
+                tech_signals.append("MACD金叉且在零轴上方")
+                tech_score += 20
+            elif macd_line > signal_line:
+                tech_signals.append("MACD金叉，动能转正")
+                tech_score += 15
+            else:
+                tech_signals.append("MACD仍需观察")
+                tech_score += 5
+            
+            # 成交量分析
+            volume_ratio = indicators.get('volume_ratio', 1)
+            if volume_ratio > 1.5:
+                tech_signals.append("成交量放大，资金关注")
+                tech_score += 10
+            elif volume_ratio > 1.2:
+                tech_signals.append("成交量适度放大")
+                tech_score += 5
+            
+            # 2. 基本面支撑分析
+            fund_signals = []
+            fund_score = 0
+            
+            overall_score = fundamental_data.get('overall_score', 0.5)
+            if overall_score > 0.7:
+                fund_signals.append("基本面优秀，具备投资价值")
+                fund_score += 25
+            elif overall_score > 0.5:
+                fund_signals.append("基本面良好，支撑股价")
+                fund_score += 15
+            else:
+                fund_signals.append("基本面一般，需谨慎")
+                fund_score += 5
+            
+            # 估值分析
+            valuation = fundamental_data.get('valuation', {})
+            val_score = valuation.get('score', 0.5)
+            if val_score > 0.6:
+                fund_signals.append("估值相对合理")
+                fund_score += 15
+            elif val_score < 0.4:
+                fund_signals.append("⚠️ 估值偏高，需注意风险")
+                fund_score -= 10
+            else:
+                fund_signals.append("估值中性")
+                fund_score += 5
+            
+            # 3. 综合评分和建议
+            total_score = tech_score + fund_score
+            
+            # 时机评级
+            if total_score >= 70:
+                rating = "买入"
+                confidence = 85
+            elif total_score >= 50:
+                rating = "观望"
+                confidence = 70
+            else:
+                rating = "等待"
+                confidence = 60
+            
+            # 4. 风险提示
+            risks = []
+            if rsi > 70:
+                risks.append("技术指标显示超买，存在短期回调风险")
+            if current_price < ma_50:
+                risks.append("股价仍在中期均线下方，趋势尚未完全确立")
+            if volume_ratio < 0.8:
+                risks.append("成交量偏低，市场关注度不够")
+            
+            # 5. 具体建议
+            reasons = []
+            if rating == "买入":
+                reasons.append("技术指标和基本面均支持当前买入")
+                if rsi < 50:
+                    reasons.append("RSI处于健康区间，非追高买入")
+                if current_price > ma_20:
+                    reasons.append("趋势确认，风险相对可控")
+            elif rating == "观望":
+                reasons.append("技术面或基本面存在不确定性")
+                reasons.append("建议等待更明确信号")
+            else:
+                reasons.append("当前不具备良好的买入条件")
+                reasons.append("建议耐心等待更佳时机")
+            
+            return {
+                'score': total_score,
+                'rating': rating,
+                'confidence': confidence,
+                'reasons': reasons,
+                'technical_signals': tech_signals,
+                'fundamental_signals': fund_signals,
+                'risks': risks,
+                'analysis': {
+                    'tech_score': tech_score,
+                    'fund_score': fund_score,
+                    'rsi_status': 'healthy' if 30 < rsi < 70 else 'extreme',
+                    'trend_status': 'up' if current_price > ma_20 > ma_50 else 'mixed'
+                }
+            }
+            
+        except Exception as e:
+            print(f"买入时机分析失败: {e}")
+            return {
+                'error': str(e),
+                'score': 50,
+                'rating': '观望',
+                'confidence': 50,
+                'reasons': ['分析数据不足'],
+                'technical_signals': [],
+                'fundamental_signals': [],
+                'risks': ['数据获取异常，建议谨慎']
+            }
+
     def _analyze_right_side_trading(self, symbol: str, technical_data: Dict, basic_data: Dict) -> Dict:
         """右侧交易分析"""
         try:
@@ -662,7 +868,7 @@ class UnifiedStockAnalyzer:
                 ]
                 
                 target_price = 450  # TSLA长期目标价
-                upside_potential = ((target_price - current_price) / current_price) * 100
+                upside_potential = ((target_price - current_price) / current_price) * 100 if current_price > 0 else 0
                 
                 return {
                     'core_position_pct': core_position,
@@ -721,7 +927,7 @@ class UnifiedStockAnalyzer:
             
             # 长期目标
             target_price = current_price * (1.2 + score * 0.8)  # 根据评分调整目标价
-            upside_potential = ((target_price - current_price) / current_price) * 100
+            upside_potential = ((target_price - current_price) / current_price) * 100 if current_price > 0 else 0
             
             return {
                 'core_position_pct': core_position,
@@ -858,11 +1064,19 @@ class UnifiedStockAnalyzer:
             avg_gain = gains.rolling(window=period, min_periods=period).mean()
             avg_loss = losses.rolling(window=period, min_periods=period).mean()
             
-            rs = avg_gain / avg_loss
+            # 防止除零错误
+            avg_loss_safe = avg_loss.replace(0, 1e-10)
+            rs = avg_gain / avg_loss_safe
             rsi = 100 - (100 / (1 + rs))
             
+            # 处理无效值
+            rsi = rsi.fillna(50)
+            rsi = rsi.replace([np.inf, -np.inf], [100, 0])
+            rsi = rsi.clip(0, 100)
+            
             return float(rsi.iloc[-1]) if not pd.isna(rsi.iloc[-1]) else 50
-        except:
+        except Exception as e:
+            print(f"RSI计算错误: {e}")
             return 50
     
     def _calculate_macd(self, prices):

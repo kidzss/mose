@@ -10,21 +10,37 @@ import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta
 import warnings
+import json
 warnings.filterwarnings('ignore')
 
 class DailyHoldingsAnalyzer:
     def __init__(self):
-        # 默认持仓配置 - 根据之前的信息
-        self.portfolio = {
-            'AMD': {'shares': 13, 'cost': 125.746},
-            # 可以添加其他持仓
-        }
+        # 从配置文件读取持仓信息
+        try:
+            with open('portfolio_config.json', 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                self.portfolio = {}
+                
+                # 转换持仓数据格式
+                for symbol, position in config['positions'].items():
+                    if position.get('shares', 0) > 0:  # 只包含有持仓的股票
+                        self.portfolio[symbol] = {
+                            'shares': position['shares'],
+                            'cost': position['cost_basis'],
+                            'technical_analysis': position.get('technical_analysis', {})
+                        }
+        except Exception as e:
+            print(f"⚠️ 无法读取配置文件，使用默认配置: {e}")
+            # 默认持仓配置
+            self.portfolio = {
+                'AMD': {'shares': 20, 'cost': 125.212},
+            }
         
         # 监控的市场指标
         self.market_indices = ['^GSPC', '^IXIC', '^DJI', '^VIX']
         
         # 对比股票池
-        self.watchlist = ['AMD', 'NVDA', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'META', 'AMZN']
+        self.watchlist = ['AMD', 'NVDA', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'META', 'AMZN', 'ASML', 'MRVL']
     
     def get_today_data(self, symbols):
         """获取今日收盘数据"""
@@ -162,6 +178,9 @@ class DailyHoldingsAnalyzer:
                 else:
                     suggestion = "维持当前仓位"
                 
+                # 检查是否有技术分析记录
+                tech_analysis = position.get('technical_analysis', {})
+                
                 portfolio_analysis.append({
                     'symbol': symbol,
                     'shares': shares,
@@ -173,7 +192,8 @@ class DailyHoldingsAnalyzer:
                     'rsi': rsi,
                     'tech_status': tech_status,
                     'suggestion': suggestion,
-                    'position_52w': position_52w
+                    'position_52w': position_52w,
+                    'tech_analysis': tech_analysis
                 })
         
         # 总体表现
@@ -195,6 +215,18 @@ class DailyHoldingsAnalyzer:
             print(f"   盈亏: ${stock['unrealized_pnl']:+.2f} ({stock['pnl_pct']:+.2f}%)")
             print(f"   RSI: {stock['rsi']:.1f} ({stock['tech_status']})")
             print(f"   52周位置: {stock['position_52w']:.1f}%")
+            
+            # 显示技术分析记录
+            if stock['tech_analysis']:
+                tech = stock['tech_analysis']
+                print(f"   📈 技术分析 ({tech.get('date', 'N/A')}):")
+                print(f"      形态: {tech.get('pattern', 'N/A')}")
+                print(f"      趋势: {tech.get('trend_direction', 'N/A')}")
+                print(f"      目标: {tech.get('price_target', 'N/A')}")
+                print(f"      策略: {tech.get('strategy', 'N/A')}")
+                if tech.get('note'):
+                    print(f"      备注: {tech['note']}")
+            
             print(f"   💡 建议: {stock['suggestion']}")
         
         return portfolio_analysis
@@ -373,30 +405,111 @@ class DailyHoldingsAnalyzer:
         print(f"   3. 科技股财报季表现")
         print(f"   4. 市场成交量变化")
     
-    def run_daily_analysis(self):
-        """运行完整的每日分析"""
-        print("🚀 开始每日持股分析...")
-        print("=" * 60)
+    def check_tsla_add_position_triggers(self, data):
+        """检查TSLA加仓触发条件"""
+        if 'TSLA' not in data:
+            return
         
-        # 获取所有需要的数据
+        tsla_data = data['TSLA']
+        current_price = tsla_data['price']
+        
+        print("\n🚗 === TSLA倒金字塔加仓策略提醒 ===")
+        print(f"当前价格: ${current_price:.2f}")
+        print(f"关键支撑: $336 (不破看涨)")
+        
+        # 加仓策略配置
+        strategy = {
+            'batch_1': {'range': (296, 300), 'amount': 825, 'allocation': '30%', 'logic': '试探性建仓，验证支撑有效性'},
+            'batch_2': {'range': (285, 290), 'amount': 1100, 'allocation': '40%', 'logic': '确认趋势后重仓买入，获取主要收益'},
+            'batch_3': {'range': (273, 280), 'amount': 825, 'allocation': '30%', 'logic': '极值区域收割，风险最低时加码'}
+        }
+        
+        # 检查触发条件
+        triggered_batches = []
+        
+        for batch_name, batch_info in strategy.items():
+            min_price, max_price = batch_info['range']
+            if min_price <= current_price <= max_price:
+                triggered_batches.append((batch_name, batch_info))
+        
+        if triggered_batches:
+            print("\n🎯 触发加仓条件:")
+            for batch_name, batch_info in triggered_batches:
+                print(f"   📍 {batch_name.upper()}: ${batch_info['range'][0]}-${batch_info['range'][1]}")
+                print(f"      💰 资金: ${batch_info['amount']} ({batch_info['allocation']})")
+                print(f"      📝 逻辑: {batch_info['logic']}")
+                print(f"      ⚠️  建议: 立即考虑执行加仓!")
+        else:
+            print("\n⏳ 等待加仓时机:")
+            
+            # 显示距离各批次的差距
+            for batch_name, batch_info in strategy.items():
+                min_price, max_price = batch_info['range']
+                mid_price = (min_price + max_price) / 2
+                distance = ((current_price - mid_price) / mid_price) * 100
+                
+                if current_price > max_price:
+                    status = f"还需下跌 {distance:.1f}%"
+                elif current_price < min_price:
+                    status = f"已跌破 {abs(distance):.1f}%"
+                else:
+                    status = "在区间内"
+                
+                print(f"   📍 {batch_name.upper()}: ${min_price}-${max_price} ({status})")
+                print(f"      💰 准备资金: ${batch_info['amount']} ({batch_info['allocation']})")
+        
+        # 风险提醒
+        if current_price < 336:
+            print(f"\n⚠️  风险提醒: 已跌破关键支撑$336，当前${current_price:.2f}")
+            print("   需要重新评估支撑有效性")
+        elif current_price > 350:
+            print(f"\n📈 价格偏高: 当前${current_price:.2f}，建议等待回调")
+        
+        # 技术分析提醒
+        rsi = tsla_data.get('rsi', 50)
+        if rsi < 30:
+            print(f"   📊 RSI: {rsi:.1f} (超卖，支持加仓)")
+        elif rsi > 70:
+            print(f"   📊 RSI: {rsi:.1f} (超买，谨慎加仓)")
+        else:
+            print(f"   📊 RSI: {rsi:.1f} (中性)")
+        
+        print(f"\n💡 总策略: 倒金字塔加仓，总资金$2,750 (约占组合10%)")
+        print(f"   止损位: 硬止损$260, 软止损$270")
+        print(f"   持有期: 最长6个月，每月底评估")
+
+    def run_daily_analysis(self):
+        """运行每日分析"""
+        print("🚀 开始每日持股分析...")
+        print(f"📅 分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # 获取所有需要的股票数据
         all_symbols = list(self.portfolio.keys()) + self.market_indices + self.watchlist
         all_symbols = list(set(all_symbols))  # 去重
         
         data = self.get_today_data(all_symbols)
         
         if not data:
-            print("❌ 无法获取市场数据，请检查网络连接")
+            print("❌ 无法获取市场数据")
             return
         
-        # 执行各项分析
+        # 分析投资组合
+        portfolio_analysis = self.analyze_portfolio_performance(data)
+        
+        # 分析市场环境
         self.analyze_market_environment(data)
-        self.analyze_portfolio_performance(data)
+        
+        # TSLA加仓提醒检查
+        self.check_tsla_add_position_triggers(data)
+        
+        # 生成交易信号
         self.generate_trading_signals(data)
+        
+        # 创建每日总结
         self.create_daily_summary(data)
         
-        print("\n" + "=" * 60)
-        print("✅ 每日分析完成!")
-        print(f"📅 分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("\n✅ 每日分析完成!")
+        print("="*80)
 
 def main():
     analyzer = DailyHoldingsAnalyzer()

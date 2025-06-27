@@ -23,6 +23,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # 导入统一分析系统
 from analysis.unified_stock_analyzer import UnifiedStockAnalyzer
 from analysis.streamlit_analysis_bridge import display_stock_analysis
+from analysis.decision_support_system import DecisionSupportSystem
 
 warnings.filterwarnings('ignore')
 
@@ -201,8 +202,9 @@ def calculate_rsi(prices, period=14):
         avg_gain = gains.rolling(window=period, min_periods=period).mean()
         avg_loss = losses.rolling(window=period, min_periods=period).mean()
         
-        # 计算RS和RSI
-        rs = avg_gain / avg_loss
+        # 计算RS和RSI - 防止除零错误
+        avg_loss_safe = avg_loss.replace(0, 1e-10)
+        rs = avg_gain / avg_loss_safe
         rsi = 100 - (100 / (1 + rs))
         
         # 获取最后一个有效值
@@ -382,11 +384,24 @@ def create_stock_chart(symbol, data):
     
     # RSI
     def calculate_rsi_series(prices, period=14):
-        delta = prices.diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=period, min_periods=period).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=period, min_periods=period).mean()
-        rs = gain / loss.replace(0, np.nan)
-        return 100 - (100 / (1 + rs))
+        try:
+            delta = prices.diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=period, min_periods=period).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=period, min_periods=period).mean()
+            
+            # 防止除零错误
+            loss_safe = loss.replace(0, 1e-10)
+            rs = gain / loss_safe
+            rsi = 100 - (100 / (1 + rs))
+            
+            # 处理无效值
+            rsi = rsi.fillna(50)
+            rsi = rsi.replace([np.inf, -np.inf], [100, 0])
+            rsi = rsi.clip(0, 100)
+            
+            return rsi
+        except Exception as e:
+            return pd.Series([50] * len(prices), index=prices.index)
     
     rsi_series = calculate_rsi_series(hist['Close'])
     fig.add_trace(
@@ -438,11 +453,7 @@ def main():
     # 侧边栏配置
     st.sidebar.header("🎛️ 交易配置")
     
-    # 显示持仓信息
-    st.sidebar.subheader("💼 当前持仓")
-    for symbol in config['current_positions']:
-        info = config['portfolio_info'].get(symbol, {})
-        st.sidebar.markdown(f"**{symbol}** - {info.get('shares', 0)}股 @ ${info.get('cost_basis', 0):.2f}")
+    # 持仓信息已在投资组合标签页显示，此处不再重复
     
     # 监控股票选择
     st.sidebar.subheader("📊 监控股票")
@@ -519,8 +530,8 @@ def main():
             stock_data = {}
             signals = {}
     
-    # 主要内容区域 - 新增深度分析标签页
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 市场概览", "📈 监控股票", "🎯 技术分析", "🔬 深度分析", "💼 投资组合"])
+    # 主要内容区域 - 专业投资分析中心架构
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 市场概览", "📈 监控股票", "🔬 专业投资分析中心", "💼 投资组合", "🧠 决策支持"])
     
     with tab1:
         st.header("📊 市场概览")
@@ -635,59 +646,8 @@ def main():
                 st.info("暂无重要预警信息")
     
     with tab3:
-        st.header("🎯 技术分析")
-        
-        if not selected_stocks:
-            st.warning("请在侧边栏选择要分析的股票")
-        else:
-            # 选择要分析的股票
-            analysis_stock = st.selectbox("选择要分析的股票", selected_stocks)
-            
-            if analysis_stock and analysis_stock in stock_data:
-                data = stock_data[analysis_stock]
-                signal = signals.get(analysis_stock, {})
-                
-                # 基本信息
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("当前价格", f"${data['price']:.2f}", f"{data['change_pct']:+.2f}%")
-                with col2:
-                    rsi_color = "🟢" if data['rsi'] < 30 else "🔴" if data['rsi'] > 70 else "🟡"
-                    st.metric("RSI", f"{data['rsi']:.1f}", rsi_color)
-                with col3:
-                    st.metric("20日均线", f"${data['ma_20']:.2f}")
-                with col4:
-                    st.metric("50日均线", f"${data['ma_50']:.2f}")
-                
-                # 技术评级
-                st.subheader("📊 技术评级")
-                col1, col2 = st.columns([1, 2])
-                
-                with col1:
-                    rating_color = signal.get('color', '#ffc107')
-                    st.markdown(f"""
-                    <div style="background-color: {rating_color}; color: white; padding: 1rem; border-radius: 10px; text-align: center;">
-                        <h3>{signal.get('rating', 'N/A')}</h3>
-                        <p>综合评分: {signal.get('score', 0)}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown("**技术信号:**")
-                    for sig in signal.get('signals', []):
-                        st.write(f"• {sig}")
-                
-                # 快速入口到深度分析
-                st.info(f"💡 想要查看 {analysis_stock} 的完整分析报告？切换到 **🔬 深度分析** 标签页获取基本面、流动性、智能分析等更多信息！")
-                
-                # 详细图表
-                chart = create_stock_chart(analysis_stock, stock_data)
-                if chart:
-                    st.plotly_chart(chart, use_container_width=True)
-    
-    with tab4:
-        st.header("🔬 深度股票分析")
-        st.markdown("**专业级股票综合分析系统** - 集成技术面、基本面、流动性、智能分析等7大维度")
+        st.header("🔬 专业投资分析中心")
+        st.markdown("**专业级股票综合分析系统** - 集成技术面、基本面、流动性、智能分析等8大维度")
         
         if not selected_stocks:
             st.warning("请在侧边栏选择要分析的股票")
@@ -719,7 +679,7 @@ def main():
                     st.error(f"分析过程中出现错误: {e}")
                     st.info("请检查股票代码是否正确，或稍后重试")
     
-    with tab5:
+    with tab4:
         st.header("💼 投资组合管理")
         
         if not portfolio:
@@ -805,10 +765,342 @@ def main():
             else:
                 st.success("✅ 当前无风险预警")
     
+    with tab5:
+        st.header("🧠 投资决策支持系统")
+        st.markdown("**专门为避免抄底抄到半山腰、避免卖到半路而设计**")
+        
+        # 初始化决策支持系统
+        if 'decision_support' not in st.session_state:
+            st.session_state.decision_support = DecisionSupportSystem()
+        
+        dss = st.session_state.decision_support
+        
+        # 决策类型选择
+        decision_type = st.radio("选择决策类型", [
+            "📊 仓位管理分析", "🔍 买入时机分析", "💰 卖出时机分析", 
+            "📝 查看决策历史", "✍️ 添加备注"
+        ])
+        
+        if decision_type == "📊 仓位管理分析":
+            st.subheader("专业仓位管理分析")
+            st.markdown("**集成技术分析、风险评估、加仓策略的专业仓位管理系统**")
+            
+            if not selected_stocks:
+                st.warning("请在侧边栏选择要分析的股票")
+            else:
+                position_stock = st.selectbox("选择要分析仓位的股票", selected_stocks, key="position_analysis")
+                
+                # 仓位输入
+                col1, col2 = st.columns(2)
+                with col1:
+                    current_position = st.number_input("当前仓位 (%)", min_value=0.0, max_value=100.0, 
+                                                     value=18.29, step=0.1, key="current_pos")
+                with col2:
+                    target_position = st.number_input("目标仓位 (%)", min_value=0.0, max_value=100.0, 
+                                                    value=25.0, step=0.1, key="target_pos")
+                
+                if st.button("📊 开始仓位管理分析", type="primary"):
+                    with st.spinner(f"正在分析 {position_stock} 的仓位管理策略..."):
+                        # 获取当前分析数据
+                        if 'unified_analyzer' not in st.session_state:
+                            st.session_state.unified_analyzer = UnifiedStockAnalyzer()
+                        
+                        current_analysis = st.session_state.unified_analyzer.get_comprehensive_analysis(position_stock)
+                        
+                        # 进行仓位管理分析
+                        position_decision = dss.analyze_position_management(
+                            position_stock, current_position, target_position, current_analysis
+                        )
+                        
+                        if 'decision' in position_decision:
+                            # 基本信息展示
+                            st.markdown("### 📊 当前市场状况")
+                            tech_data = position_decision['technical_data']
+                            col1, col2, col3, col4 = st.columns(4)
+                            
+                            with col1:
+                                st.metric("当前价格", f"${position_decision['current_price']:.2f}")
+                            with col2:
+                                st.metric("MA20", f"${tech_data['ma20']:.2f}")
+                            with col3:
+                                st.metric("RSI", f"{tech_data['rsi']:.1f}")
+                            with col4:
+                                price_vs_ma20 = tech_data['price_vs_ma20_pct']
+                                st.metric("价格偏离MA20", f"{price_vs_ma20:+.1f}%")
+                            
+                            # 仓位状况
+                            st.markdown("### 📈 仓位状况分析")
+                            col1, col2, col3 = st.columns(3)
+                            
+                            with col1:
+                                st.metric("当前仓位", f"{position_decision['current_position']:.1f}%")
+                            with col2:
+                                st.metric("目标仓位", f"{position_decision['target_position']:.1f}%")
+                            with col3:
+                                gap = position_decision['position_gap']
+                                st.metric("仓位缺口", f"{gap:+.1f}%")
+                            
+                            # 决策结果
+                            decision_detail = position_decision['decision']
+                            st.markdown("### 🎯 仓位管理决策")
+                            
+                            action = decision_detail['action']
+                            confidence = decision_detail['confidence']
+                            risk_level = decision_detail['risk_level']
+                            
+                            if action == "暂时不要加仓":
+                                st.error(f"🔴 **{action}** (信心度: {confidence}%, 风险: {risk_level})")
+                            elif action == "可以小幅加仓":
+                                st.warning(f"🟡 **{action}** (信心度: {confidence}%, 风险: {risk_level})")
+                            else:
+                                st.success(f"🟢 **{action}** (信心度: {confidence}%, 风险: {risk_level})")
+                            
+                            st.info(f"**决策理由:** {decision_detail['reason']}")
+                            
+                            # 推荐策略详情
+                            st.markdown("### 💡 推荐操作策略")
+                            strategies = position_decision['strategies']
+                            recommended_strategy_key = decision_detail['recommended_strategy']
+                            
+                            if recommended_strategy_key in strategies:
+                                recommended_strategy = strategies[recommended_strategy_key]
+                                st.markdown(f"**{recommended_strategy['name']}** (推荐)")
+                                
+                                for batch in recommended_strategy['batches']:
+                                    if 'position_add' in batch:
+                                        st.markdown(f"• **第{batch['batch']}批加仓**: {batch['price_range']} "
+                                                  f"(加仓{batch['position_add']:.1f}%) - {batch['condition']}")
+                                    elif 'position_reduce' in batch:
+                                        st.markdown(f"• **减仓**: {batch['price_range']} "
+                                                  f"(减仓{batch['position_reduce']:.1f}%) - {batch['condition']}")
+                            
+                            # 其他策略选择
+                            with st.expander("查看其他策略选择"):
+                                for key, strategy in strategies.items():
+                                    if key != recommended_strategy_key:
+                                        st.markdown(f"**{strategy['name']}** ({'推荐' if strategy['recommended'] else '不推荐'})")
+                                        for batch in strategy['batches']:
+                                            if 'position_add' in batch:
+                                                st.markdown(f"  • {batch['price_range']} (加仓{batch['position_add']:.1f}%)")
+                                            elif 'position_reduce' in batch:
+                                                st.markdown(f"  • {batch['price_range']} (减仓{batch['position_reduce']:.1f}%)")
+                            
+                            # 风险评估
+                            st.markdown("### ⚠️ 风险评估")
+                            risk_assessment = position_decision['risk_assessment']
+                            
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.metric("风险评分", f"{risk_assessment['risk_score']}/100")
+                            with col2:
+                                st.metric("风险等级", risk_assessment['risk_level'])
+                            
+                            if risk_assessment['risk_factors']:
+                                st.markdown("**风险因素:**")
+                                for factor in risk_assessment['risk_factors']:
+                                    st.markdown(f"• {factor}")
+                            
+                            st.markdown(f"**风险建议:** {risk_assessment['recommendation']}")
+                            
+                            # 最优时机
+                            st.markdown("### ⏰ 最优操作时机")
+                            optimal_timing = position_decision['optimal_timing']
+                            
+                            st.markdown(f"**时机判断:** {optimal_timing['best_timing']}")
+                            st.markdown("**时机信号:**")
+                            for signal in optimal_timing['signals']:
+                                st.markdown(f"• {signal}")
+                            
+                            # 保存决策记录
+                            dss.save_decision(position_decision)
+                            
+                            # 用户备注区域
+                            st.markdown("### ✍️ 添加您的想法")
+                            user_note = st.text_area("记录您对此次仓位分析的想法:", key=f"position_note_{position_stock}")
+                            if st.button("💾 保存备注") and user_note:
+                                dss.add_user_note(position_stock, f"仓位管理分析备注: {user_note}")
+                                st.success("备注已保存!")
+                        else:
+                            st.error("分析失败，请稍后重试")
+        
+        elif decision_type == "🔍 买入时机分析":
+            st.subheader("买入时机分析 - 避免抄底陷阱")
+            
+            if not selected_stocks:
+                st.warning("请在侧边栏选择要分析的股票")
+            else:
+                buy_stock = st.selectbox("选择要分析买入时机的股票", selected_stocks, key="buy_analysis")
+                
+                if st.button("🔍 分析买入时机", type="primary"):
+                    with st.spinner(f"正在分析 {buy_stock} 的买入时机..."):
+                        # 获取当前分析数据
+                        if 'unified_analyzer' not in st.session_state:
+                            st.session_state.unified_analyzer = UnifiedStockAnalyzer()
+                        
+                        current_analysis = st.session_state.unified_analyzer.get_comprehensive_analysis(buy_stock)
+                        
+                        # 进行买入时机分析
+                        buy_decision = dss.analyze_buy_timing(buy_stock, current_analysis)
+                        
+                        if 'decision' in buy_decision:
+                            # 显示决策结果
+                            decision_detail = buy_decision['decision']
+                            decision = decision_detail['action']
+                            confidence = decision_detail['confidence']
+                            
+                            # 决策结果展示
+                            if decision == "建议买入":
+                                st.success(f"🟢 **{decision}** (信心度: {confidence}%)")
+                            elif decision == "可以考虑":
+                                st.warning(f"🟡 **{decision}** (信心度: {confidence}%)")
+                            else:
+                                st.error(f"🔴 **{decision}** (信心度: {confidence}%)")
+                            
+                            # 详细分析结果
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                st.markdown("**✅ 支持理由:**")
+                                for reason in decision_detail.get('reasons', []):
+                                    st.markdown(f"• {reason}")
+                            
+                            with col2:
+                                st.markdown("**⚠️ 风险提醒:**")
+                                for warning in decision_detail.get('warnings', []):
+                                    st.markdown(f"• {warning}")
+                            
+                            # 保存决策记录
+                            dss.save_decision(buy_decision)
+                            
+                            # 用户备注区域
+                            user_note = st.text_area("添加您的想法和备注:", key=f"buy_note_{buy_stock}")
+                            if st.button("💾 保存备注") and user_note:
+                                dss.add_user_note(buy_stock, f"买入分析备注: {user_note}")
+                                st.success("备注已保存!")
+                        else:
+                            st.error("分析失败，请稍后重试")
+        
+        elif decision_type == "💰 卖出时机分析":
+            st.subheader("卖出时机分析 - 避免卖到半路")
+            
+            # 获取持仓股票
+            holding_stocks = []
+            if portfolio:
+                holding_stocks = list(portfolio.keys())
+            
+            if not holding_stocks:
+                st.warning("当前没有持仓股票")
+            else:
+                sell_stock = st.selectbox("选择要分析卖出时机的持仓股票", holding_stocks, key="sell_analysis")
+                
+                if st.button("💰 分析卖出时机", type="primary"):
+                    with st.spinner(f"正在分析 {sell_stock} 的卖出时机..."):
+                        # 获取持仓信息
+                        if sell_stock in portfolio:
+                            position_info = {
+                                'cost_basis': portfolio[sell_stock]['cost'],
+                                'shares': portfolio[sell_stock]['shares']
+                            }
+                            
+                            # 获取当前分析数据
+                            if 'unified_analyzer' not in st.session_state:
+                                st.session_state.unified_analyzer = UnifiedStockAnalyzer()
+                            
+                            current_analysis = st.session_state.unified_analyzer.get_comprehensive_analysis(sell_stock)
+                            
+                            # 进行卖出时机分析
+                            sell_decision = dss.analyze_sell_timing(sell_stock, position_info, current_analysis)
+                            
+                            if 'decision' in sell_decision:
+                                # 显示决策结果
+                                decision_detail = sell_decision['decision']
+                                decision = decision_detail['action']
+                                confidence = decision_detail['confidence']
+                                reason = decision_detail.get('summary', '无详细信息')
+                                
+                                # 盈亏状况
+                                profit_pct = sell_decision['profit_pct']
+                                if profit_pct > 0:
+                                    st.success(f"💰 当前盈利: {profit_pct:.1f}%")
+                                else:
+                                    st.error(f"📉 当前亏损: {profit_pct:.1f}%")
+                                
+                                # 决策建议
+                                if decision == "考虑止损":
+                                    st.error(f"🔴 **{decision}** (信心度: {confidence}%)")
+                                elif decision == "考虑减仓":
+                                    st.warning(f"🟡 **{decision}** (信心度: {confidence}%)")
+                                else:
+                                    st.success(f"🟢 **{decision}** (信心度: {confidence}%)")
+                                
+                                st.info(f"**分析理由:** {reason}")
+                                
+                                # 保存决策记录
+                                dss.save_decision(sell_decision)
+                                
+                                # 用户备注区域
+                                user_note = st.text_area("添加您的想法和备注:", key=f"sell_note_{sell_stock}")
+                                if st.button("💾 保存备注") and user_note:
+                                    dss.add_user_note(sell_stock, f"卖出分析备注: {user_note}")
+                                    st.success("备注已保存!")
+                            else:
+                                st.error("分析失败，请稍后重试")
+                        else:
+                            st.error("找不到持仓信息")
+        
+        elif decision_type == "📝 查看决策历史":
+            st.subheader("决策历史记录")
+            
+            if not selected_stocks:
+                st.warning("请在侧边栏选择股票")
+            else:
+                history_stock = st.selectbox("选择要查看历史的股票", selected_stocks, key="history_analysis")
+                days = st.slider("查看最近几天的记录", 7, 90, 30)
+                
+                history = dss.get_decision_history(history_stock, days)
+                
+                if history:
+                    st.success(f"找到 {len(history)} 条记录")
+                    
+                    for record in history:
+                        with st.expander(f"{record['timestamp'][:19]} - {record.get('decision_type', 'UNKNOWN')}"):
+                            if record.get('type') == 'USER_NOTE':
+                                st.markdown(f"**用户备注:** {record['note']}")
+                            else:
+                                if record.get('decision_type') == 'BUY_TIMING':
+                                    st.markdown(f"**买入决策:** {record.get('decision', 'N/A')}")
+                                    st.markdown(f"**信心度:** {record.get('confidence', 0)}%")
+                                    st.markdown(f"**价格:** ${record.get('current_price', 0):.2f}")
+                                elif record.get('decision_type') == 'SELL_TIMING':
+                                    st.markdown(f"**卖出决策:** {record.get('decision', 'N/A')}")
+                                    st.markdown(f"**信心度:** {record.get('confidence', 0)}%")
+                                    st.markdown(f"**价格:** ${record.get('current_price', 0):.2f}")
+                                    st.markdown(f"**盈亏:** {record.get('profit_pct', 0):.1f}%")
+                                    st.markdown(f"**理由:** {record.get('reason', 'N/A')}")
+                                
+                                if record.get('user_notes'):
+                                    st.markdown(f"**备注:** {record['user_notes']}")
+                else:
+                    st.info("暂无决策记录")
+        
+        elif decision_type == "✍️ 添加备注":
+            st.subheader("添加投资备注")
+            
+            if not selected_stocks:
+                st.warning("请在侧边栏选择股票")
+            else:
+                note_stock = st.selectbox("选择股票", selected_stocks, key="note_stock")
+                note_content = st.text_area("输入您的想法、分析或备注:")
+                
+                if st.button("💾 保存备注") and note_content:
+                    result = dss.add_user_note(note_stock, note_content)
+                    st.success(result)
+    
     # 页面底部信息
     st.markdown("---")
     st.markdown("**💡 使用说明:** 本系统提供实时市场数据和技术分析，仅供参考，投资有风险，决策需谨慎。")
     st.markdown("**🔬 深度分析:** 集成专业级分析系统，提供技术面、基本面、流动性、智能分析等多维度评估。")
+    st.markdown("**🧠 决策支持:** 专门为避免抄底抄到半山腰、避免卖到半路而设计，帮助您做出更明智的投资决策。")
 
 if __name__ == "__main__":
     main() 

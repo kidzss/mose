@@ -50,7 +50,7 @@ class StreamlitTradingDashboard:
     def run_dashboard(self):
         """运行主仪表板"""
         # 页面标题
-        st.title("🚀 专业实时交易监控系统")
+        st.title("🚀 Mose实时交易监控系统")
         st.markdown("---")
         
         # 侧边栏配置

@@ -19,6 +19,51 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data.data_interface import DataInterface
 
+def load_portfolio_config():
+    """从JSON配置文件加载持仓和观察仓信息"""
+    try:
+        with open('portfolio_config.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # 提取当前持仓股票 (排除港股和已卖出的股票)
+        current_positions = []
+        portfolio_info = {}
+        
+        for symbol, position in config.get('positions', {}).items():
+            if (not symbol.endswith('.HK') and 
+                position.get('shares', 0) > 0 and 
+                position.get('status') != 'SOLD'):
+                current_positions.append(symbol)
+                portfolio_info[symbol] = {
+                    'shares': position.get('shares', 0),
+                    'cost_basis': position.get('cost_basis', 0),
+                    'stop_loss_threshold': position.get('stop_loss_threshold', 0.08),
+                    'sector': position.get('sector', 'Unknown')
+                }
+        
+        # 提取观察仓股票
+        watchlist_stocks = list(config.get('watchlist', {}).keys())
+        
+        # 完整监控列表
+        all_stocks = current_positions + watchlist_stocks
+        
+        return {
+            'current_positions': current_positions,
+            'watchlist_stocks': watchlist_stocks,
+            'all_stocks': all_stocks,
+            'portfolio_info': portfolio_info
+        }
+        
+    except Exception as e:
+        print(f"❌ 配置文件加载失败: {e}")
+        # 返回默认配置
+        return {
+            'current_positions': ['AMD', 'NVDA'],
+            'watchlist_stocks': ['MSFT', 'AAPL'],
+            'all_stocks': ['AMD', 'NVDA', 'MSFT', 'AAPL'],
+            'portfolio_info': {}
+        }
+
 class RealtimeIntradayMonitor:
     """实时日内监控系统"""
     
@@ -27,10 +72,18 @@ class RealtimeIntradayMonitor:
         初始化实时监控系统
         
         Args:
-            symbols: 监控的股票列表
+            symbols: 监控的股票列表 (如果为None，则从配置文件加载)
             update_interval: 更新间隔(秒)
         """
-        self.symbols = symbols or ['AMD', 'NVDA', 'TSLA', 'AAPL', 'MSFT']
+        # 加载配置文件
+        self.config = load_portfolio_config()
+        
+        # 如果没有指定股票列表，使用配置文件中的股票
+        if symbols is None:
+            self.symbols = self.config['all_stocks']
+        else:
+            self.symbols = symbols
+            
         self.update_interval = update_interval
         self.data_interface = DataInterface()
         self.yahoo_source = self.data_interface.get_data_source('yahoo')
@@ -38,7 +91,7 @@ class RealtimeIntradayMonitor:
         # 存储历史数据和信号
         self.price_history = {}
         self.alerts = []
-        self.positions = {}
+        self.positions = self.config['portfolio_info']  # 从配置文件加载持仓信息
         self.running = False
         
         # 交易参数
@@ -52,7 +105,9 @@ class RealtimeIntradayMonitor:
         }
         
         print(f"🚀 实时日内监控系统初始化完成")
-        print(f"📊 监控股票: {self.symbols}")
+        print(f"📊 持仓股票: {self.config['current_positions']}")
+        print(f"👀 观察仓股票: {self.config['watchlist_stocks']}")
+        print(f"📈 总监控股票: {len(self.symbols)} 只")
         print(f"⏰ 更新间隔: {self.update_interval}秒")
     
     async def start_monitoring(self):

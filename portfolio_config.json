@@ -5,19 +5,19 @@
         "currency": "USD",
         "description": "持仓调整更新 - AMD继续减仓(30→20股)，MRK新建仓8股，优化投资组合配置，AMD占比降至9.42%",
         "watchlist_update": {
-            "date": "2025-06-19",
-            "added_stocks": 34,
-            "total_watchlist": 39,
+            "date": "2025-06-24",
+            "added_stocks": 41,
+            "total_watchlist": 46,
             "categories": {
                 "防御性股票": 5,
                 "金融股票": 6,
                 "医疗股票": 3,
-                "科技股票": 7,
+                "科技股票": 14,
                 "消费股票": 4,
-                "能源股票": 2,
+                "能源股票": 0,
                 "ETF基金": 6,
                 "市场指标": 1,
-                "原有观察股": 5
+                "原有观察股": 7
             }
         }
     },
@@ -72,16 +72,25 @@
             "unrealized_pnl": -68.10
         },
         "AMD": {
-            "shares": 20,
-            "cost_basis": 125.212,
-            "weight": 9.42,
-            "investment_amount": 2504.24,
+            "shares": 25,
+            "cost_basis": 125.746,
+            "weight": 12.54,
+            "investment_amount": 3143.65,
             "sector": "Technology",
             "stop_loss_threshold": 0.08,
             "current_price": 128.24,
             "current_value": 2564.80,
             "unrealized_pnl": 60.56,
-            "transaction_note": "继续减仓，从30股减至20股，RSI超买73.0+无量上涨，保护利润"
+            "transaction_note": "",
+            "technical_analysis": {
+                "date": "2025-06-24",
+                "pattern": "光头光脚大阳线",
+                "trend_direction": "拐头向上",
+                "price_target": "150-160",
+                "strategy": "继续持有等待",
+                "confidence": "强势信号",
+                "note": "技术形态确认向上突破，预期后续继续上涨"
+            }
         },
         "PFE": {
             "shares": 80,
@@ -258,11 +267,6 @@
             "category": "消费股票",
             "reason": "会员制零售龙头，客户粘性强，抗通胀能力优秀"
         },
-        "HD": {
-            "target_buy_price": 350.0,
-            "category": "消费股票",
-            "reason": "家装零售龙头，地产后周期受益，DIY趋势"
-        },
         "DIS": {
             "target_buy_price": 95.0,
             "category": "消费股票",
@@ -272,16 +276,6 @@
             "target_buy_price": 1100.0,
             "category": "消费股票",
             "reason": "流媒体龙头，全球化布局，内容护城河深厚"
-        },
-        "XOM": {
-            "target_buy_price": 105.0,
-            "category": "能源股票",
-            "reason": "石油巨头，现金流强劲，分红和回购积极"
-        },
-        "CVX": {
-            "target_buy_price": 138.0,
-            "category": "能源股票",
-            "reason": "综合能源公司，财务稳健，能源转型布局"
         },
         "SPY": {
             "target_buy_price": 590.0,
@@ -298,6 +292,11 @@
             "category": "ETF基金",
             "reason": "科技板块ETF，AI和云计算主题投资"
         },
+        "SOXX": {
+            "target_buy_price": 225.0,
+            "category": "ETF基金",
+            "reason": "半导体行业ETF，追踪NYSE半导体指数，包含NVDA、AVGO、TSM等龙头股，分析师平均目标价$241.73，当前价格$235，等待技术调整至$225买入"
+        },
         "IWM": {
             "target_buy_price": 199.0,
             "category": "ETF基金",
@@ -307,6 +306,71 @@
             "target_buy_price": 220.0,
             "category": "ETF基金",
             "reason": "黄金ETF，通胀对冲，地缘风险避险"
+        },
+        "MRVL": {
+            "target_buy_price": 70.0,
+            "category": "科技股票",
+            "reason": "半导体数据基础设施解决方案提供商，AI和云计算基础设施受益，当前价格约$74，等待回调买入"
+        },
+        "ASML": {
+            "target_buy_price": 800.0,
+            "category": "科技股票",
+            "reason": "半导体设备制造龙头，AI芯片制造关键设备供应商，分析师平均目标价$913，等待技术调整买入机会"
+        },
+        "TSM": {
+            "target_buy_price": 200.0,
+            "category": "科技股票",
+            "reason": "全球半导体代工龙头，台积电，垄断先进制程技术，AI芯片制造核心供应商，分析师平均目标价$223.71，当前价格$210，等待回调至$200买入"
+        },
+        "META": {
+            "target_buy_price": 650.0,
+            "category": "科技股票",
+            "reason": "全球社交媒体龙头，元宇宙和AI双重布局，分析师平均目标价$707.16，当前价格$698，等待回调至$650买入"
+        },
+        "AMZN": {
+            "target_buy_price": 200.0,
+            "category": "科技股票",
+            "reason": "电商和云计算双引擎驱动，AWS增长强劲，分析师平均目标价$242.48，当前价格$213，等待技术调整至$200买入"
+        },
+        "TSLA": {
+            "target_buy_price": 300.0,
+            "category": "科技股票",
+            "reason": "电动车龙头，自动驾驶和AI技术领先，分析师平均目标价$295，当前价格$340，等待回调至$300买入",
+            "add_position_strategy": {
+                "strategy_type": "倒金字塔加仓",
+                "total_funds": 2750,
+                "percentage_of_portfolio": 10.0,
+                "key_support_level": 336,
+                "batches": {
+                    "batch_1": {
+                        "price_range": "296-300",
+                        "allocation": "30%",
+                        "amount": 825,
+                        "expected_shares": 2.8,
+                        "logic": "试探性建仓，验证支撑有效性"
+                    },
+                    "batch_2": {
+                        "price_range": "285-290", 
+                        "allocation": "40%",
+                        "amount": 1100,
+                        "expected_shares": 3.8,
+                        "logic": "确认趋势后重仓买入，获取主要收益"
+                    },
+                    "batch_3": {
+                        "price_range": "273-280",
+                        "allocation": "30%", 
+                        "amount": 825,
+                        "expected_shares": 3.0,
+                        "logic": "极值区域收割，风险最低时加码"
+                    }
+                },
+                "risk_management": {
+                    "hard_stop_loss": 260,
+                    "soft_stop_loss": 270,
+                    "max_holding_period": "6个月",
+                    "evaluation_frequency": "每月底"
+                }
+            }
         },
         "^VIX": {
             "target_level": 25.0,
