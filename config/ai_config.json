@@ -1,0 +1,128 @@
+{
+  "ai_api": {
+    "openai": {
+      "endpoint": "https://api.openai.com/v1/chat/completions",
+      "model": "gpt-4",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 30,
+      "cost": "paid",
+      "free_tier": "$5 credit for new users"
+    },
+    "anthropic": {
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-sonnet-20240229",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 30,
+      "cost": "paid",
+      "free_tier": "none"
+    },
+    "deepseek_local": {
+      "endpoint": "http://localhost:11434/v1/chat/completions",
+      "model": "deepseek-r1:latest",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 60,
+      "cost": "free",
+      "free_tier": "unlimited",
+      "description": "本地运行DeepSeek模型，完全免费，金融分析能力强"
+    },
+    "local_ollama": {
+      "endpoint": "http://localhost:11434/v1/chat/completions",
+      "model": "llama2",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 60,
+      "cost": "free",
+      "free_tier": "unlimited",
+      "description": "本地运行，完全免费，需要安装Ollama"
+    },
+    "huggingface": {
+      "endpoint": "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf",
+      "model": "meta-llama/Llama-2-7b-chat-hf",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 30,
+      "cost": "free_tier",
+      "free_tier": "30,000 requests/month",
+      "description": "云端API，有免费额度"
+    },
+    "google_colab": {
+      "endpoint": "local",
+      "model": "llama2",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "timeout": 120,
+      "cost": "free",
+      "free_tier": "12 hours/day GPU",
+      "description": "Google Colab免费GPU运行"
+    }
+  },
+  "analysis_templates": {
+    "investment_strategy": {
+      "name": "投资策略分析",
+      "description": "分析用户的投资策略和决策模式",
+      "keywords": ["策略", "决策", "投资风格", "风险控制"]
+    },
+    "risk_assessment": {
+      "name": "风险评估",
+      "description": "评估投资组合的风险水平和潜在风险点",
+      "keywords": ["风险", "波动", "回撤", "分散"]
+    },
+    "decision_optimization": {
+      "name": "决策优化",
+      "description": "优化投资决策流程和时机选择",
+      "keywords": ["优化", "时机", "决策", "改进"]
+    },
+    "psychology_analysis": {
+      "name": "心理分析",
+      "description": "分析投资心理状态和情绪管理",
+      "keywords": ["心理", "情绪", "心态", "压力"]
+    },
+    "comprehensive": {
+      "name": "综合分析",
+      "description": "全面的投资分析和建议",
+      "keywords": ["综合", "全面", "整体", "多维度"]
+    }
+  },
+  "recommended_setup": {
+    "development": "deepseek_local",
+    "production": "deepseek_local",
+    "advanced": "openai"
+  },
+  "setup_instructions": {
+    "deepseek_local": [
+      "1. 安装Ollama: winget install Ollama.Ollama",
+      "2. 下载模型: ollama pull deepseek-r1",
+      "3. 启动服务: ollama serve",
+      "4. 设置环境变量: export AI_API_ENDPOINT=http://localhost:11434/v1/chat/completions",
+      "5. 设置模型: export AI_MODEL=deepseek-r1"
+    ],
+    "local_ollama": [
+      "1. 安装Ollama: winget install Ollama.Ollama",
+      "2. 下载模型: ollama pull llama2",
+      "3. 启动服务: ollama serve",
+      "4. 设置环境变量: export AI_API_ENDPOINT=http://localhost:11434/v1/chat/completions"
+    ],
+    "huggingface": [
+      "1. 注册Hugging Face账户",
+      "2. 获取API Token",
+      "3. 设置环境变量: export AI_API_KEY=hf_your_token_here"
+    ]
+  },
+  "features": {
+    "enable_ai_analysis": true,
+    "enable_note_management": true,
+    "enable_export": true,
+    "enable_reports": true,
+    "max_notes_per_stock": 1000,
+    "max_analysis_history": 100
+  },
+  "ui_settings": {
+    "show_ai_analysis_tab": true,
+    "show_note_management_tab": true,
+    "default_analysis_type": "comprehensive",
+    "auto_save_analysis": true
+  }
+} 

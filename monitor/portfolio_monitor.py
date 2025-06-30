@@ -51,7 +51,7 @@ class PortfolioMonitor:
         self.market_monitor = MarketMonitor()
         
         # 初始化通知管理器
-        self.notification_manager = NotificationManager()
+        self.notification_manager = NotificationManager(monitor_config)
         
         # 初始化实时数据源
         self.realtime_data_source = YahooFinanceRealTimeSource()

@@ -28,9 +28,23 @@ class NotificationManager:
     
     def __init__(self, config=None):
         """初始化通知管理器"""
-        self.config = config or default_config
+        # 确保config是字典类型
+        if config is None:
+            config = {}
+        elif hasattr(config, '__dict__'):
+            # 如果是对象，转换为字典
+            config = config.__dict__
+        
+        self.config = config
         self.alert_system = AlertSystem(self.config)
-        self.thresholds = self.config['notification_threshold']
+        
+        # 安全获取阈值配置
+        self.thresholds = self.config.get('notification_threshold', {
+            'price_change': 0.02,
+            'market_volatility': 0.5,
+            'volume_change': 2.0
+        })
+        
         self.notification_history = {}
         self.cooldown_periods = {
             'trade_signal': timedelta(minutes=5),  # 缩短信号冷却时间

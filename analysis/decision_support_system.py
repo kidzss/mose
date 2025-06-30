@@ -900,23 +900,192 @@ class DecisionSupportSystem:
         }
     
     def add_user_note(self, symbol: str, note: str):
-        """添加用户备注"""
-        timestamp = datetime.now().isoformat()
-        
-        user_note = {
-            'symbol': symbol,
-            'timestamp': timestamp,
-            'note': note,
-            'type': 'USER_NOTE'
-        }
-        
+        """添加用户备注 - 增强版"""
+        try:
+            timestamp = datetime.now().isoformat()
+            
+            user_note = {
+                'symbol': symbol,
+                'timestamp': timestamp,
+                'note': note,
+                'type': 'USER_NOTE',
+                'note_id': f"{symbol}_{timestamp.replace(':', '-')}",  # 唯一ID
+                'status': 'active'  # 备注状态
+            }
+            
+            if symbol not in self.decisions_history:
+                self.decisions_history[symbol] = []
+            
+            self.decisions_history[symbol].append(user_note)
+            self._save_decisions_history()
+            
+            # 记录到日志文件
+            self._log_note(symbol, note, timestamp)
+            
+            return f"✅ 已成功记录 {symbol} 的备注: {note[:50]}{'...' if len(note) > 50 else ''}"
+            
+        except Exception as e:
+            print(f"添加备注失败: {e}")
+            return f"❌ 保存备注失败: {str(e)}"
+    
+    def _log_note(self, symbol: str, note: str, timestamp: str):
+        """记录备注到日志文件"""
+        try:
+            log_file = "user_notes.log"
+            with open(log_file, 'a', encoding='utf-8') as f:
+                f.write(f"[{timestamp}] {symbol}: {note}\n")
+        except Exception as e:
+            print(f"记录备注日志失败: {e}")
+    
+    def get_user_notes(self, symbol: str, days: int = 30) -> List[Dict]:
+        """获取用户备注"""
         if symbol not in self.decisions_history:
-            self.decisions_history[symbol] = []
+            return []
         
-        self.decisions_history[symbol].append(user_note)
-        self._save_decisions_history()
+        cutoff_date = datetime.now() - timedelta(days=days)
         
-        return f"已记录 {symbol} 的备注: {note}"
+        user_notes = []
+        for record in self.decisions_history[symbol]:
+            if record.get('type') == 'USER_NOTE':
+                record_date = datetime.fromisoformat(record['timestamp'])
+                if record_date >= cutoff_date:
+                    user_notes.append(record)
+        
+        return sorted(user_notes, key=lambda x: x['timestamp'], reverse=True)
+    
+    def delete_user_note(self, symbol: str, note_id: str) -> str:
+        """删除用户备注"""
+        try:
+            if symbol in self.decisions_history:
+                for i, record in enumerate(self.decisions_history[symbol]):
+                    if record.get('type') == 'USER_NOTE' and record.get('note_id') == note_id:
+                        del self.decisions_history[symbol][i]
+                        self._save_decisions_history()
+                        return f"✅ 已删除备注: {record.get('note', '')[:30]}..."
+            
+            return "❌ 未找到要删除的备注"
+            
+        except Exception as e:
+            return f"❌ 删除备注失败: {str(e)}"
+    
+    def update_user_note(self, symbol: str, note_id: str, new_note: str) -> str:
+        """更新用户备注"""
+        try:
+            if symbol in self.decisions_history:
+                for record in self.decisions_history[symbol]:
+                    if record.get('type') == 'USER_NOTE' and record.get('note_id') == note_id:
+                        old_note = record.get('note', '')
+                        record['note'] = new_note
+                        record['updated_at'] = datetime.now().isoformat()
+                        self._save_decisions_history()
+                        return f"✅ 已更新备注: {old_note[:30]}... → {new_note[:30]}..."
+            
+            return "❌ 未找到要更新的备注"
+            
+        except Exception as e:
+            return f"❌ 更新备注失败: {str(e)}"
+    
+    def export_notes_for_ai(self, symbol: str = None) -> Dict:
+        """导出备注数据用于AI分析"""
+        try:
+            export_data = {
+                'export_time': datetime.now().isoformat(),
+                'notes': [],
+                'decisions': [],
+                'summary': {}
+            }
+            
+            symbols_to_export = [symbol] if symbol else list(self.decisions_history.keys())
+            
+            for sym in symbols_to_export:
+                if sym in self.decisions_history:
+                    symbol_data = {
+                        'symbol': sym,
+                        'user_notes': [],
+                        'decisions': []
+                    }
+                    
+                    for record in self.decisions_history[sym]:
+                        if record.get('type') == 'USER_NOTE':
+                            symbol_data['user_notes'].append({
+                                'timestamp': record['timestamp'],
+                                'note': record['note'],
+                                'note_id': record.get('note_id', '')
+                            })
+                        else:
+                            symbol_data['decisions'].append({
+                                'timestamp': record['timestamp'],
+                                'decision_type': record.get('decision_type', 'UNKNOWN'),
+                                'decision': record.get('decision', {}),
+                                'current_price': record.get('current_price', 0)
+                            })
+                    
+                    export_data['notes'].append(symbol_data)
+            
+            # 生成摘要统计
+            total_notes = sum(len(sym_data['user_notes']) for sym_data in export_data['notes'])
+            total_decisions = sum(len(sym_data['decisions']) for sym_data in export_data['notes'])
+            
+            export_data['summary'] = {
+                'total_symbols': len(symbols_to_export),
+                'total_notes': total_notes,
+                'total_decisions': total_decisions,
+                'export_format': 'ai_analysis_ready'
+            }
+            
+            return export_data
+            
+        except Exception as e:
+            print(f"导出AI数据失败: {e}")
+            return {'error': str(e)}
+    
+    def prepare_ai_analysis_prompt(self, symbol: str) -> str:
+        """为AI分析准备提示词"""
+        try:
+            notes = self.get_user_notes(symbol, days=90)  # 获取90天的备注
+            decisions = self.get_decision_history(symbol, days=90)
+            
+            prompt = f"""
+# 投资决策分析请求
+
+## 股票信息
+- 股票代码: {symbol}
+- 分析时间范围: 最近90天
+
+## 用户备注记录 ({len(notes)} 条)
+"""
+            
+            for note in notes[:10]:  # 最多显示10条备注
+                note_time = datetime.fromisoformat(note['timestamp']).strftime('%Y-%m-%d %H:%M')
+                prompt += f"- {note_time}: {note['note']}\n"
+            
+            prompt += f"""
+## 系统决策记录 ({len(decisions)} 条)
+"""
+            
+            for decision in decisions[:5]:  # 最多显示5条决策
+                if decision.get('type') != 'USER_NOTE':
+                    decision_time = datetime.fromisoformat(decision['timestamp']).strftime('%Y-%m-%d %H:%M')
+                    decision_type = decision.get('decision_type', 'UNKNOWN')
+                    prompt += f"- {decision_time} ({decision_type}): {decision.get('decision', {}).get('action', 'N/A')}\n"
+            
+            prompt += """
+## 分析请求
+请基于以上用户备注和系统决策记录，提供以下分析：
+
+1. **投资思路分析**: 分析用户的主要投资思路和策略偏好
+2. **决策质量评估**: 评估用户决策的合理性和改进空间
+3. **风险控制建议**: 基于备注内容提供风险控制建议
+4. **投资策略优化**: 提供具体的投资策略优化建议
+5. **心理状态分析**: 分析用户的心理状态和投资情绪
+
+请提供详细、专业的分析报告。
+"""
+            
+            return prompt
+            
+        except Exception as e:
+            return f"准备AI分析提示词失败: {str(e)}"
     
     def get_decision_history(self, symbol: str, days: int = 30) -> List[Dict]:
         """获取决策历史"""
