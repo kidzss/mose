@@ -156,8 +156,8 @@ class AlertSystem:
     def analyze_market_sentiment(self) -> Dict:
         """分析市场情绪"""
         try:
-            vix = yf.download('^VIX', period='5d')
-            spy = yf.download('SPY', period='5d')
+            vix = yf.download('^VIX', period='5d', auto_adjust=True)
+            spy = yf.download('SPY', period='5d', auto_adjust=True)
             
             market_state = {
                 'vix_level': vix['Close'].iloc[-1],

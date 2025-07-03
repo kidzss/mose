@@ -8,15 +8,50 @@ from typing import Dict, Optional, List
 import time
 import json
 import os
+import logging
 from datetime import datetime, timedelta
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# 配置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class YFinanceClient:
     """yfinance客户端，用于获取财务基本面数据"""
     
-    def __init__(self):
-        """初始化yfinance客户端"""
+    def __init__(self, max_retries: int = 3, retry_delay: float = 1.0):
+        """初始化yfinance客户端
+        
+        Args:
+            max_retries: 最大重试次数
+            retry_delay: 重试延迟时间（秒）
+        """
         self.cache_dir = "data/yfinance_cache"
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
         self._ensure_cache_dir()
+        self._setup_session()
+        
+    def _setup_session(self):
+        """设置requests session，配置重试策略"""
+        self.session = requests.Session()
+        
+        # 配置重试策略
+        retry_strategy = Retry(
+            total=self.max_retries,
+            status_forcelist=[429, 500, 502, 503, 504],
+            method_whitelist=["HEAD", "GET", "OPTIONS"],
+            backoff_factor=self.retry_delay
+        )
+        
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
+        
+        # 设置超时
+        self.session.timeout = 30
         
     def _ensure_cache_dir(self):
         """确保缓存目录存在"""
@@ -37,7 +72,7 @@ class YFinanceClient:
                     with open(cache_path, 'r', encoding='utf-8') as f:
                         return json.load(f)
             except Exception as e:
-                print(f"读取缓存失败 {symbol}: {e}")
+                logger.warning(f"读取缓存失败 {symbol}: {e}")
         return None
     
     def _save_to_cache(self, symbol: str, data: Dict):
@@ -47,11 +82,27 @@ class YFinanceClient:
             with open(cache_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2, default=str)
         except Exception as e:
-            print(f"保存缓存失败 {symbol}: {e}")
+            logger.error(f"保存缓存失败 {symbol}: {e}")
+    
+    def _is_retryable_error(self, error: Exception) -> bool:
+        """判断错误是否可重试"""
+        error_str = str(error).lower()
+        
+        # curl错误16: HTTP/2 stream 0 was not closed cleanly
+        if "curl" in error_str and "16" in error_str:
+            return True
+            
+        # 网络相关错误
+        retryable_errors = [
+            "connection", "timeout", "network", "ssl", "tls",
+            "http/2", "stream", "reset", "refused", "unreachable"
+        ]
+        
+        return any(err in error_str for err in retryable_errors)
     
     def get_stock_info(self, symbol: str, use_cache: bool = True) -> Optional[Dict]:
         """
-        获取股票基本信息
+        获取股票基本信息，带重试机制
         
         Args:
             symbol: 股票代码
@@ -66,22 +117,40 @@ class YFinanceClient:
             if cached_data:
                 return cached_data
         
-        try:
-            print(f"📊 获取 {symbol} 的yfinance数据...")
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
-            
-            if info and len(info) > 5:  # 确保获取到有效数据
-                # 保存到缓存
-                self._save_to_cache(symbol, info)
-                return info
-            else:
-                print(f"❌ {symbol}: yfinance数据无效")
-                return None
+        for attempt in range(self.max_retries + 1):
+            try:
+                logger.info(f"📊 获取 {symbol} 的yfinance数据... (尝试 {attempt + 1}/{self.max_retries + 1})")
                 
-        except Exception as e:
-            print(f"❌ 获取 {symbol} yfinance数据失败: {e}")
-            return None
+                # 创建Ticker对象
+                ticker = yf.Ticker(symbol)
+                
+                # 获取股票信息
+                info = ticker.info
+                
+                if info and len(info) > 5:  # 确保获取到有效数据
+                    # 保存到缓存
+                    self._save_to_cache(symbol, info)
+                    logger.info(f"✅ {symbol}: 数据获取成功")
+                    return info
+                else:
+                    logger.warning(f"❌ {symbol}: yfinance数据无效")
+                    return None
+                    
+            except Exception as e:
+                error_msg = str(e)
+                logger.warning(f"❌ 获取 {symbol} yfinance数据失败 (尝试 {attempt + 1}/{self.max_retries + 1}): {error_msg}")
+                
+                # 判断是否可重试
+                if attempt < self.max_retries and self._is_retryable_error(e):
+                    delay = self.retry_delay * (2 ** attempt)  # 指数退避
+                    logger.info(f"🔄 {symbol}: {delay}秒后重试...")
+                    time.sleep(delay)
+                    continue
+                else:
+                    logger.error(f"❌ {symbol}: 最终获取失败，不再重试")
+                    return None
+        
+        return None
     
     def extract_financial_metrics(self, info: Dict) -> Dict[str, float]:
         """
@@ -175,7 +244,7 @@ class YFinanceClient:
     
     def get_batch_financial_data(self, symbols: List[str], max_symbols: int = 50) -> Dict[str, Dict]:
         """
-        批量获取多个股票的财务数据
+        批量获取多个股票的财务数据，带错误处理和重试机制
         
         Args:
             symbols: 股票代码列表
@@ -186,8 +255,9 @@ class YFinanceClient:
         """
         results = {}
         processed = 0
+        failed_symbols = []
         
-        print(f"🔄 开始批量获取yfinance财务数据，目标股票数: {min(len(symbols), max_symbols)}")
+        logger.info(f"🔄 开始批量获取yfinance财务数据，目标股票数: {min(len(symbols), max_symbols)}")
         
         for symbol in symbols[:max_symbols]:
             try:
@@ -196,18 +266,25 @@ class YFinanceClient:
                     metrics = self.extract_financial_metrics(info)
                     results[symbol] = metrics
                     processed += 1
-                    print(f"✅ {symbol}: 数据获取成功 ({processed}/{min(len(symbols), max_symbols)})")
+                    logger.info(f"✅ {symbol}: 数据获取成功 ({processed}/{min(len(symbols), max_symbols)})")
                 else:
-                    print(f"❌ {symbol}: 数据获取失败")
+                    logger.warning(f"❌ {symbol}: 数据获取失败")
+                    failed_symbols.append(symbol)
                 
-                # 避免请求过快
-                time.sleep(0.1)
+                # 避免请求过快，但减少延迟
+                time.sleep(0.05)
                     
             except Exception as e:
-                print(f"❌ {symbol}: 处理异常 - {e}")
+                logger.error(f"❌ {symbol}: 处理异常 - {e}")
+                failed_symbols.append(symbol)
                 continue
         
-        print(f"📊 批量获取完成，成功: {len(results)}/{min(len(symbols), max_symbols)}")
+        success_rate = len(results) / min(len(symbols), max_symbols) * 100
+        logger.info(f"📊 批量获取完成，成功: {len(results)}/{min(len(symbols), max_symbols)} ({success_rate:.1f}%)")
+        
+        if failed_symbols:
+            logger.warning(f"❌ 失败的股票: {', '.join(failed_symbols)}")
+        
         return results
     
     def save_financial_data(self, financial_data: Dict[str, Dict], filename: str = None):
@@ -227,10 +304,10 @@ class YFinanceClient:
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(financial_data, f, ensure_ascii=False, indent=2, default=str)
-            print(f"💾 yfinance财务数据已保存到: {filepath}")
+            logger.info(f"💾 yfinance财务数据已保存到: {filepath}")
             return filepath
         except Exception as e:
-            print(f"❌ 保存yfinance财务数据失败: {e}")
+            logger.error(f"❌ 保存yfinance财务数据失败: {e}")
             return None
 
 # 使用示例

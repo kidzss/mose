@@ -229,7 +229,8 @@ class DataManager:
                 index_symbol,
                 start=start_date or (datetime.now() - timedelta(days=365)),
                 end=end_date or datetime.now(),
-                interval='1d'
+                interval='1d',
+                auto_adjust=True
             )
             
             # Standardize data format
@@ -250,7 +251,7 @@ class DataManager:
             stats = {}
             for index_name, index_symbol in self.market_indices.items():
                 # Get today's data
-                data = yf.download(index_symbol, period='5d', interval='1d')
+                data = yf.download(index_symbol, period='5d', interval='1d', auto_adjust=True)
                 if not data.empty:
                     # Calculate daily return
                     daily_return = (data['Close'][-1] / data['Close'][-2] - 1) * 100

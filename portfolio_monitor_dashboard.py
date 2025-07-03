@@ -29,7 +29,6 @@ class PortfolioMonitorDashboard:
             'GOOG': {'target_shares': 20, 'sell_above': 175},
             'NVDA': {'target_shares': 29, 'sell_above': 150}
         }
-    RST这个图@
     def get_real_time_data(self):
         """获取实时股票数据"""
         stock_data = {}

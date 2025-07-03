@@ -19,7 +19,7 @@ db_config = {
 def get_data(stock, start_date, end_date):
     """获取股票数据"""
     try:
-        data = yf.download(stock, start=start_date, end=end_date)
+        data = yf.download(stock, start=start_date, end=end_date, auto_adjust=True)
         if data.empty:
             print(f"股票 {stock} 无数据返回")
             return None

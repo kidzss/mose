@@ -50,7 +50,7 @@ class MacroFactorAnalyzer:
             
             for name, symbol in self.macro_symbols.items():
                 try:
-                    data = yf.download(symbol, period=period, interval="1d")
+                    data = yf.download(symbol, period=period, interval="1d", auto_adjust=True)
                     if not data.empty:
                         macro_data[name] = data
                         logger.info(f"成功获取 {name} 数据")

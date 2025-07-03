@@ -385,7 +385,7 @@ class RiskOptimizer:
         
         for symbol in symbols:
             try:
-                data = yf.download(symbol, period=period, interval="1d")
+                data = yf.download(symbol, period=period, interval="1d", auto_adjust=True)
                 if not data.empty:
                     price_data[symbol] = data
             except Exception as e:

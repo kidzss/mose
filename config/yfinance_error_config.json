@@ -1,0 +1,48 @@
+{
+  "retry_settings": {
+    "max_retries": 3,
+    "retry_delay": 1.0,
+    "exponential_backoff": true,
+    "max_delay": 10.0
+  },
+  "timeout_settings": {
+    "request_timeout": 30,
+    "connect_timeout": 10,
+    "read_timeout": 30
+  },
+  "error_handling": {
+    "retryable_errors": [
+      "curl.*16",
+      "http/2.*stream.*not.*closed",
+      "connection.*timeout",
+      "network.*unreachable",
+      "ssl.*error",
+      "tls.*error",
+      "reset.*connection",
+      "refused.*connection"
+    ],
+    "non_retryable_errors": [
+      "invalid.*symbol",
+      "not.*found",
+      "unauthorized",
+      "forbidden",
+      "rate.*limit"
+    ]
+  },
+  "cache_settings": {
+    "enabled": true,
+    "cache_duration_hours": 24,
+    "cache_dir": "data/yfinance_cache"
+  },
+  "rate_limiting": {
+    "requests_per_second": 2,
+    "delay_between_requests": 0.5,
+    "batch_size": 10
+  },
+  "logging": {
+    "level": "INFO",
+    "log_errors": true,
+    "log_retries": true,
+    "log_success": false
+  }
+} 

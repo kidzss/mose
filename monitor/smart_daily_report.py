@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import platform
 import base64
+import json
 
 # 添加项目根目录到路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -2703,6 +2704,10 @@ class SmartDailyReportGenerator:
         # 生成HTML报告（包含宏观分析）
         html_content = self._generate_html_report(results, macro_analysis)
         
+        # 生成JSON数据（新增功能）
+        json_data = self.generate_json_data(results)
+        json_filename = self.save_json_data(json_data)
+        
         # 保存报告文件
         # 使用统一路径配置生成报告文件名
         try:
@@ -2715,7 +2720,250 @@ class SmartDailyReportGenerator:
             f.write(html_content)
         
         logger.info(f"日报生成完成: {report_filename}")
+        if json_filename:
+            logger.info(f"JSON数据已保存: {json_filename}")
+        
         return html_content  # 返回HTML内容而不是文件名
+
+    def generate_json_data(self, analysis_results: List[Dict]) -> Dict:
+        """
+        生成JSON格式的股票分析数据
+        以股票代码为key，方便后续直接调用
+        """
+        logger.info("开始生成JSON格式分析数据...")
+        
+        json_data = {
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'data_version': '1.0',
+            'stocks': {}
+        }
+        
+        for result in analysis_results:
+            if result is None:
+                continue
+                
+            symbol = result['symbol']
+            stock_data = {
+                'basic_info': {
+                    'symbol': symbol,
+                    'current_price': result['current_price'],
+                    'price_change_pct': result['price_change'],
+                    'volume': result['volume'],
+                    'rsi': result['rsi']
+                },
+                
+                'market_environment': {
+                    'trend': result.get('environment', 'unknown'),
+                    'confidence': result.get('confidence', 0),
+                    'reasons': result.get('reasons', [])
+                },
+                
+                'strategy': {
+                    'recommended_strategy': result.get('strategy', 'unknown'),
+                    'market_environment': result.get('market_env', 'unknown'),
+                    'signal_quality': result.get('signal_quality', 0),
+                    'signal_strength': result.get('signal_strength', 'unknown')
+                },
+                
+                'data_quality': result.get('data_quality', {})
+            }
+            
+            # 添加持仓信息（如果有）
+            if 'portfolio' in result:
+                portfolio = result['portfolio']
+                stock_data['position_analysis'] = {
+                    'cost_price': portfolio['cost_price'],
+                    'shares': portfolio['shares'],
+                    'weight': portfolio['weight'],
+                    'investment_amount': portfolio['investment_amount'],
+                    'current_value': portfolio['current_value'],
+                    'pnl_amount': portfolio['pnl_amount'],
+                    'pnl_percent': portfolio['pnl_percent'],
+                    'is_profit': portfolio['is_profit']
+                }
+            
+            # 添加买入时机分析（如果有）
+            if 'buy_timing' in result:
+                buy_timing = result['buy_timing']
+                stock_data['buy_timing_analysis'] = {
+                    'previous_buy': buy_timing['previous_buy'],
+                    'previous_sell': buy_timing['previous_sell'],
+                    'previous_gain': buy_timing['previous_gain'],
+                    'target_price': buy_timing['target_price'],
+                    'current_price': buy_timing['current_price'],
+                    'signal_strength': buy_timing['signal_strength'],
+                    'timing_rating': buy_timing['timing_rating'],
+                    'timing_color': buy_timing['timing_color'],
+                    'reasons': buy_timing['reasons'],
+                    'reason': buy_timing['reason']
+                }
+            
+            # 添加财务分析（如果有）
+            if 'financial_analysis' in result:
+                financial = result['financial_analysis']
+                stock_data['financial_analysis'] = {
+                    'total_score': financial.get('total_score', 0),
+                    'overall_rating': financial.get('overall_rating', 'unknown'),
+                    'valuation_metrics': {
+                        'pe_ratio': financial.get('valuation', {}).get('pe_ratio', 0),
+                        'peg_ratio': financial.get('valuation', {}).get('peg_ratio', 0),
+                        'pb_ratio': financial.get('valuation', {}).get('pb_ratio', 0)
+                    },
+                    'profitability_metrics': {
+                        'profit_margin': financial.get('profitability', {}).get('profit_margin', 0),
+                        'roe': financial.get('profitability', {}).get('roe', 0),
+                        'gross_margin': financial.get('profitability', {}).get('gross_margin', 0)
+                    },
+                    'growth_metrics': {
+                        'eps_growth': financial.get('growth', {}).get('eps_growth', 0),
+                        'revenue_growth': financial.get('growth', {}).get('revenue_growth', 0),
+                        'fcf_conversion': financial.get('growth', {}).get('fcf_conversion', 0)
+                    },
+                    'financial_health': {
+                        'debt_to_equity': financial.get('financial_health', {}).get('debt_to_equity', 0),
+                        'current_ratio': financial.get('financial_health', {}).get('current_ratio', 0),
+                        'free_cashflow': financial.get('financial_health', {}).get('free_cashflow', 0)
+                    },
+                    'analyst_ratings': {
+                        'rating': financial.get('analyst_ratings', {}).get('rating', 'unknown'),
+                        'target_price': financial.get('analyst_ratings', {}).get('target_price', 0),
+                        'upside_potential': financial.get('analyst_ratings', {}).get('upside_potential', 0)
+                    },
+                    'investment_recommendation': {
+                        'action': financial.get('investment_recommendation', {}).get('action', 'unknown'),
+                        'confidence': financial.get('investment_recommendation', {}).get('confidence', 0),
+                        'advantages': financial.get('investment_recommendation', {}).get('advantages', []),
+                        'action_suggestions': financial.get('investment_recommendation', {}).get('action_suggestions', [])
+                    }
+                }
+            
+            # 添加流动性分析（如果有）
+            if 'liquidity_analysis' in result:
+                liquidity = result['liquidity_analysis']
+                stock_data['liquidity_analysis'] = {
+                    'liquidity_score': liquidity.get('liquidity_score', 0),
+                    'risk_level': liquidity.get('risk_level', 'unknown'),
+                    'bid_ask_spread_pct': liquidity.get('bid_ask_spread_pct', 0),
+                    'market_cap_tier': liquidity.get('market_cap_tier', 'unknown'),
+                    'exit_difficulty': liquidity.get('exit_difficulty', 'unknown'),
+                    'risk_warning': liquidity.get('risk_warning', ''),
+                    'investment_suggestion': liquidity.get('investment_suggestion', ''),
+                    'spread_rating': liquidity.get('spread_rating', 'unknown'),
+                    'volume_consistency': liquidity.get('volume_consistency', 0),
+                    'market_depth_score': liquidity.get('market_depth_score', 0),
+                    'liquidity_reasons': liquidity.get('liquidity_reasons', []),
+                    'avg_daily_volume': liquidity.get('avg_daily_volume', 0)
+                }
+            
+            # 添加增强分析（如果有）
+            if 'enhanced_analysis' in result:
+                enhanced = result['enhanced_analysis']
+                stock_data['enhanced_analysis'] = {
+                    'total_score': enhanced.get('total_score', 0),
+                    'overall_rating': enhanced.get('overall_rating', 'unknown'),
+                    'growth_analysis': {
+                        'score': enhanced.get('growth_analysis', {}).get('score', 0),
+                        'rating': enhanced.get('growth_analysis', {}).get('rating', 'unknown'),
+                        'industry_comparison': enhanced.get('growth_analysis', {}).get('industry_comparison', 'unknown')
+                    },
+                    'smart_exit_strategy': {
+                        'action': enhanced.get('smart_exit_strategy', {}).get('action', 'unknown'),
+                        'stop_loss_analysis': enhanced.get('smart_exit_strategy', {}).get('stop_loss_analysis', ''),
+                        'take_profit_analysis': enhanced.get('smart_exit_strategy', {}).get('take_profit_analysis', '')
+                    },
+                    'investment_recommendation': enhanced.get('investment_recommendation', ''),
+                    'stock_type_analysis': {
+                        'type': enhanced.get('stock_type_analysis', {}).get('type', 'unknown'),
+                        'risk_level': enhanced.get('stock_type_analysis', {}).get('risk_level', 'unknown'),
+                        'comprehensive_score': enhanced.get('stock_type_analysis', {}).get('comprehensive_score', 0),
+                        'technical_score': enhanced.get('stock_type_analysis', {}).get('technical_score', 0),
+                        'fundamental_score': enhanced.get('stock_type_analysis', {}).get('fundamental_score', 0),
+                        'sentiment_score': enhanced.get('stock_type_analysis', {}).get('sentiment_score', 0),
+                        'trading_strategy': enhanced.get('stock_type_analysis', {}).get('trading_strategy', {}),
+                        'stock_characteristics': enhanced.get('stock_type_analysis', {}).get('stock_characteristics', [])
+                    },
+                    'right_side_trading': {
+                        'buy_signal': enhanced.get('right_side_trading', {}).get('buy_signal', 'unknown'),
+                        'decision_basis': enhanced.get('right_side_trading', {}).get('decision_basis', ''),
+                        'trend_continuation': enhanced.get('right_side_trading', {}).get('trend_continuation', ''),
+                        'left_side_risk_warning': enhanced.get('right_side_trading', {}).get('left_side_risk_warning', ''),
+                        'core_principles': enhanced.get('right_side_trading', {}).get('core_principles', [])
+                    }
+                }
+            
+            # 添加波浪交易分析（如果有）
+            if 'wave_trading' in result:
+                wave = result['wave_trading']
+                stock_data['wave_trading_analysis'] = {
+                    'wave_pattern': wave.get('wave_pattern', 'unknown'),
+                    'current_wave': wave.get('current_wave', 'unknown'),
+                    'wave_strength': wave.get('wave_strength', 0),
+                    'entry_levels': wave.get('entry_levels', []),
+                    'exit_levels': wave.get('exit_levels', []),
+                    'long_term_target': wave.get('long_term_target', {}),
+                    'risk_control': wave.get('risk_control', {}),
+                    'technical_support': wave.get('technical_support', []),
+                    'rsi_status': wave.get('rsi_status', ''),
+                    'monitoring_points': wave.get('monitoring_points', [])
+                }
+            
+            # 将股票数据添加到JSON中
+            json_data['stocks'][symbol] = stock_data
+        
+        # 添加投资组合汇总信息
+        json_data['portfolio_summary'] = {
+            'total_value': self.total_portfolio_value,
+            'stock_allocation': self.portfolio_allocation,
+            'cash_allocation': self.cash_allocation,
+            'money_fund_allocation': self.money_fund_allocation,
+            'total_stock_investment': self.total_stock_investment,
+            'money_fund_value': self.money_fund_value
+        }
+        
+        # 添加宏观分析（如果有）
+        macro_analysis = self._get_macro_analysis()
+        if macro_analysis:
+            json_data['macro_analysis'] = macro_analysis
+        
+        logger.info(f"JSON数据生成完成，包含 {len(json_data['stocks'])} 只股票的分析数据")
+        return json_data
+
+    def save_json_data(self, json_data: Dict, filename: str = None) -> str:
+        """
+        保存JSON数据到文件
+        """
+        if filename is None:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"stock_analysis_data_{timestamp}.json"
+        
+        # 自定义JSON编码器，处理numpy数据类型和日期对象
+        class NumpyEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                elif isinstance(obj, np.bool_):  # 处理 numpy bool
+                    return bool(obj)
+                elif pd.isna(obj):
+                    return None
+                elif hasattr(obj, 'date'):  # 处理datetime.date对象
+                    return obj.isoformat()
+                elif hasattr(obj, 'isoformat'):  # 处理datetime对象
+                    return obj.isoformat()
+                return super(NumpyEncoder, self).default(obj)
+        
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, ensure_ascii=False, indent=2, cls=NumpyEncoder)
+            
+            logger.info(f"JSON数据已保存到: {filename}")
+            return filename
+        except Exception as e:
+            logger.error(f"保存JSON数据失败: {e}")
+            return None
 
 def main():
     """主函数 - 生成用户持仓股票日报"""

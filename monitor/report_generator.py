@@ -242,8 +242,8 @@ class ReportGenerator:
     def _calculate_market_returns(self) -> tuple:
         """计算大盘指数收益率"""
         try:
-            sp500 = yf.download('^GSPC', period='2d')
-            nasdaq = yf.download('^IXIC', period='2d')
+            sp500 = yf.download('^GSPC', period='2d', auto_adjust=True)
+            nasdaq = yf.download('^IXIC', period='2d', auto_adjust=True)
             
             sp500_return = (sp500['Close'].iloc[-1] / sp500['Close'].iloc[-2]) - 1
             nasdaq_return = (nasdaq['Close'].iloc[-1] / nasdaq['Close'].iloc[-2]) - 1
@@ -257,7 +257,7 @@ class ReportGenerator:
         """计算风险指标"""
         try:
             # 获取SP500收益率作为市场基准
-            sp500 = yf.download('^GSPC', period='1y')['Close'].pct_change().dropna()
+            sp500 = yf.download('^GSPC', period='1y', auto_adjust=True)['Close'].pct_change().dropna()
             
             # 计算投资组合的每日收益率
             portfolio_returns = []
@@ -417,9 +417,9 @@ class ReportGenerator:
         try:
             # 获取主要指数数据
             indices = {
-                'SPY': yf.download('^GSPC', period='5d'),
-                'QQQ': yf.download('^IXIC', period='5d'),
-                'VIX': yf.download('^VIX', period='5d')
+                'SPY': yf.download('^GSPC', period='5d', auto_adjust=True),
+                'QQQ': yf.download('^IXIC', period='5d', auto_adjust=True),
+                'VIX': yf.download('^VIX', period='5d', auto_adjust=True)
             }
             
             # 分析市场情绪

@@ -27,7 +27,7 @@ def load_data(symbol, start_date, end_date):
             logger.warning(f"调整开始日期到: {start.strftime('%Y-%m-%d')}")
         
         # 下载数据
-        data = yf.download(symbol, start=start, end=end, interval='5m')
+        data = yf.download(symbol, start=start, end=end, interval='5m', auto_adjust=True)
         
         # 确保数据完整性
         if data.empty:
