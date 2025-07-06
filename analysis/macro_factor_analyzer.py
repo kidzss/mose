@@ -43,9 +43,22 @@ class MacroFactorAnalyzer:
         self.cache = {}
         self.last_update = None
         
-    def fetch_macro_data(self, period: str = "1y") -> Dict[str, pd.DataFrame]:
+    def fetch_macro_data(self, period: str = "1y", force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
         """获取宏观经济数据"""
         try:
+            # 检查缓存是否有效（1小时内）
+            cache_valid = (
+                not force_refresh and 
+                self.cache.get('macro_data') and 
+                self.last_update and 
+                (datetime.now() - self.last_update).total_seconds() < 3600  # 1小时缓存
+            )
+            
+            if cache_valid:
+                logger.info("使用缓存的宏观数据")
+                return self.cache['macro_data']
+            
+            logger.info("开始获取最新宏观数据...")
             macro_data = {}
             
             for name, symbol in self.macro_symbols.items():
@@ -53,7 +66,7 @@ class MacroFactorAnalyzer:
                     data = yf.download(symbol, period=period, interval="1d", auto_adjust=True)
                     if not data.empty:
                         macro_data[name] = data
-                        logger.info(f"成功获取 {name} 数据")
+                        logger.info(f"成功获取 {name} 数据: {len(data)} 条记录")
                     else:
                         logger.warning(f"无法获取 {name} 数据")
                 except Exception as e:
@@ -63,6 +76,7 @@ class MacroFactorAnalyzer:
             self.cache['macro_data'] = macro_data
             self.last_update = datetime.now()
             
+            logger.info(f"宏观数据获取完成，共获取 {len(macro_data)} 个数据源")
             return macro_data
             
         except Exception as e:
@@ -203,12 +217,22 @@ class MacroFactorAnalyzer:
             logger.error(f"分析美元强度失败: {e}")
             return {}
     
-    def calculate_macro_score(self) -> Dict:
+    def calculate_macro_score(self, force_refresh: bool = False) -> Dict:
         """计算综合宏观得分"""
         try:
+            # 强制刷新或检查缓存
+            if force_refresh or not self.cache.get('macro_data'):
+                logger.info("获取最新宏观数据...")
+                self.fetch_macro_data(force_refresh=force_refresh)
+                
             if not self.cache.get('macro_data'):
-                logger.warning("没有宏观数据，先获取数据")
-                return {}
+                logger.warning("没有宏观数据，返回默认值")
+                return {
+                    'macro_score': 0.5,
+                    'components': {},
+                    'recommendation': '宏观环境中性，保持谨慎乐观',
+                    'last_update': datetime.now()
+                }
                 
             macro_data = self.cache['macro_data']
             
@@ -252,7 +276,12 @@ class MacroFactorAnalyzer:
             
         except Exception as e:
             logger.error(f"计算宏观得分失败: {e}")
-            return {}
+            return {
+                'macro_score': 0.5,
+                'components': {},
+                'recommendation': '宏观环境中性，保持谨慎乐观',
+                'last_update': datetime.now()
+            }
     
     def _get_recommendation(self, score: float) -> str:
         """根据得分生成建议"""

@@ -56,15 +56,15 @@ class PortfolioMacroIntegration:
             logger.error(f"加载投资组合配置失败: {e}")
             return {}
     
-    def analyze_macro_impact_on_portfolio(self) -> Dict:
+    def analyze_macro_impact_on_portfolio(self, force_refresh: bool = False) -> Dict:
         """分析宏观因子对当前投资组合的影响"""
         try:
             # 获取宏观数据和分析
             logger.info("获取宏观数据...")
-            macro_data = self.macro_analyzer.fetch_macro_data()
+            macro_data = self.macro_analyzer.fetch_macro_data(force_refresh=force_refresh)
             
             logger.info("计算宏观得分...")
-            macro_score = self.macro_analyzer.calculate_macro_score()
+            macro_score = self.macro_analyzer.calculate_macro_score(force_refresh=force_refresh)
             
             # 获取行业影响
             sector_impact = self.macro_analyzer.get_sector_impact(macro_score)
@@ -351,13 +351,13 @@ class PortfolioMacroIntegration:
             logger.error(f"生成调整建议失败: {e}")
             return {}
     
-    def generate_macro_report(self) -> Dict:
+    def generate_macro_report(self, force_refresh: bool = True) -> Dict:
         """生成宏观分析报告"""
         try:
             logger.info("开始生成宏观分析报告...")
             
-            # 执行完整分析
-            analysis_result = self.analyze_macro_impact_on_portfolio()
+            # 执行完整分析，默认强制刷新
+            analysis_result = self.analyze_macro_impact_on_portfolio(force_refresh=force_refresh)
             
             if not analysis_result:
                 return {'error': '分析失败'}

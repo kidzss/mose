@@ -174,14 +174,22 @@ class InflationSectorAnalyzer:
         self.cache = {}
         self.cache_expiry = timedelta(hours=1)
     
-    def get_inflation_indicators(self, lookback_days: int = 252) -> Dict[str, pd.DataFrame]:
+    def get_inflation_indicators(self, lookback_days: int = 252, force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
         """获取通胀相关指标数据"""
         cache_key = f"inflation_data_{lookback_days}"
         
-        if (cache_key in self.cache and 
-            datetime.now() - self.cache[cache_key]['timestamp'] < self.cache_expiry):
+        # 检查缓存是否有效（1小时内）
+        cache_valid = (
+            not force_refresh and
+            cache_key in self.cache and 
+            datetime.now() - self.cache[cache_key]['timestamp'] < self.cache_expiry
+        )
+        
+        if cache_valid:
+            logger.info("使用缓存的通胀数据")
             return self.cache[cache_key]['data']
         
+        logger.info("开始获取最新通胀数据...")
         inflation_data = {}
         end_date = datetime.now()
         start_date = end_date - timedelta(days=lookback_days)
@@ -446,13 +454,13 @@ class InflationSectorAnalyzer:
             logger.error(f"分析行业通胀影响失败: {e}")
             return {}
     
-    def generate_inflation_sector_report(self) -> Dict:
+    def generate_inflation_sector_report(self, force_refresh: bool = True) -> Dict:
         """生成完整的通胀-行业影响分析报告"""
         logger.info("🔍 开始生成通胀-行业影响分析报告...")
         
         try:
-            # 获取通胀数据
-            inflation_data = self.get_inflation_indicators()
+            # 获取通胀数据，默认强制刷新
+            inflation_data = self.get_inflation_indicators(force_refresh=force_refresh)
             if not inflation_data:
                 logger.error("❌ 无法获取通胀数据")
                 return self._generate_fallback_report()

@@ -676,7 +676,7 @@ def main():
             signals = {}
     
     # 主要内容区域 - 专业投资分析中心架构
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 市场概览", "📈 监控股票", "🔬 专业投资分析中心", "💼 投资组合", "🧠 决策支持", "🤖 AI诊断"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 市场概览", "📈 监控股票", "🔬 专业投资分析中心", "💼 投资组合", "🧠 决策支持", "🤖 AI诊断", "💬 AI问答"])
     
     with tab1:
         st.header("📊 市场概览")
@@ -1541,6 +1541,25 @@ def main():
         from start_ai_daily_analysis_monitor import AIDailyAnalysisMonitor
         monitor = AIDailyAnalysisMonitor()
         monitor.run_streamlit_app()
+    
+    # AI问答功能
+    with tab7:
+        try:
+            # 导入Ollama AI问答模块
+            from monitor.ollama_ai_qa import OllamaAIQA
+            
+            # 创建AI问答界面实例
+            qa_interface = OllamaAIQA()
+            
+            # 渲染AI问答界面
+            qa_interface.render_qa_interface()
+            
+        except ImportError as e:
+            st.error(f"AI问答模块导入失败: {e}")
+            st.info("请确保monitor/ollama_ai_qa.py文件存在")
+        except Exception as e:
+            st.error(f"AI问答功能初始化失败: {e}")
+            st.info("请检查Ollama服务是否正在运行")
 
     # 页面底部信息
     st.markdown("---")

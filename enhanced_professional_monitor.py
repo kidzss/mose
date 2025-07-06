@@ -401,6 +401,17 @@ class AIEnhancedProfessionalMonitor:
         """渲染AI诊断"""
         st.header("🤖 AI智能诊断")
         
+        # 创建子标签页
+        ai_tab1, ai_tab2 = st.tabs(["📊 AI分析", "💬 AI对话"])
+        
+        with ai_tab1:
+            self._render_ai_analysis_tab()
+        
+        with ai_tab2:
+            self._render_ai_chat_tab()
+    
+    def _render_ai_analysis_tab(self):
+        """渲染AI分析标签页"""
         # AI诊断控制
         col1, col2, col3 = st.columns([2, 1, 1])
         with col1:
@@ -447,6 +458,25 @@ class AIEnhancedProfessionalMonitor:
                 self._render_ai_alert(alert)
         else:
             st.info("暂无AI警报")
+    
+    def _render_ai_chat_tab(self):
+        """渲染AI对话标签页"""
+        try:
+            # 导入AI对话界面
+            from monitor.ai_chat_interface import AIChatInterface
+            
+            # 创建AI对话界面实例
+            chat_interface = AIChatInterface()
+            
+            # 渲染对话界面
+            chat_interface.render_chat_interface()
+            
+        except ImportError as e:
+            st.error(f"AI对话模块导入失败: {e}")
+            st.info("请确保ai_chat_interface.py文件存在")
+        except Exception as e:
+            st.error(f"AI对话功能初始化失败: {e}")
+            st.info("请检查AI对话模块配置")
     
     def _render_ai_analysis_result(self, analysis: Dict):
         """渲染AI分析结果"""

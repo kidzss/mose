@@ -2654,7 +2654,8 @@ class SmartDailyReportGenerator:
             if self.macro_integration:
                 try:
                     logger.info("开始基础宏观因子分析...")
-                    base_macro = self.macro_integration.generate_macro_report()
+                    # 强制刷新宏观数据
+                    base_macro = self.macro_integration.generate_macro_report(force_refresh=True)
                     
                     if 'error' not in base_macro:
                         macro_analysis.update(base_macro)
@@ -2668,7 +2669,8 @@ class SmartDailyReportGenerator:
             if self.inflation_sector_analyzer:
                 try:
                     logger.info("开始通胀-行业影响分析...")
-                    inflation_report = self.inflation_sector_analyzer.generate_inflation_sector_report()
+                    # 强制刷新通胀数据
+                    inflation_report = self.inflation_sector_analyzer.generate_inflation_sector_report(force_refresh=True)
                     if inflation_report:
                         macro_analysis['inflation_sector_analysis'] = inflation_report
                         logger.info("通胀-行业分析完成")
