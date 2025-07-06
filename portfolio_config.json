@@ -1,89 +1,107 @@
 {
     "meta": {
-        "last_updated": "2025-06-23",
-        "total_assets": 27533.17,
+        "last_updated": "2025-01-27",
+        "total_assets": 28821.33,
         "currency": "USD",
-        "description": "持仓调整更新 - AMD继续减仓(30→20股)，MRK新建仓8股，优化投资组合配置，AMD占比降至9.42%",
-        "watchlist_update": {
-            "date": "2025-06-24",
-            "added_stocks": 41,
-            "total_watchlist": 46,
-            "categories": {
-                "防御性股票": 5,
-                "金融股票": 6,
-                "医疗股票": 3,
-                "科技股票": 14,
-                "消费股票": 4,
-                "能源股票": 0,
-                "ETF基金": 6,
-                "市场指标": 1,
-                "原有观察股": 7
+        "description": "持仓更新 - 总资产28821.33，PFE减仓至20股准备做T，移除当前价格字段便于实时更新",
+        "asset_allocation": {
+            "stocks": {
+                "percentage": 62.33,
+                "amount": 17964.33,
+                "note": "美股持仓，实时价格需动态获取"
+            },
+            "money_fund": {
+                "percentage": 34.38,
+                "amount": 9908.77,
+                "description": "货币基金随时赎回",
+                "annual_yield": 4.0,
+                "liquidity": "T+0随时赎回"
+            },
+            "cash": {
+                "percentage": 3.29,
+                "amount": 948.23,
+                "note": "现金储备"
             }
         }
     },
     "portfolio": {
-        "total_value": 27533.17,
+        "total_value": 28821.33,
         "stock_allocation": {
-            "total_amount": 17530.37,
-            "percentage": 63.67,
-            "note": "仅包含美股，港股小米单独记录，AMD继续减仓，MRK新建仓"
+            "total_amount": 17964.33,
+            "percentage": 62.33,
+            "note": "美股持仓，实时价格需动态获取"
         },
         "cash_allocation": {
-            "amount": 4014.34,
-            "percentage": 14.58
+            "amount": 948.23,
+            "percentage": 3.29
         },
         "money_fund_allocation": {
-            "amount": 5988.46,
-            "percentage": 21.75,
+            "amount": 9908.77,
+            "percentage": 34.38,
             "description": "美元货币型基金",
             "annual_yield": 4.0,
             "liquidity": "T+0随时赎回",
             "risk_level": "极低风险",
             "note": "相当于高息现金等价物"
-        },
-        "hk_stock_allocation": {
-            "total_amount": 97.03,
-            "percentage": 0.35,
-            "description": "港股小米集团，不参与自动分析"
         }
     },
     "positions": {
+        "PFE": {
+            "shares": 20,
+            "cost_basis": 27.095,
+            "weight": 1.76,
+            "investment_amount": 541.90,
+            "sector": "Healthcare",
+            "stop_loss_threshold": 0.10,
+            "trading_strategy": "做T波段操作",
+            "transaction_note": "减仓至20股，准备做T操作，最近在25.5卖出60股"
+        },
         "NVDA": {
             "shares": 35,
             "cost_basis": 137.942,
-            "weight": 18.29,
+            "weight": 19.35,
             "investment_amount": 4827.97,
             "sector": "Technology",
             "stop_loss_threshold": 0.08,
-            "current_price": 143.86,
-            "current_value": 5035.10,
-            "unrealized_pnl": 207.13,
-            "transaction_note": "减持5股，从40股减至35股"
+            "transaction_note": "核心科技股持仓"
+        },
+        "MRK": {
+            "shares": 18,
+            "cost_basis": 80.454,
+            "weight": 5.05,
+            "investment_amount": 1448.17,
+            "sector": "Healthcare",
+            "stop_loss_threshold": 0.10,
+            "transaction_note": "防御性医药股"
         },
         "GOOG": {
             "shares": 30,
             "cost_basis": 170.00,
-            "weight": 18.28,
+            "weight": 18.79,
             "investment_amount": 5100.00,
             "sector": "Technology", 
             "stop_loss_threshold": 0.12,
-            "current_price": 167.73,
-            "current_value": 5031.90,
-            "unrealized_pnl": -68.10
+            "transaction_note": "核心科技股持仓"
+        },
+        "BRK-B": {
+            "shares": 3,
+            "cost_basis": 485.083,
+            "weight": 5.05,
+            "investment_amount": 1455.25,
+            "sector": "Financial",
+            "stop_loss_threshold": 0.12,
+            "transaction_note": "价值防御配置"
         },
         "AMD": {
             "shares": 25,
-            "cost_basis": 125.746,
-            "weight": 12.54,
-            "investment_amount": 3143.65,
+            "cost_basis": 125.276,
+            "weight": 11.96,
+            "investment_amount": 3131.90,
             "sector": "Technology",
             "stop_loss_threshold": 0.08,
-            "current_price": 128.24,
-            "current_value": 2564.80,
-            "unrealized_pnl": 60.56,
-            "transaction_note": "",
+            "transaction_note": "科技股持仓，技术形态强势",
             "technical_analysis": {
-                "date": "2025-06-24",
+                "date": "2025-01-27",
                 "pattern": "光头光脚大阳线",
                 "trend_direction": "拐头向上",
                 "price_target": "150-160",
@@ -91,73 +109,19 @@
                 "confidence": "强势信号",
                 "note": "技术形态确认向上突破，预期后续继续上涨"
             }
-        },
-        "PFE": {
-            "shares": 80,
-            "cost_basis": 25.899,
-            "weight": 6.96,
-            "investment_amount": 2071.92,
-            "sector": "Healthcare",
-            "stop_loss_threshold": 0.10,
-            "current_price": 23.98,
-            "current_value": 1918.40,
-            "unrealized_pnl": -153.52
-        },
-        "MRK": {
-            "shares": 8,
-            "cost_basis": 79.363,
-            "weight": 2.30,
-            "investment_amount": 634.90,
-            "sector": "Healthcare",
-            "stop_loss_threshold": 0.10,
-            "current_price": 79.01,
-            "current_value": 632.08,
-            "unrealized_pnl": -2.82,
-            "transaction_note": "新建仓防御性医药股"
-        },
-        "BRK-B": {
-            "shares": 2,
-            "cost_basis": 485.36,
-            "weight": 3.52,
-            "investment_amount": 970.72,
-            "sector": "Financial",
-            "stop_loss_threshold": 0.12,
-            "current_price": 485.01,
-            "current_value": 970.02,
-            "unrealized_pnl": -0.70,
-            "transaction_note": "价值防御配置"
-        },
-        "TSLA": {
-            "shares": 0,
-            "cost_basis": 179.841,
-            "weight": 0.00,
-            "investment_amount": 0.00,
-            "sector": "Automotive",
-            "stop_loss_threshold": 0.15,
-            "status": "SOLD",
-            "exit_date": "2025-06-20",
-            "exit_price": 324.00,
-            "exit_shares": 4,
-            "total_return": 576.00,
-            "return_percentage": 79.6,
-            "holding_period_days": "约6个月",
-            "exit_reason": "波段操作获利了结，符合右侧交易策略"
-        },
-        "9999.HK": {
-            "shares": 14,
-            "cost_basis": 10.539,
-            "weight": 0.35,
-            "investment_amount": 97.03,
-            "sector": "Technology",
-            "currency": "HKD",
-            "current_price_hkd": 53.8,
-            "cost_basis_hkd": 10.539,
-            "stop_loss_threshold": 0.12,
-            "description": "小米集团-W",
-            "excluded_from_analysis": true,
-            "exclusion_reason": "港股数据获取困难，避免影响自动分析系统"
         }
     },
+    "recent_transactions": [
+        {
+            "date": "2025-01-27",
+            "action": "SELL",
+            "symbol": "PFE",
+            "shares": 60,
+            "price": 25.5,
+            "amount": 1530.00,
+            "note": "减仓准备做T操作"
+        }
+    ],
     "watchlist": {
         "MSFT": {
             "target_buy_price": 420.0,
