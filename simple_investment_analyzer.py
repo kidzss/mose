@@ -18,7 +18,7 @@ st.set_page_config(
     layout="wide"
 )
 
-@st.cache_data(ttl=300)  # 缓存5分钟
+@st.cache_data(ttl=60)  # 缓存1分钟
 def get_market_data():
     """获取市场数据"""
     try:

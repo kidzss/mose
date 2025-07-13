@@ -22,6 +22,7 @@ import time
 import logging
 import json
 from datetime import datetime, timedelta
+from typing import Dict, Any
 
 # 添加项目根目录到路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -56,6 +57,15 @@ class PersonalInvestorAutomation:
             'min_quality_factor': 0.7,     # 最低质量因子
             'max_results': 15,             # 推荐股票数量
             'min_score': 60,               # 最低评分
+            # 策略信号权重配置
+            'strategy_weights': {
+                'TDI': 0.3,        # TDI策略权重
+                'NiuniuV3': 0.4,   # 牛牛策略权重（主要策略）
+                'CPGW': 0.3        # CPGW策略权重
+            },
+            'strategy_score_threshold': 0.6,  # 策略信号最低分数阈值
+            'enhanced_analysis_weight': 0.7,  # AI增强分析权重
+            'strategy_signal_weight': 0.3     # 策略信号权重
         }
         
         # 初始化增强分析器（Phase 2新功能）
@@ -70,10 +80,28 @@ class PersonalInvestorAutomation:
             logger.warning(f"增强分析器初始化失败: {e}")
             self.enhanced_screener = None
         
+        # 初始化策略工厂（新增）
+        self.strategy_factory = None
+        try:
+            from strategy.strategy_factory import StrategyFactory
+            self.strategy_factory = StrategyFactory()
+            logger.info("✅ 策略工厂初始化成功")
+        except Exception as e:
+            logger.warning(f"策略工厂初始化失败: {e}")
+        
+        # 初始化动态权重系统（新增）
+        self.dynamic_weight_system = None
+        try:
+            from utils.dynamic_weight_system import DynamicWeightSystem
+            self.dynamic_weight_system = DynamicWeightSystem()
+            logger.info("✅ 动态权重系统初始化成功")
+        except Exception as e:
+            logger.warning(f"动态权重系统初始化失败: {e}")
+        
         # 加载个人配置
         self._load_personal_config()
         
-        logger.info("🚀 个人投资者自动化系统初始化完成")
+        logger.info("�� 个人投资者自动化系统初始化完成")
     
     def _load_personal_config(self):
         """加载个人配置文件"""
@@ -196,11 +224,22 @@ class PersonalInvestorAutomation:
                     min_score=enhanced_min_score
                 )
                 
-                # 转换为兼容格式
+                # 转换为兼容格式并集成策略信号分析
                 high_quality_results = []
                 for result in enhanced_results[:self.config['max_results']]:
                     # 计算简化的夏普比率 (基于增强评分)
                     sharpe_ratio = result['enhanced_score'] * 2.0  # 简化计算，范围0-2
+                    
+                    # 获取策略信号分析
+                    strategy_analysis = self._analyze_strategy_signals(
+                        result['symbol'], 
+                        current_price=result['current_price']
+                    )
+                    
+                    # 融合AI增强分析分数和策略信号分数
+                    enhanced_score = result['enhanced_score']
+                    strategy_score = strategy_analysis['strategy_score']
+                    fused_score = self._fuse_enhanced_and_strategy_scores(enhanced_score, strategy_score)
                     
                     stock_data = {
                         'symbol': result['symbol'],
@@ -214,8 +253,12 @@ class PersonalInvestorAutomation:
                             'recommendations': result['recommendations'],
                             'warnings': result['warnings']
                         },
-                        'quality_factor': result['enhanced_score'],  # 兼容性
-                        'sharpe_ratio': sharpe_ratio  # 添加夏普比率
+                        'quality_factor': fused_score,  # 使用融合后的分数
+                        'sharpe_ratio': sharpe_ratio,  # 添加夏普比率
+                        # 新增策略信号信息
+                        'strategy_analysis': strategy_analysis,
+                        'fused_score': fused_score,
+                        'strategy_score': strategy_score
                     }
                     high_quality_results.append(stock_data)
                 
@@ -443,6 +486,175 @@ class PersonalInvestorAutomation:
         
         return recommendations
     
+    def _analyze_strategy_signals(self, symbol: str, current_price: float = None) -> Dict[str, Any]:
+        """
+        分析股票的策略信号
+        
+        Args:
+            symbol: 股票代码
+            current_price: 当前价格
+            
+        Returns:
+            策略信号分析结果
+        """
+        if not self.strategy_factory:
+            logger.warning(f"策略工厂未初始化，跳过策略信号分析: {symbol}")
+            return {'strategy_score': 0.0, 'strategy_signals': {}, 'error': 'Strategy factory not available'}
+        
+        try:
+            # 获取股票历史数据
+            data = self.data_interface.get_data_for_strategy(symbol, lookback_days=60)
+            if data is None or len(data) == 0:
+                logger.warning(f"无法获取 {symbol} 的历史数据")
+                return {'strategy_score': 0.0, 'strategy_signals': {}, 'error': 'No historical data'}
+            
+            # 转换为DataFrame格式
+            import pandas as pd
+            df = pd.DataFrame(data)
+            df['date'] = pd.to_datetime(df['date'])
+            df.set_index('date', inplace=True)
+            
+            # 初始化策略信号结果
+            strategy_signals = {}
+            strategy_scores = {}
+            
+            # 分析各个策略的信号
+            strategy_weights = self.config['strategy_weights']
+            
+            for strategy_name, weight in strategy_weights.items():
+                try:
+                    # 创建策略实例
+                    strategy = self.strategy_factory.create_strategy(strategy_name)
+                    if strategy:
+                        # 生成策略信号
+                        signals_df = strategy.generate_signals(df.copy())
+                        
+                        # 获取最新信号
+                        latest_signal = signals_df.iloc[-1] if not signals_df.empty else None
+                        
+                        if latest_signal is not None:
+                            # 将信号转换为分数
+                            signal_score = self._convert_signal_to_score(latest_signal, strategy_name)
+                            strategy_scores[strategy_name] = signal_score
+                            strategy_signals[strategy_name] = {
+                                'signal': latest_signal.get('signal', 'unknown'),
+                                'score': signal_score,
+                                'strength': latest_signal.get('strength', 0.0),
+                                'confidence': latest_signal.get('confidence', 0.0)
+                            }
+                            logger.debug(f"{symbol} {strategy_name} 信号: {signal_score:.3f}")
+                        else:
+                            strategy_scores[strategy_name] = 0.0
+                            strategy_signals[strategy_name] = {'signal': 'unknown', 'score': 0.0}
+                            
+                except Exception as e:
+                    logger.warning(f"{symbol} {strategy_name} 策略分析失败: {e}")
+                    strategy_scores[strategy_name] = 0.0
+                    strategy_signals[strategy_name] = {'signal': 'error', 'score': 0.0}
+            
+            # 计算加权策略分数
+            total_weight = sum(strategy_weights.values())
+            weighted_strategy_score = 0.0
+            
+            if total_weight > 0:
+                for strategy_name, weight in strategy_weights.items():
+                    score = strategy_scores.get(strategy_name, 0.0)
+                    weighted_strategy_score += (score * weight) / total_weight
+            
+            # 集成动态权重系统
+            if self.dynamic_weight_system:
+                try:
+                    # 获取AI分析结果
+                    ai_analysis = None
+                    if self.enhanced_analyzer:
+                        ai_analysis = self.enhanced_analyzer.analyze_stock_comprehensive(symbol)
+                    
+                    if ai_analysis:
+                        # 记录信号到动态权重系统
+                        current_price = current_price or df['Close'].iloc[-1]
+                        self.dynamic_weight_system.record_signal(symbol, ai_analysis, strategy_signals, current_price)
+                        
+                        # 计算动态权重
+                        accuracy_comparison = self.dynamic_weight_system.calculate_accuracy_comparison(symbol)
+                        if 'error' not in accuracy_comparison:
+                            dynamic_weights = self.dynamic_weight_system.calculate_dynamic_weights(symbol, accuracy_comparison)
+                            if 'error' not in dynamic_weights:
+                                # 使用动态权重调整策略分数
+                                new_weights = dynamic_weights['new_weights']
+                                strategy_signals['dynamic_weights'] = new_weights
+                                strategy_signals['weight_adjustment'] = dynamic_weights['adjustment']
+                                logger.info(f"动态权重调整: {symbol} - AI权重: {new_weights['ai_weight']:.2f}, 策略权重: {new_weights['strategy_weight']:.2f}")
+                                
+                                # 使用动态权重重新计算加权分数
+                                weighted_strategy_score = (weighted_strategy_score * new_weights['strategy_weight'])
+                except Exception as e:
+                    logger.warning(f"动态权重系统处理失败: {e}")
+            
+            return {
+                'strategy_score': weighted_strategy_score,
+                'strategy_signals': strategy_signals,
+                'individual_scores': strategy_scores,
+                'error': None
+            }
+            
+        except Exception as e:
+            logger.error(f"{symbol} 策略信号分析失败: {e}")
+            return {'strategy_score': 0.0, 'strategy_signals': {}, 'error': str(e)}
+    
+    def _convert_signal_to_score(self, signal_data: Dict, strategy_name: str) -> float:
+        """
+        将策略信号转换为分数 (0-1)
+        
+        Args:
+            signal_data: 策略信号数据
+            strategy_name: 策略名称
+            
+        Returns:
+            信号分数 (0-1)
+        """
+        signal = signal_data.get('signal', 'unknown').lower()
+        strength = signal_data.get('strength', 0.0)
+        confidence = signal_data.get('confidence', 0.0)
+        
+        # 基础信号分数映射
+        signal_scores = {
+            'buy': 1.0,
+            'strong_buy': 1.0,
+            'hold': 0.5,
+            'sell': 0.0,
+            'strong_sell': 0.0,
+            'unknown': 0.5
+        }
+        
+        # 获取基础分数
+        base_score = signal_scores.get(signal, 0.5)
+        
+        # 根据强度和置信度调整分数
+        adjusted_score = base_score * (0.7 + 0.3 * strength) * (0.8 + 0.2 * confidence)
+        
+        # 确保分数在0-1范围内
+        return max(0.0, min(1.0, adjusted_score))
+    
+    def _fuse_enhanced_and_strategy_scores(self, enhanced_score: float, strategy_score: float) -> float:
+        """
+        融合AI增强分析分数和策略信号分数
+        
+        Args:
+            enhanced_score: AI增强分析分数 (0-1)
+            strategy_score: 策略信号分数 (0-1)
+            
+        Returns:
+            融合后的综合分数 (0-1)
+        """
+        enhanced_weight = self.config['enhanced_analysis_weight']
+        strategy_weight = self.config['strategy_signal_weight']
+        
+        # 加权融合
+        fused_score = (enhanced_score * enhanced_weight) + (strategy_score * strategy_weight)
+        
+        # 确保分数在0-1范围内
+        return max(0.0, min(1.0, fused_score))
+    
     def _generate_personalized_report(self, results, report_type, 
                                     market_analysis=None, strategy_recommendations=None):
         """生成个性化投资报告"""
@@ -512,6 +724,9 @@ class PersonalInvestorAutomation:
                     <th>目标卖出</th>
                     <th>止损价格</th>
                     <th>增强评分</th>
+                    <th>策略信号</th>
+                    <th>动态权重</th>
+                    <th>融合评分</th>
                     <th>成长性</th>
                     <th>行业表现</th>
                     <th>投资建议</th>
@@ -532,6 +747,19 @@ class PersonalInvestorAutomation:
             enhanced_score = stock.get('enhanced_score', enhanced_analysis.get('overall_score', 0)) * 100
             growth_score = stock.get('growth_score', 0) * 100
             
+            # 获取策略信号信息
+            strategy_analysis = stock.get('strategy_analysis', {})
+            strategy_score = strategy_analysis.get('strategy_score', 0) * 100
+            fused_score = stock.get('fused_score', 0) * 100
+            
+            # 生成策略信号摘要
+            strategy_signals = strategy_analysis.get('strategy_signals', {})
+            strategy_summary = self._get_strategy_signal_summary(strategy_signals)
+            
+            # 获取动态权重信息
+            dynamic_weights = strategy_signals.get('dynamic_weights', {})
+            weight_summary = self._get_dynamic_weight_summary(dynamic_weights)
+            
             # 获取行业表现信息
             industry_performance = self._get_industry_performance(stock)
             
@@ -547,6 +775,9 @@ class PersonalInvestorAutomation:
                     <td>${sell_price}</td>
                     <td>${stop_loss}</td>
                     <td>{enhanced_score:.1f}</td>
+                    <td>{strategy_summary}</td>
+                    <td>{weight_summary}</td>
+                    <td>{fused_score:.1f}</td>
                     <td>{growth_score:.1f}</td>
                     <td>{industry_performance}</td>
                     <td>{self._get_enhanced_investment_advice(stock)}</td>
@@ -567,6 +798,10 @@ class PersonalInvestorAutomation:
                     <li><strong>🆕 行业比较</strong>: 显示在同行业中的相对表现水平</li>
                     <li><strong>🆕 成长性分析</strong>: 评估了EPS增长率和自由现金流质量</li>
                     <li><strong>🆕 专家建议集成</strong>: FCF打分、成长性跟踪、预警提示全面集成</li>
+                    <li><strong>🆕 策略信号融合</strong>: 集成TDI、NiuniuV3、CPGW策略信号，提升选股质量</li>
+                    <li><strong>🆕 融合评分</strong>: AI增强分析(70%) + 策略信号(30%)的综合评分</li>
+                    <li><strong>🆕 动态权重系统</strong>: 基于AI和策略准确性差异自动调整权重，实现自适应学习</li>
+                    <li><strong>🆕 权重趋势</strong>: 显示AI和策略权重的调整方向和幅度，帮助理解系统学习过程</li>
                 </ul>
             </div>
             
@@ -683,6 +918,78 @@ class PersonalInvestorAutomation:
         except Exception as e:
             return '数据获取失败'
     
+    def _get_strategy_signal_summary(self, strategy_signals: Dict) -> str:
+        """
+        生成策略信号摘要
+        
+        Args:
+            strategy_signals: 策略信号字典
+            
+        Returns:
+            策略信号摘要字符串
+        """
+        if not strategy_signals:
+            return "无信号"
+        
+        # 统计各策略信号
+        buy_count = 0
+        hold_count = 0
+        sell_count = 0
+        total_count = 0
+        
+        for strategy_name, signal_info in strategy_signals.items():
+            signal = signal_info.get('signal', 'unknown').lower()
+            if 'buy' in signal:
+                buy_count += 1
+            elif 'hold' in signal:
+                hold_count += 1
+            elif 'sell' in signal:
+                sell_count += 1
+            total_count += 1
+        
+        # 生成摘要
+        if buy_count > hold_count and buy_count > sell_count:
+            return f"🟢 买入({buy_count}/{total_count})"
+        elif hold_count > sell_count:
+            return f"🟡 持有({hold_count}/{total_count})"
+        elif sell_count > 0:
+            return f"🔴 卖出({sell_count}/{total_count})"
+        else:
+            return "⚪ 中性"
+    
+    def _get_dynamic_weight_summary(self, dynamic_weights: Dict) -> str:
+        """
+        生成动态权重摘要
+        
+        Args:
+            dynamic_weights: 动态权重字典
+            
+        Returns:
+            动态权重摘要字符串
+        """
+        if not dynamic_weights:
+            return "默认权重"
+        
+        ai_weight = dynamic_weights.get('ai_weight', 0.7)
+        strategy_weight = dynamic_weights.get('strategy_weight', 0.3)
+        
+        # 判断权重调整方向
+        if ai_weight > 0.7:
+            ai_trend = "↑"
+        elif ai_weight < 0.7:
+            ai_trend = "↓"
+        else:
+            ai_trend = "="
+        
+        if strategy_weight > 0.3:
+            strategy_trend = "↑"
+        elif strategy_weight < 0.3:
+            strategy_trend = "↓"
+        else:
+            strategy_trend = "="
+        
+        return f"AI{ai_trend}{ai_weight:.1f} 策略{strategy_trend}{strategy_weight:.1f}"
+    
     def _get_enhanced_investment_advice(self, stock):
         """获取增强版投资建议（Phase 2新功能）"""
         quality = stock['quality_factor']
@@ -694,24 +1001,30 @@ class PersonalInvestorAutomation:
         warnings = enhanced_analysis.get('warnings', [])
         recommendations = enhanced_analysis.get('recommendations', [])
         
-        # 有警告信息的情况
-        if warnings:
-            return f"谨慎：{warnings[0][:20]}..."
+        # 调试信息
+        logger.debug(f"投资建议调试 - {stock.get('symbol', 'Unknown')}: "
+                    f"enhanced_score={enhanced_score}, quality={quality}, score={score}")
         
-        # 基于增强评分的建议
-        if enhanced_score > 0.8 and quality > 0.8 and score > 70:
+        # 有高风险警告信息的情况（只过滤真正的高风险警告）
+        high_risk_warnings = [w for w in warnings if any(keyword in w.lower() 
+                            for keyword in ['high risk', '高风险', 'overvalued', '估值过高', '严重'])]
+        if high_risk_warnings:
+            return f"⚠️ 谨慎：{high_risk_warnings[0][:20]}..."
+        
+        # 基于增强评分的建议（降低阈值，使其更合理）
+        if enhanced_score > 0.7 and quality > 0.7 and score > 65:
             advice = "🟢 强烈推荐"
             if recommendations:
                 advice += f"，{recommendations[0][:15]}..."
             return advice
-        elif enhanced_score > 0.7 and quality > 0.7 and score > 60:
+        elif enhanced_score > 0.6 and quality > 0.6 and score > 55:
             advice = "🔵 推荐买入"
             if recommendations:
                 advice += f"，{recommendations[0][:15]}..."
             return advice
-        elif enhanced_score > 0.6 and quality > 0.6 and score > 55:
+        elif enhanced_score > 0.5 and quality > 0.5 and score > 50:
             return "🟡 小仓位试仓"
-        elif enhanced_score > 0.4:
+        elif enhanced_score > 0.3:
             return "🟠 观望为主"
         else:
             return "🔴 暂时回避"

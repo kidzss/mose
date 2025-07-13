@@ -1,34 +1,34 @@
 {
     "meta": {
-        "last_updated": "2025-01-27",
-        "total_assets": 28821.33,
+        "last_updated": "2025-07-06",
+        "total_assets": 30288.23,
         "currency": "USD",
-        "description": "持仓更新 - 总资产28821.33，PFE减仓至20股准备做T，移除当前价格字段便于实时更新",
+        "description": "持仓更新 - 总资产30288.23，新增TSLA持仓5股，倒金字塔加仓策略执行中",
         "asset_allocation": {
             "stocks": {
-                "percentage": 62.33,
-                "amount": 17964.33,
+                "percentage": 64.46,
+                "amount": 19431.23,
                 "note": "美股持仓，实时价格需动态获取"
             },
             "money_fund": {
-                "percentage": 34.38,
+                "percentage": 32.72,
                 "amount": 9908.77,
                 "description": "货币基金随时赎回",
                 "annual_yield": 4.0,
                 "liquidity": "T+0随时赎回"
             },
             "cash": {
-                "percentage": 3.29,
+                "percentage": 2.82,
                 "amount": 948.23,
                 "note": "现金储备"
             }
         }
     },
     "portfolio": {
-        "total_value": 28821.33,
+        "total_value": 30288.23,
         "stock_allocation": {
-            "total_amount": 17964.33,
-            "percentage": 62.33,
+            "total_amount": 19431.23,
+            "percentage": 64.46,
             "note": "美股持仓，实时价格需动态获取"
         },
         "cash_allocation": {
@@ -109,9 +109,46 @@
                 "confidence": "强势信号",
                 "note": "技术形态确认向上突破，预期后续继续上涨"
             }
+        },
+        "TSLA": {
+            "shares": 5,
+            "cost_basis": 293.38,
+            "weight": 5.13,
+            "investment_amount": 1466.90,
+            "sector": "Technology",
+            "stop_loss_threshold": 0.05,
+            "transaction_note": "电动车龙头，倒金字塔加仓策略执行中",
+            "trading_strategy": {
+                "strategy_type": "倒金字塔加仓",
+                "current_batch": "第一批完成",
+                "next_batch": "第二批：$285-290区间加仓5股",
+                "total_target": "10股，占比9-10%",
+                "risk_management": {
+                    "hard_stop_loss": 270,
+                    "soft_stop_loss": 275,
+                    "target_price": "300-320"
+                }
+            },
+            "technical_analysis": {
+                "date": "2025-07-06",
+                "current_price": "288-296区间震荡",
+                "support_levels": "285-290",
+                "resistance_levels": "300-310",
+                "strategy": "耐心持有，等待突破",
+                "confidence": "策略执行正确，等待加仓机会"
+            }
         }
     },
     "recent_transactions": [
+        {
+            "date": "2025-07-06",
+            "action": "BUY",
+            "symbol": "TSLA",
+            "shares": 5,
+            "price": 293.38,
+            "amount": 1466.90,
+            "note": "第一批试探性建仓，倒金字塔策略执行"
+        },
         {
             "date": "2025-01-27",
             "action": "SELL",

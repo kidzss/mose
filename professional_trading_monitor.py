@@ -179,7 +179,7 @@ def get_ai_analysis(symbol, stock_data, portfolio_info=None):
     except Exception as e:
         return {"error": f"AI分析失败: {str(e)}"}
 
-@st.cache_data(ttl=300)  # 缓存5分钟
+@st.cache_data(ttl=60)  # 缓存1分钟，减少缓存时间
 def load_portfolio_config():
     """从JSON配置文件加载持仓和观察仓信息"""
     try:
@@ -537,6 +537,12 @@ def get_ollama_models():
 def main():
     # 页面标题
     st.markdown('<div class="main-header">⚡ 专业实时交易监控系统</div>', unsafe_allow_html=True)
+    
+    # 添加清除缓存按钮
+    if st.sidebar.button("🔄 清除缓存并重新加载配置"):
+        st.cache_data.clear()
+        st.success("缓存已清除，配置将重新加载")
+        st.rerun()
     
     # 加载配置信息
     config = load_portfolio_config()

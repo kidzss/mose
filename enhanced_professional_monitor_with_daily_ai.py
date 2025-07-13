@@ -180,7 +180,7 @@ async def get_enhanced_ai_analysis(symbol, stock_data, portfolio_info=None):
     except Exception as e:
         return {"error": f"AI分析失败: {str(e)}"}
 
-@st.cache_data(ttl=300)  # 缓存5分钟
+@st.cache_data(ttl=60)  # 缓存1分钟
 def load_portfolio_config():
     """从JSON配置文件加载持仓和观察仓信息"""
     try:
