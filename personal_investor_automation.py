@@ -574,6 +574,10 @@ class PersonalInvestorAutomation:
                         current_price = current_price or df['Close'].iloc[-1]
                         self.dynamic_weight_system.record_signal(symbol, ai_analysis, strategy_signals, current_price)
                         
+                        # 设置风险偏好（从配置中读取）
+                        risk_tolerance = self.config.get('risk_tolerance', 'moderate')
+                        self.dynamic_weight_system.set_risk_tolerance(risk_tolerance)
+                        
                         # 计算动态权重
                         accuracy_comparison = self.dynamic_weight_system.calculate_accuracy_comparison(symbol)
                         if 'error' not in accuracy_comparison:
@@ -583,10 +587,18 @@ class PersonalInvestorAutomation:
                                 new_weights = dynamic_weights['new_weights']
                                 strategy_signals['dynamic_weights'] = new_weights
                                 strategy_signals['weight_adjustment'] = dynamic_weights['adjustment']
+                                strategy_signals['accuracy_comparison'] = accuracy_comparison
+                                
                                 logger.info(f"动态权重调整: {symbol} - AI权重: {new_weights['ai_weight']:.2f}, 策略权重: {new_weights['strategy_weight']:.2f}")
+                                logger.info(f"准确性比较: AI={accuracy_comparison['ai_accuracy']:.3f}, 策略={accuracy_comparison['strategy_accuracy']:.3f}")
                                 
                                 # 使用动态权重重新计算加权分数
                                 weighted_strategy_score = (weighted_strategy_score * new_weights['strategy_weight'])
+                                
+                                # 获取表现摘要
+                                performance_summary = self.dynamic_weight_system.get_performance_summary(symbol)
+                                if 'error' not in performance_summary:
+                                    strategy_signals['performance_summary'] = performance_summary
                 except Exception as e:
                     logger.warning(f"动态权重系统处理失败: {e}")
             

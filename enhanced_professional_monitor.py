@@ -568,24 +568,55 @@ class AIEnhancedProfessionalMonitor:
         """渲染系统设置"""
         st.header("⚙️ 系统设置")
         
-        # AI设置
-        st.subheader("🤖 AI设置")
-        st.write("**AI模型:** DeepSeek R1")
-        st.write("**API端点:** http://localhost:11434")
+        # 创建标签页
+        settings_tab1, settings_tab2, settings_tab3 = st.tabs([
+            "🤖 AI设置", 
+            "📊 配置管理", 
+            "📈 系统信息"
+        ])
         
-        # 测试AI连接
-        if st.button("🔗 测试AI连接"):
+        with settings_tab1:
+            st.subheader("🤖 AI设置")
+            st.write("**AI模型:** DeepSeek R1")
+            st.write("**API端点:** http://localhost:11434")
+            
+            # 测试AI连接
+            if st.button("🔗 测试AI连接"):
+                try:
+                    # 这里可以添加AI连接测试逻辑
+                    st.success("✅ AI连接正常")
+                except Exception as e:
+                    st.error(f"❌ AI连接失败: {e}")
+        
+        with settings_tab2:
+            st.subheader("📊 配置管理")
+            
+            # 导入配置管理器
             try:
-                # 这里可以添加AI连接测试逻辑
-                st.success("✅ AI连接正常")
+                from portfolio_config_manager import render_portfolio_config_manager
+                render_portfolio_config_manager()
+            except ImportError as e:
+                st.error(f"配置管理器导入失败: {e}")
+                st.info("请确保portfolio_config_manager.py文件存在")
             except Exception as e:
-                st.error(f"❌ AI连接失败: {e}")
+                st.error(f"配置管理功能初始化失败: {e}")
         
-        # 系统信息
-        st.subheader("📊 系统信息")
-        st.write(f"**最后更新:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.write(f"**分析记录数:** {len(self.ai_module.get_recent_analysis())}")
-        st.write(f"**警报数量:** {len(self.ai_module.get_alerts())}")
+        with settings_tab3:
+            st.subheader("📈 系统信息")
+            st.write(f"**最后更新:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            st.write(f"**分析记录数:** {len(self.ai_module.get_recent_analysis())}")
+            st.write(f"**警报数量:** {len(self.ai_module.get_alerts())}")
+            
+            # 显示配置文件状态
+            import os
+            config_files = ['portfolio_config.json', 'personal_investor_config.json']
+            st.markdown("### 📁 配置文件状态")
+            for config_file in config_files:
+                if os.path.exists(config_file):
+                    file_size = os.path.getsize(config_file)
+                    st.write(f"✅ **{config_file}**: {file_size:,} bytes")
+                else:
+                    st.write(f"❌ **{config_file}**: 文件不存在")
     
     def _trigger_ai_analysis(self, symbol: str, analysis_type: str = "comprehensive"):
         """触发AI分析"""

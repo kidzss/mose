@@ -682,7 +682,7 @@ def main():
             signals = {}
     
     # 主要内容区域 - 专业投资分析中心架构
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 市场概览", "📈 监控股票", "🔬 专业投资分析中心", "💼 投资组合", "🧠 决策支持", "🤖 AI诊断", "💬 AI问答"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["📊 市场概览", "📈 监控股票", "🔬 专业投资分析中心", "💼 投资组合", "🧠 决策支持", "🤖 AI诊断", "💬 AI问答", "⚙️ 系统设置"])
     
     with tab1:
         st.header("📊 市场概览")
@@ -1566,6 +1566,218 @@ def main():
         except Exception as e:
             st.error(f"AI问答功能初始化失败: {e}")
             st.info("请检查Ollama服务是否正在运行")
+    
+    # 系统设置标签页
+    with tab8:
+        st.header("⚙️ 系统设置")
+        
+        # 创建子标签页
+        settings_tab1, settings_tab2, settings_tab3 = st.tabs([
+            "🤖 AI设置", 
+            "📊 配置管理", 
+            "📈 系统信息"
+        ])
+        
+        with settings_tab1:
+            st.subheader("🤖 AI设置")
+            st.write("**AI模型:** DeepSeek R1")
+            st.write("**API端点:** http://localhost:11434")
+            
+            # 测试AI连接
+            if st.button("🔗 测试AI连接"):
+                try:
+                    import requests
+                    response = requests.get("http://localhost:11434/api/tags", timeout=5)
+                    if response.status_code == 200:
+                        st.success("✅ AI连接正常")
+                    else:
+                        st.error("❌ AI连接失败")
+                except Exception as e:
+                    st.error(f"❌ AI连接失败: {e}")
+        
+        with settings_tab2:
+            st.subheader("📊 配置管理")
+            
+            # 导入配置管理器
+            try:
+                from portfolio_config_manager import render_portfolio_config_manager
+                render_portfolio_config_manager()
+            except ImportError as e:
+                st.error(f"配置管理器导入失败: {e}")
+                st.info("请确保portfolio_config_manager.py文件存在")
+            except Exception as e:
+                st.error(f"配置管理功能初始化失败: {e}")
+        
+        with settings_tab3:
+            st.subheader("📈 系统信息")
+            st.write(f"**最后更新:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            
+            # 显示配置文件状态
+            import os
+            config_files = ['portfolio_config.json', 'personal_investor_config.json']
+            st.markdown("### 📁 配置文件状态")
+            for config_file in config_files:
+                if os.path.exists(config_file):
+                    file_size = os.path.getsize(config_file)
+                    st.write(f"✅ **{config_file}**: {file_size:,} bytes")
+                else:
+                    st.write(f"❌ **{config_file}**: 文件不存在")
+            
+            # 显示系统状态
+            st.markdown("### 🔧 系统状态")
+            try:
+                # 检查数据接口
+                from data.data_interface import DataInterface
+                data_interface = DataInterface()
+                st.write("✅ **数据接口**: 正常")
+            except Exception as e:
+                st.write(f"❌ **数据接口**: {e}")
+            
+            try:
+                # 检查AI模块
+                from ai_trading_module import AITradingModule
+                ai_module = AITradingModule()
+                st.write("✅ **AI模块**: 正常")
+            except Exception as e:
+                st.write(f"❌ **AI模块**: {e}")
+            
+            # 数据更新功能
+            st.markdown("---")
+            st.subheader("🔄 数据更新管理")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("### 📊 股票数据更新")
+                
+                # 更新选项
+                update_type = st.selectbox(
+                    "选择更新类型",
+                    ["增量更新", "强制更新", "指定股票更新"],
+                    help="增量更新：只更新最新数据；强制更新：重新获取所有数据；指定股票：更新特定股票"
+                )
+                
+                if update_type == "指定股票更新":
+                    # 从配置文件获取持仓股票
+                    portfolio_data = load_portfolio_config()
+                    if portfolio_data and 'positions' in portfolio_data:
+                        position_symbols = list(portfolio_data['positions'].keys())
+                        selected_symbols = st.multiselect(
+                            "选择要更新的股票",
+                            position_symbols,
+                            default=position_symbols[:3]  # 默认选择前3个
+                        )
+                    else:
+                        selected_symbols = st.text_input(
+                            "输入股票代码（用逗号分隔）",
+                            value="NVDA,AMD,GOOG",
+                            help="例如：NVDA,AMD,GOOG"
+                        ).split(',')
+                        selected_symbols = [s.strip() for s in selected_symbols if s.strip()]
+                else:
+                    selected_symbols = None
+                
+                # 更新按钮
+                if st.button("🔄 开始数据更新", type="primary"):
+                    with st.spinner("正在更新股票数据..."):
+                        try:
+                            # 导入数据更新器
+                            from data.data_updater import MarketDataUpdater
+                            from config.trading_config import default_config
+                            
+                            # 数据库配置
+                            db_config = {
+                                "host": default_config.database.host,
+                                "port": default_config.database.port,
+                                "user": default_config.database.user,
+                                "password": default_config.database.password,
+                                "database": default_config.database.database
+                            }
+                            
+                            # 创建更新器
+                            updater = MarketDataUpdater(db_config)
+                            
+                            # 执行更新
+                            if update_type == "增量更新":
+                                report = updater.update_stock_data(symbols=selected_symbols, force_update=False)
+                            elif update_type == "强制更新":
+                                report = updater.update_stock_data(symbols=selected_symbols, force_update=True)
+                            else:  # 指定股票更新
+                                report = updater.update_stock_data(symbols=selected_symbols, force_update=False)
+                            
+                            # 显示更新结果
+                            st.success("✅ 数据更新完成！")
+                            st.write(f"**总计**: {report['total']} 只股票")
+                            st.write(f"**更新成功**: {report['updated']} 只")
+                            st.write(f"**跳过**: {report['skipped']} 只")
+                            st.write(f"**失败**: {report['failed']} 只")
+                            
+                            # 显示详细结果
+                            if report['details']:
+                                with st.expander("📋 详细更新结果"):
+                                    for symbol, status in report['details'].items():
+                                        if status == 'updated':
+                                            st.write(f"✅ {symbol}: 更新成功")
+                                        elif status == 'skipped (up to date)':
+                                            st.write(f"⏭️ {symbol}: 数据已是最新")
+                                        else:
+                                            st.write(f"❌ {symbol}: {status}")
+                            
+                        except Exception as e:
+                            st.error(f"❌ 数据更新失败: {e}")
+                            st.info("请检查数据库连接和网络状态")
+            
+            with col2:
+                st.markdown("### 📊 数据状态检查")
+                
+                # 检查数据更新时间
+                if st.button("🔍 检查数据状态"):
+                    try:
+                        from data.data_updater import MarketDataUpdater
+                        from config.trading_config import default_config
+                        
+                        db_config = {
+                            "host": default_config.database.host,
+                            "port": default_config.database.port,
+                            "user": default_config.database.user,
+                            "password": default_config.database.password,
+                            "database": default_config.database.database
+                        }
+                        
+                        updater = MarketDataUpdater(db_config)
+                        
+                        # 获取持仓股票的最后更新时间
+                        portfolio_data = load_portfolio_config()
+                        if portfolio_data and 'positions' in portfolio_data:
+                            position_symbols = list(portfolio_data['positions'].keys())
+                            
+                            st.markdown("#### 📅 持仓股票数据状态")
+                            for symbol in position_symbols[:5]:  # 显示前5个
+                                last_update = updater.get_last_update_time(symbol)
+                                if last_update:
+                                    days_ago = (datetime.now() - last_update).days
+                                    if days_ago == 0:
+                                        st.write(f"✅ {symbol}: 今天已更新")
+                                    elif days_ago == 1:
+                                        st.write(f"🟡 {symbol}: 1天前更新")
+                                    else:
+                                        st.write(f"🔴 {symbol}: {days_ago}天前更新")
+                                else:
+                                    st.write(f"❌ {symbol}: 无数据")
+                        
+                    except Exception as e:
+                        st.error(f"❌ 检查数据状态失败: {e}")
+                
+                # 数据清理功能
+                st.markdown("### 🧹 数据维护")
+                
+                if st.button("🗑️ 清理缓存"):
+                    st.cache_data.clear()
+                    st.cache_resource.clear()
+                    st.success("✅ 缓存已清理")
+                
+                if st.button("🔄 刷新系统"):
+                    st.rerun()
 
     # 页面底部信息
     st.markdown("---")

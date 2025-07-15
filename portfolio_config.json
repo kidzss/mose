@@ -1,43 +1,43 @@
 {
     "meta": {
-        "last_updated": "2025-07-06",
-        "total_assets": 30288.23,
+        "last_updated": "2025-07-14",
+        "total_assets": 29454.19,
         "currency": "USD",
-        "description": "持仓更新 - 总资产30288.23，新增TSLA持仓5股，倒金字塔加仓策略执行中",
+        "description": "持仓更新 - 清仓PFE，总资产29454.19，股票配置66.37%，货币基金33.63%",
         "asset_allocation": {
             "stocks": {
-                "percentage": 64.46,
-                "amount": 19431.23,
+                "percentage": 66.37,
+                "amount": 19545.56,
                 "note": "美股持仓，实时价格需动态获取"
             },
             "money_fund": {
-                "percentage": 32.72,
-                "amount": 9908.77,
+                "percentage": 33.63,
+                "amount": 9908.63,
                 "description": "货币基金随时赎回",
                 "annual_yield": 4.0,
                 "liquidity": "T+0随时赎回"
             },
             "cash": {
-                "percentage": 2.82,
-                "amount": 948.23,
-                "note": "现金储备"
+                "percentage": 0,
+                "amount": 0,
+                "note": "现金已转入货币基金"
             }
         }
     },
     "portfolio": {
-        "total_value": 30288.23,
+        "total_value": 29454.19,
         "stock_allocation": {
-            "total_amount": 19431.23,
-            "percentage": 64.46,
+            "total_amount": 19545.56,
+            "percentage": 66.37,
             "note": "美股持仓，实时价格需动态获取"
         },
         "cash_allocation": {
-            "amount": 948.23,
-            "percentage": 3.29
+            "amount": 0,
+            "percentage": 0
         },
         "money_fund_allocation": {
-            "amount": 9908.77,
-            "percentage": 34.38,
+            "amount": 9908.63,
+            "percentage": 33.63,
             "description": "美元货币型基金",
             "annual_yield": 4.0,
             "liquidity": "T+0随时赎回",
@@ -46,16 +46,7 @@
         }
     },
     "positions": {
-        "PFE": {
-            "shares": 20,
-            "cost_basis": 27.095,
-            "weight": 1.76,
-            "investment_amount": 541.90,
-            "sector": "Healthcare",
-            "stop_loss_threshold": 0.10,
-            "trading_strategy": "做T波段操作",
-            "transaction_note": "减仓至20股，准备做T操作，最近在25.5卖出60股"
-        },
+
         "NVDA": {
             "shares": 35,
             "cost_basis": 137.942,
@@ -141,13 +132,13 @@
     },
     "recent_transactions": [
         {
-            "date": "2025-07-06",
-            "action": "BUY",
-            "symbol": "TSLA",
-            "shares": 5,
-            "price": 293.38,
-            "amount": 1466.90,
-            "note": "第一批试探性建仓，倒金字塔策略执行"
+            "date": "2025-07-14",
+            "action": "SELL",
+            "symbol": "PFE",
+            "shares": 20,
+            "price": 27.5,
+            "amount": 550.00,
+            "note": "完全清仓PFE"
         },
         {
             "date": "2025-01-27",

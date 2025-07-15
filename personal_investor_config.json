@@ -23,18 +23,44 @@
     "原材料"
   ],
   "current_portfolio": {
-    "total_assets": 27533.17,
-    "stock_allocation": 63.67,
-    "cash_allocation": 14.58,
-    "fund_allocation": 21.75,
+    "total_assets": 29454.19,
+    "stock_allocation": 66.37,
+    "cash_allocation": 0,
+    "fund_allocation": 33.63,
     "major_holdings": [
-      "NVDA",
-      "GOOG", 
+      "GOOG",
+      "NVDA", 
       "AMD",
-      "PFE",
       "MRK",
       "BRK-B"
-    ]
+    ],
+    "detailed_holdings": {
+      "GOOG": {
+        "shares": 30,
+        "cost_basis": 170.00,
+        "allocation": 18.61
+      },
+      "AMD": {
+        "shares": 25,
+        "cost_basis": 125.276,
+        "allocation": 12.47
+      },
+      "NVDA": {
+        "shares": 35,
+        "cost_basis": 137.942,
+        "allocation": 19.63
+      },
+      "MRK": {
+        "shares": 18,
+        "cost_basis": 80.454,
+        "allocation": 5.12
+      },
+      "BRK-B": {
+        "shares": 3,
+        "cost_basis": 485.083,
+        "allocation": 5.85
+      }
+    }
   },
   "trading_preferences": {
     "strategy_type": "波段操作",
