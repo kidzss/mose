@@ -343,7 +343,7 @@ class SmartDailyReportGenerator:
                 # 生成模拟价格数据
                 np.random.seed(hash(symbol) % 1000)  # 为每个股票使用固定种子
                 base_price = {"AMD": 126.50, "GOOGL": 176.80, "NVDA": 144.60, 
-                             "PFE": 28.50, "TSLA": 250.00, "EOG": 125.00,
+                             "PFE": 28.50, "TSLA": 313.17, "EOG": 125.00,
                              "MSFT": 430.00, "ADBE": 395.00, "PHM": 101.50, "CF": 99.90}.get(symbol, 100.0)
                 
                 prices = []

@@ -32,7 +32,7 @@ class SimpleAIMonitor:
         stocks = [
             {"symbol": "NVDA", "price": 155.02, "change": 2.5, "rsi": 65},
             {"symbol": "AMD", "price": 59.19, "change": -1.2, "rsi": 75},
-            {"symbol": "TSLA", "price": 296.50, "change": 3.8, "rsi": 70},
+            {"symbol": "TSLA", "price": 313.17, "change": -1.18, "rsi": 65},
             {"symbol": "AAPL", "price": 198.45, "change": 1.5, "rsi": 60},
             {"symbol": "MSFT", "price": 415.20, "change": -0.8, "rsi": 55}
         ]

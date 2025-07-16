@@ -271,7 +271,7 @@ def create_streamlit_ai_dashboard():
         with col2:
             st.metric("AMD", "$59.19", "-1.2%")
         with col3:
-            st.metric("TSLA", "$296.50", "+3.8%")
+            st.metric("TSLA", "$313.17", "-1.18%")
         
         # 手动AI分析按钮
         if st.button("🤖 手动AI分析", type="primary"):

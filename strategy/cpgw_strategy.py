@@ -52,8 +52,25 @@ class CPGWStrategy(Strategy):
         # Make a copy to avoid modifying the original DataFrame
         df = df.copy()
         
+        # 标准化列名，确保使用小写
+        column_mapping = {
+            'Close': 'close',
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Volume': 'volume'
+        }
+        
+        # 重命名列（如果存在）
+        for old_col, new_col in column_mapping.items():
+            if old_col in df.columns and new_col not in df.columns:
+                df[new_col] = df[old_col]
+        
+        # 确保使用小写列名
+        close_col = 'close' if 'close' in df.columns else 'Close'
+        
         # Calculate RSI
-        delta = df['Close'].diff()
+        delta = df[close_col].diff()
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
         
@@ -64,17 +81,17 @@ class CPGWStrategy(Strategy):
         df['rsi'] = 100 - (100 / (1 + rs))
         
         # Calculate moving averages
-        df['fast_ma'] = df['Close'].rolling(window=self.fast_ma).mean()
-        df['slow_ma'] = df['Close'].rolling(window=self.slow_ma).mean()
+        df['fast_ma'] = df[close_col].rolling(window=self.fast_ma).mean()
+        df['slow_ma'] = df[close_col].rolling(window=self.slow_ma).mean()
         
         # Calculate MA crossover
         df['ma_cross'] = np.where(df['fast_ma'] > df['slow_ma'], 1, -1)
         
         # Calculate price momentum
-        df['momentum'] = df['Close'].pct_change(periods=5)
+        df['momentum'] = df[close_col].pct_change(periods=5)
         
         # Calculate volatility
-        df['volatility'] = df['Close'].pct_change().rolling(window=20).std()
+        df['volatility'] = df[close_col].pct_change().rolling(window=20).std()
         
         return df
     
@@ -88,9 +105,12 @@ class CPGWStrategy(Strategy):
         
         # Generate base signals
         for i in range(1, len(df)):
+            # 确保使用正确的列名
+            close_col = 'close' if 'close' in df.columns else 'Close'
+            
             # 趋势判断
-            trend_up = df['Close'].iloc[i-1] > df['fast_ma'].iloc[i-1] > df['slow_ma'].iloc[i-1]
-            trend_down = df['Close'].iloc[i-1] < df['fast_ma'].iloc[i-1] < df['slow_ma'].iloc[i-1]
+            trend_up = df[close_col].iloc[i-1] > df['fast_ma'].iloc[i-1] > df['slow_ma'].iloc[i-1]
+            trend_down = df[close_col].iloc[i-1] < df['fast_ma'].iloc[i-1] < df['slow_ma'].iloc[i-1]
             
             # Buy signal conditions
             buy_condition1 = df['rsi'].iloc[i-1] < self.oversold  # RSI oversold

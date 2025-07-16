@@ -21,6 +21,7 @@ import schedule
 import time
 import logging
 import json
+import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -97,6 +98,15 @@ class PersonalInvestorAutomation:
             logger.info("✅ 动态权重系统初始化成功")
         except Exception as e:
             logger.warning(f"动态权重系统初始化失败: {e}")
+        
+        # 初始化AI策略优化集成系统（新增）
+        self.ai_optimization_integration = None
+        try:
+            from ai_strategy_optimization_integration import AIStrategyOptimizationIntegration
+            self.ai_optimization_integration = AIStrategyOptimizationIntegration()
+            logger.info("✅ AI策略优化集成系统初始化成功")
+        except Exception as e:
+            logger.warning(f"AI策略优化集成系统初始化失败: {e}")
         
         # 加载个人配置
         self._load_personal_config()
@@ -552,6 +562,18 @@ class PersonalInvestorAutomation:
                     strategy_scores[strategy_name] = 0.0
                     strategy_signals[strategy_name] = {'signal': 'error', 'score': 0.0}
             
+            # 使用AI策略优化集成系统的优化权重（如果可用）
+            if self.ai_optimization_integration:
+                try:
+                    optimized_weights = self.ai_optimization_integration.get_optimized_weights(symbol)
+                    if optimized_weights:
+                        logger.info(f"🎯 使用优化权重: {symbol} - {optimized_weights}")
+                        strategy_weights = optimized_weights
+                    else:
+                        logger.info(f"⚠️ 未找到 {symbol} 的优化权重，使用默认权重")
+                except Exception as e:
+                    logger.warning(f"获取优化权重失败: {e}")
+            
             # 计算加权策略分数
             total_weight = sum(strategy_weights.values())
             weighted_strategy_score = 0.0
@@ -595,10 +617,21 @@ class PersonalInvestorAutomation:
                                 # 使用动态权重重新计算加权分数
                                 weighted_strategy_score = (weighted_strategy_score * new_weights['strategy_weight'])
                                 
-                                # 获取表现摘要
-                                performance_summary = self.dynamic_weight_system.get_performance_summary(symbol)
-                                if 'error' not in performance_summary:
-                                    strategy_signals['performance_summary'] = performance_summary
+                                                        # 获取表现摘要
+                        performance_summary = self.dynamic_weight_system.get_performance_summary(symbol)
+                        if 'error' not in performance_summary:
+                            strategy_signals['performance_summary'] = performance_summary
+                        
+                        # 集成AI策略优化分析（新增）
+                        if self.ai_optimization_integration:
+                            try:
+                                integrated_result = self.ai_optimization_integration.integrate_with_ai_analysis(
+                                    symbol, ai_analysis
+                                )
+                                strategy_signals['ai_optimization_integration'] = integrated_result
+                                logger.info(f"🤖 AI优化集成完成: {symbol} - 最终信号: {integrated_result['final_signal']:.3f}")
+                            except Exception as e:
+                                logger.warning(f"AI优化集成失败: {e}")
                 except Exception as e:
                     logger.warning(f"动态权重系统处理失败: {e}")
             
@@ -624,7 +657,21 @@ class PersonalInvestorAutomation:
         Returns:
             信号分数 (0-1)
         """
-        signal = signal_data.get('signal', 'unknown').lower()
+        # 安全地获取信号值，处理不同类型的信号
+        signal_raw = signal_data.get('signal', 'unknown')
+        
+        # 如果信号是数值类型，转换为字符串
+        if isinstance(signal_raw, (int, float, np.integer, np.floating)):
+            if signal_raw > 0:
+                signal = 'buy'
+            elif signal_raw < 0:
+                signal = 'sell'
+            else:
+                signal = 'hold'
+        else:
+            # 如果是字符串，转换为小写
+            signal = str(signal_raw).lower()
+        
         strength = signal_data.get('strength', 0.0)
         confidence = signal_data.get('confidence', 0.0)
         
@@ -950,7 +997,21 @@ class PersonalInvestorAutomation:
         total_count = 0
         
         for strategy_name, signal_info in strategy_signals.items():
-            signal = signal_info.get('signal', 'unknown').lower()
+            # 安全地处理信号值，处理不同类型的信号
+            signal_raw = signal_info.get('signal', 'unknown')
+            
+            # 如果信号是数值类型，转换为字符串
+            if isinstance(signal_raw, (int, float, np.integer, np.floating)):
+                if signal_raw > 0:
+                    signal = 'buy'
+                elif signal_raw < 0:
+                    signal = 'sell'
+                else:
+                    signal = 'hold'
+            else:
+                # 如果是字符串，转换为小写
+                signal = str(signal_raw).lower()
+            
             if 'buy' in signal:
                 buy_count += 1
             elif 'hold' in signal:
@@ -1002,41 +1063,65 @@ class PersonalInvestorAutomation:
         
         return f"AI{ai_trend}{ai_weight:.1f} 策略{strategy_trend}{strategy_weight:.1f}"
     
-    def _get_enhanced_investment_advice(self, stock):
-        """获取增强版投资建议（Phase 2新功能）"""
+    def _get_enhanced_investment_advice(self, stock, thresholds=None):
+        """获取增强版投资建议（Phase 2新功能）
+        thresholds: 可选，dict，支持动态调整各项阈值
+        """
+        # 默认阈值
+        default_thresholds = {
+            'strong_buy': {'enhanced_score': 0.7, 'quality': 0.7, 'score': 65},
+            'buy':        {'enhanced_score': 0.6, 'quality': 0.6, 'score': 55},
+            'hold':       {'enhanced_score': 0.5, 'quality': 0.5, 'score': 50},
+            'watch':      {'enhanced_score': 0.3},
+        }
+        if thresholds is None:
+            thresholds = default_thresholds
+        else:
+            # 合并用户自定义阈值和默认阈值
+            for k, v in default_thresholds.items():
+                if k not in thresholds:
+                    thresholds[k] = v
+                else:
+                    for subk, subv in v.items():
+                        if subk not in thresholds[k]:
+                            thresholds[k][subk] = subv
+
         quality = stock['quality_factor']
         score = stock.get('multifactor_score', stock.get('enhanced_score', 0) * 100)
-        
-        # 获取增强分析信息
         enhanced_analysis = stock.get('enhanced_analysis', {})
         enhanced_score = enhanced_analysis.get('overall_score', 0)
         warnings = enhanced_analysis.get('warnings', [])
         recommendations = enhanced_analysis.get('recommendations', [])
-        
-        # 调试信息
+
         logger.debug(f"投资建议调试 - {stock.get('symbol', 'Unknown')}: "
                     f"enhanced_score={enhanced_score}, quality={quality}, score={score}")
-        
-        # 有高风险警告信息的情况（只过滤真正的高风险警告）
-        high_risk_warnings = [w for w in warnings if any(keyword in w.lower() 
-                            for keyword in ['high risk', '高风险', 'overvalued', '估值过高', '严重'])]
+
+        high_risk_warnings = [w for w in warnings if any(keyword in str(w).lower() 
+                                for keyword in ['high risk', '高风险', 'overvalued', '估值过高', '严重'])]
         if high_risk_warnings:
             return f"⚠️ 谨慎：{high_risk_warnings[0][:20]}..."
-        
-        # 基于增强评分的建议（降低阈值，使其更合理）
-        if enhanced_score > 0.7 and quality > 0.7 and score > 65:
+
+        # 参数化阈值判断
+        t = thresholds
+        if (enhanced_score > t['strong_buy']['enhanced_score'] and 
+            quality > t['strong_buy']['quality'] and 
+            score > t['strong_buy']['score']):
             advice = "🟢 强烈推荐"
             if recommendations:
                 advice += f"，{recommendations[0][:15]}..."
             return advice
-        elif enhanced_score > 0.6 and quality > 0.6 and score > 55:
+        elif (enhanced_score > t['buy']['enhanced_score'] and 
+              quality > t['buy']['quality'] and 
+              score > t['buy']['score']):
             advice = "🔵 推荐买入"
             if recommendations:
                 advice += f"，{recommendations[0][:15]}..."
             return advice
-        elif enhanced_score > 0.5 and quality > 0.5 and score > 50:
+        elif (enhanced_score > t['hold']['enhanced_score'] and 
+              quality > t['hold']['quality'] and 
+              score > t['hold']['score']):
             return "🟡 小仓位试仓"
-        elif enhanced_score > 0.3:
+        elif enhanced_score > t['watch']['enhanced_score']:
             return "🟠 观望为主"
         else:
             return "🔴 暂时回避"

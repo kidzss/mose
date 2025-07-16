@@ -211,22 +211,45 @@ class NiuniuStrategyV3(Strategy):
     
     def _calculate_adx_fallback(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
         """ADX fallback实现（简化版本）"""
-        high = df['high']
-        low = df['low']
-        close = df['close']
-        
-        # 计算True Range
-        tr1 = high - low
-        tr2 = abs(high - close.shift(1))
-        tr3 = abs(low - close.shift(1))
-        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-        
-        # 简化的ADX计算（基于价格范围的波动率）
-        atr = tr.rolling(window=period).mean()
-        price_range = (high - low).rolling(window=period).mean()
-        adx = (atr / price_range) * 100
-        
-        return adx.fillna(20)  # 默认值
+        try:
+            high = df['high']
+            low = df['low']
+            close = df['close']
+            
+            # 计算True Range
+            tr1 = high - low
+            tr2 = abs(high - close.shift(1))
+            tr3 = abs(low - close.shift(1))
+            tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+            
+            # 计算方向移动
+            up_move = high - high.shift(1)
+            down_move = low.shift(1) - low
+            
+            # 计算+DM和-DM
+            plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
+            minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
+            
+            # 计算平滑的TR、+DM、-DM
+            tr_smooth = tr.rolling(window=period).mean()
+            plus_dm_smooth = pd.Series(plus_dm, index=df.index).rolling(window=period).mean()
+            minus_dm_smooth = pd.Series(minus_dm, index=df.index).rolling(window=period).mean()
+            
+            # 计算+DI和-DI
+            plus_di = 100 * (plus_dm_smooth / tr_smooth)
+            minus_di = 100 * (minus_dm_smooth / tr_smooth)
+            
+            # 计算DX
+            dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+            
+            # 计算ADX
+            adx = dx.rolling(window=period).mean()
+            
+            return adx.fillna(25)  # 默认值25
+            
+        except Exception as e:
+            self.logger.warning(f"ADX计算失败，使用默认值: {e}")
+            return pd.Series(25.0, index=df.index)
     
     def _calculate_atr_fallback(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
         """ATR fallback实现"""
@@ -261,13 +284,37 @@ class NiuniuStrategyV3(Strategy):
             
             # 确保所有值都是数值类型
             components = {}
-            for col in ['fast_ma', 'slow_ma', 'RSI', 'volume_ratio', 'volatility', 'ADX']:
+            required_columns = ['fast_ma', 'slow_ma', 'RSI', 'volume_ratio', 'volatility', 'ADX']
+            
+            for col in required_columns:
                 if col in df.columns:
                     self.logger.info(f"处理列 {col}, 类型: {df[col].dtype}")
                     components[col] = pd.to_numeric(df[col], errors='coerce')
                     self.logger.info(f"转换后的类型: {components[col].dtype}")
                 else:
-                    self.logger.warning(f"列 {col} 不在数据中")
+                    self.logger.warning(f"列 {col} 不在数据中，尝试重新计算")
+                    # 如果缺少RSI列，尝试重新计算
+                    if col == 'RSI':
+                        try:
+                            df['RSI'] = self._calculate_rsi_fallback(df['close'], self.rsi_period)
+                            components[col] = pd.to_numeric(df[col], errors='coerce')
+                            self.logger.info(f"重新计算RSI成功")
+                        except Exception as e:
+                            self.logger.error(f"重新计算RSI失败: {e}")
+                            # 创建一个默认的RSI序列
+                            components[col] = pd.Series(50.0, index=df.index)
+                    else:
+                        # 为其他缺失的列创建默认值
+                        if col == 'fast_ma':
+                            components[col] = df['close'].rolling(window=self.fast_period).mean()
+                        elif col == 'slow_ma':
+                            components[col] = df['close'].rolling(window=self.slow_period).mean()
+                        elif col == 'volume_ratio':
+                            components[col] = pd.Series(1.0, index=df.index)
+                        elif col == 'volatility':
+                            components[col] = df['close'].pct_change().rolling(window=20).std()
+                        elif col == 'ADX':
+                            components[col] = pd.Series(25.0, index=df.index)
             
             self.logger.info("信号组件提取完成")
             return components
@@ -276,7 +323,11 @@ class NiuniuStrategyV3(Strategy):
             self.logger.error(f"提取信号组件时出错: {str(e)}")
             self.logger.error(f"错误类型: {type(e)}")
             self.logger.error(f"错误详情: {e.__dict__ if hasattr(e, '__dict__') else 'No __dict__'}")
-            raise
+            # 返回默认组件而不是抛出异常
+            default_components = {}
+            for col in ['fast_ma', 'slow_ma', 'RSI', 'volume_ratio', 'volatility', 'ADX']:
+                default_components[col] = pd.Series(0.0, index=data.index if not data.empty else pd.DatetimeIndex([]))
+            return default_components
 
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
         """
@@ -289,33 +340,41 @@ class NiuniuStrategyV3(Strategy):
             添加了信号列的DataFrame
         """
         try:
+            # 计算技术指标
+            df = self.calculate_indicators(data)
+            
             # 确保数据包含必要的列
             required_columns = ['RSI', 'fast_ma', 'slow_ma', 'ADX']
             for col in required_columns:
-                if col not in data.columns:
+                if col not in df.columns:
                     self.logger.warning(f"数据中缺少 {col} 列")
-                    return data
+                    # 创建一个包含signal列的DataFrame
+                    df['signal'] = 0
+                    return df
                     
             # 初始化信号列
-            data['signal'] = 0
+            df['signal'] = 0
             
             # 获取当前指标值
-            current_rsi = float(data['RSI'].iloc[-1])
-            current_fast_ma = float(data['fast_ma'].iloc[-1])
-            current_slow_ma = float(data['slow_ma'].iloc[-1])
-            current_adx = float(data['ADX'].iloc[-1])
+            current_rsi = float(df['RSI'].iloc[-1])
+            current_fast_ma = float(df['fast_ma'].iloc[-1])
+            current_slow_ma = float(df['slow_ma'].iloc[-1])
+            current_adx = float(df['ADX'].iloc[-1])
             
             # 生成信号
             if current_rsi < self.rsi_oversold and current_fast_ma > current_slow_ma and current_adx > self.adx_threshold:
-                data['signal'].iloc[-1] = 1
+                df.loc[df.index[-1], 'signal'] = 1
             elif current_rsi > self.rsi_overbought and current_fast_ma < current_slow_ma and current_adx > self.adx_threshold:
-                data['signal'].iloc[-1] = -1
+                df.loc[df.index[-1], 'signal'] = -1
                 
-            return data
+            return df
             
         except Exception as e:
             self.logger.error(f"生成信号时出错: {str(e)}")
-            return data
+            # 确保返回包含signal列的DataFrame
+            df = data.copy()
+            df['signal'] = 0
+            return df
 
     def get_signal_metadata(self) -> Dict[str, Dict[str, Any]]:
         """

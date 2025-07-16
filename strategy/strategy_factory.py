@@ -11,6 +11,7 @@ from .tdi_strategy import TDIStrategy
 from .niuniu_strategy_v3 import NiuniuStrategyV3
 from .combined_strategy import CombinedStrategy
 from .cpgw_strategy import CPGWStrategy
+from .market_forecast_strategy import MarketForecastStrategy
 
 # 配置日志
 logging.basicConfig(
@@ -33,6 +34,7 @@ class StrategyFactory:
         self.register_strategy("TDI", TDIStrategy)
         self.register_strategy("NiuniuV3", NiuniuStrategyV3)
         self.register_strategy("CPGW", CPGWStrategy)
+        self.register_strategy("MarketForecast", MarketForecastStrategy)
         self.register_strategy("Combined", CombinedStrategy)
         logger.info(f"✅ 注册了 {len(self.strategies)} 个核心策略")
 
@@ -63,11 +65,13 @@ class StrategyFactory:
             'tdi': TDIStrategy,
             'niuniu_v3': NiuniuStrategyV3,
             'cpgw': CPGWStrategy,
+            'market_forecast': MarketForecastStrategy,
             'combined': CombinedStrategy,
             # 兼容性别名
             'TDI': TDIStrategy,
             'NiuniuV3': NiuniuStrategyV3,
             'CPGW': CPGWStrategy,
+            'MarketForecast': MarketForecastStrategy,
             'Combined': CombinedStrategy
         }
         
@@ -150,7 +154,7 @@ class StrategyFactory:
 
     def get_core_strategies(self) -> List[str]:
         """获取核心策略列表"""
-        return ['TDI', 'NiuniuV3', 'CPGW']
+        return ['TDI', 'NiuniuV3', 'CPGW', 'MarketForecast']
 
     def create_combined_strategy(self, weights: Optional[Dict[str, float]] = None) -> CombinedStrategy:
         """

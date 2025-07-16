@@ -47,22 +47,41 @@ class TDIStrategy(Strategy):
         """
         df = data.copy()
         
+        # 标准化列名，确保使用小写
+        column_mapping = {
+            'Close': 'close',
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Volume': 'volume'
+        }
+        
+        # 重命名列（如果存在）
+        for old_col, new_col in column_mapping.items():
+            if old_col in df.columns and new_col not in df.columns:
+                df[new_col] = df[old_col]
+        
+        # 确保使用小写列名
+        close_col = 'close' if 'close' in df.columns else 'Close'
+        high_col = 'high' if 'high' in df.columns else 'High'
+        low_col = 'low' if 'low' in df.columns else 'Low'
+        
         # 计算移动平均线
-        df['MA5'] = df['close'].rolling(window=5).mean()    # 短期
-        df['MA20'] = df['close'].rolling(window=20).mean()  # 中期
-        df['MA50'] = df['close'].rolling(window=50).mean()  # 长期
+        df['MA5'] = df[close_col].rolling(window=5).mean()    # 短期
+        df['MA20'] = df[close_col].rolling(window=20).mean()  # 中期
+        df['MA50'] = df[close_col].rolling(window=50).mean()  # 长期
         
         # 计算RSI
-        delta = df['close'].diff()
+        delta = df[close_col].diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
         rs = gain / loss
         df['RSI'] = 100 - (100 / (1 + rs))
         
         # 计算ATR
-        high_low = df['high'] - df['low']
-        high_close = np.abs(df['high'] - df['close'].shift())
-        low_close = np.abs(df['low'] - df['close'].shift())
+        high_low = df[high_col] - df[low_col]
+        high_close = np.abs(df[high_col] - df[close_col].shift())
+        low_close = np.abs(df[low_col] - df[close_col].shift())
         ranges = pd.concat([high_low, high_close, low_close], axis=1)
         true_range = np.max(ranges, axis=1)
         df['ATR'] = true_range.rolling(window=self.adaptive_params['atr_period']).mean()
@@ -86,36 +105,39 @@ class TDIStrategy(Strategy):
         data['signal'] = 0
         data['signal_type'] = ''  # 新增信号类型列
         
+        # 确保使用正确的列名
+        close_col = 'close' if 'close' in data.columns else 'Close'
+        
         # 短期信号 (5日均线)
         short_term_buy = (
-            (data['close'] > data['MA5']) &
+            (data[close_col] > data['MA5']) &
             (data['RSI'] < 30)
         )
         short_term_sell = (
-            (data['close'] < data['MA5']) &
+            (data[close_col] < data['MA5']) &
             (data['RSI'] > 70)
         )
         
         # 中期信号 (20日均线)
         medium_term_buy = (
-            (data['close'] > data['MA20']) &
+            (data[close_col] > data['MA20']) &
             (data['MA20'] > data['MA50']) &
             (data['RSI'] < 35)
         )
         medium_term_sell = (
-            (data['close'] < data['MA20']) &
+            (data[close_col] < data['MA20']) &
             (data['MA20'] < data['MA50']) &
             (data['RSI'] > 65)
         )
         
         # 长期信号 (50日均线)
         long_term_buy = (
-            (data['close'] > data['MA50']) &
+            (data[close_col] > data['MA50']) &
             (data['MA50'].diff() > 0) &
             (data['RSI'] < 40)
         )
         long_term_sell = (
-            (data['close'] < data['MA50']) &
+            (data[close_col] < data['MA50']) &
             (data['MA50'].diff() < 0) &
             (data['RSI'] > 60)
         )
@@ -153,10 +175,11 @@ class TDIStrategy(Strategy):
                 }
                 
                 confidence = self._calculate_signal_confidence(latest_data)
+                close_col = 'close' if 'close' in latest_data.index else 'Close'
                 self.notification_manager.send_trading_signal(
                     stock=self.symbol,
                     signal_type=action,
-                    price=latest_data['close'],
+                    price=latest_data[close_col],
                     indicators=indicators,
                     confidence=confidence,
                     time_frame=time_frame
@@ -199,32 +222,35 @@ class TDIStrategy(Strategy):
             rsi_confidence = (data['RSI'] - 70) / 30
         confidence += rsi_confidence * rsi_weight
         
+        # 确保使用正确的列名
+        close_col = 'close' if 'close' in data.index else 'Close'
+        
         # 均线权重
         if time_frame == 'short':
             if data['signal'] > 0:  # 买入信号
-                ma_confidence = (data['close'] - data['MA5']) / data['MA5']
+                ma_confidence = (data[close_col] - data['MA5']) / data['MA5']
             else:  # 卖出信号
-                ma_confidence = (data['MA5'] - data['close']) / data['close']
+                ma_confidence = (data['MA5'] - data[close_col]) / data[close_col]
         elif time_frame == 'medium':
             if data['signal'] > 0:  # 买入信号
                 ma_confidence = (
-                    (data['close'] - data['MA20']) / data['MA20'] +
+                    (data[close_col] - data['MA20']) / data['MA20'] +
                     (data['MA20'] - data['MA50']) / data['MA50']
                 ) / 2
             else:  # 卖出信号
                 ma_confidence = (
-                    (data['MA20'] - data['close']) / data['close'] +
+                    (data['MA20'] - data[close_col]) / data[close_col] +
                     (data['MA50'] - data['MA20']) / data['MA20']
                 ) / 2
         else:  # long
             if data['signal'] > 0:  # 买入信号
-                ma_confidence = (data['close'] - data['MA50']) / data['MA50']
+                ma_confidence = (data[close_col] - data['MA50']) / data['MA50']
             else:  # 卖出信号
-                ma_confidence = (data['MA50'] - data['close']) / data['close']
+                ma_confidence = (data['MA50'] - data[close_col]) / data[close_col]
         confidence += ma_confidence * ma_weight
         
         # ATR权重
-        atr_confidence = min(data['ATR'] / data['close'], 1.0)
+        atr_confidence = min(data['ATR'] / data[close_col], 1.0)
         confidence += atr_confidence * atr_weight
         
         return min(max(confidence, 0.0), 1.0)

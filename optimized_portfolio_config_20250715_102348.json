@@ -1,0 +1,154 @@
+{
+  "portfolio_name": "Intelligent Optimized Portfolio",
+  "creation_date": "2025-07-15T10:23:48.761509",
+  "optimization_version": "1.0",
+  "target_return": 0.15,
+  "max_risk": 0.2,
+  "rebalance_frequency": 30,
+  "stocks": {
+    "NVDA": {
+      "symbol": "NVDA",
+      "strategy_weights": {
+        "TDI": 0.33369381103810264,
+        "NiuniuV3": 0.2532566096281807,
+        "CPGW": 0.15963427089164153,
+        "MarketForecast": 0.08457756868995465,
+        "Combined": 0.1688377397521205
+      },
+      "expected_performance": {
+        "total_return": -0.031954250956535195,
+        "annual_return": -0.023336436005460467,
+        "sharpe_ratio": -0.19301545722081123,
+        "max_drawdown": -0.1485076963717586,
+        "volatility": 0.12283838001762852,
+        "win_rate": 0.060916495986555366,
+        "excess_return": -2.414957396027951
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.03514923036282414,
+      "stop_loss": -0.11880615709740688,
+      "take_profit": -0.02556340076522816
+    },
+    "AMD": {
+      "symbol": "AMD",
+      "strategy_weights": {
+        "TDI": 0.3450647308006928,
+        "NiuniuV3": 0.24797296682187045,
+        "CPGW": 0.15857111848477098,
+        "MarketForecast": 0.08307587267808555,
+        "Combined": 0.16531531121458032
+      },
+      "expected_performance": {
+        "total_return": 0.016226073193486096,
+        "annual_return": 0.012532735270748661,
+        "sharpe_ratio": -0.6604461516554818,
+        "max_drawdown": -0.10207152648188501,
+        "volatility": 0.11845549328719615,
+        "win_rate": 0.0684055790195628,
+        "excess_return": 0.017452788207914908
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.0397928473518115,
+      "stop_loss": -0.08165722118550801,
+      "take_profit": 0.012980858554788878
+    },
+    "GOOG": {
+      "symbol": "GOOG",
+      "strategy_weights": {
+        "TDI": 0.3812658516084691,
+        "NiuniuV3": 0.23479327794504856,
+        "CPGW": 0.14936581413534866,
+        "MarketForecast": 0.07804620434776789,
+        "Combined": 0.15652885196336572
+      },
+      "expected_performance": {
+        "total_return": 0.008471544298026006,
+        "annual_return": 0.0070687150174202195,
+        "sharpe_ratio": 0.18898343791542405,
+        "max_drawdown": -0.0804374666040881,
+        "volatility": 0.055900822350586965,
+        "win_rate": 0.05233585864195945,
+        "excess_return": -0.27209625043587643
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.04195625333959119,
+      "stop_loss": -0.06434997328327048,
+      "take_profit": 0.006777235438420805
+    },
+    "TSLA": {
+      "symbol": "TSLA",
+      "strategy_weights": {
+        "TDI": 0.34498685301277554,
+        "NiuniuV3": 0.24217685816243806,
+        "CPGW": 0.15400712341605,
+        "MarketForecast": 0.09737792663377774,
+        "Combined": 0.1614512387749587
+      },
+      "expected_performance": {
+        "total_return": 0.022169503870583807,
+        "annual_return": 0.015298985835245658,
+        "sharpe_ratio": 0.09861076490808765,
+        "max_drawdown": -0.09611886333316642,
+        "volatility": 0.1453293990136467,
+        "win_rate": 0.06115996580786643,
+        "excess_return": -0.16887794425632152
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.04038811366668336,
+      "stop_loss": -0.07689509066653315,
+      "take_profit": 0.017735603096467045
+    },
+    "MRK": {
+      "symbol": "MRK",
+      "strategy_weights": {
+        "TDI": 0.37234337723697,
+        "NiuniuV3": 0.23506239687791636,
+        "CPGW": 0.15738453127771063,
+        "MarketForecast": 0.07850143002212538,
+        "Combined": 0.1567082645852776
+      },
+      "expected_performance": {
+        "total_return": 0.06719445013183943,
+        "annual_return": 0.049501268333818155,
+        "sharpe_ratio": 0.357058947445696,
+        "max_drawdown": -0.03769966502822632,
+        "volatility": 0.06005658030314575,
+        "win_rate": 0.07077954512391446,
+        "excess_return": 0.2935614410177073
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.06602738840352569,
+      "stop_loss": -0.030159732022581057,
+      "take_profit": 0.05375556010547155
+    },
+    "BRK-B": {
+      "symbol": "BRK-B",
+      "strategy_weights": {
+        "TDI": 0.33947647098176614,
+        "NiuniuV3": 0.2493286084511019,
+        "CPGW": 0.16171007471520082,
+        "MarketForecast": 0.08326577355119655,
+        "Combined": 0.16621907230073463
+      },
+      "expected_performance": {
+        "total_return": -0.00614230141690365,
+        "annual_return": -0.003900848038119112,
+        "sharpe_ratio": -0.28842693727194924,
+        "max_drawdown": -0.043537713816681714,
+        "volatility": 0.036068971877950426,
+        "win_rate": 0.058701572608245545,
+        "excess_return": -0.3274191732160435
+      },
+      "market_condition": "ranging",
+      "risk_level": "high",
+      "position_size": 0.045646228618331834,
+      "stop_loss": -0.03483017105334537,
+      "take_profit": -0.0049138411335229205
+    }
+  }
+}
